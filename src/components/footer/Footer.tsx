@@ -5,7 +5,7 @@ import { HomeIcon, SearchIcon, WriteIcon } from '~/shared/custom-icons';
 import { ShadowIcon } from '../shadow-icon/ShadowIcon';
 
 export const Footer = () => (
-    <Box as='footer' bgColor='limeAlpha.50' py={1} data-test-id='footer'>
+    <Box as='footer' bgColor='lime.50' py={1} data-test-id='footer'>
         <UnorderedList
             listStyleType='none'
             display='grid'

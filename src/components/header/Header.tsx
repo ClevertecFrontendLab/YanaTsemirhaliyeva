@@ -20,7 +20,7 @@ export const Header = () => {
     return (
         <Box
             as='header'
-            bgColor='limeAlpha.50'
+            bgColor='lime.50'
             pos='fixed'
             top='0'
             left='0'

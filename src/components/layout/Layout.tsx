@@ -52,7 +52,6 @@ export const Layout = ({ children }: LayoutProps) => {
                     pos='fixed'
                     left='0'
                     pt='106px'
-                    bgColor='pink.50'
                 >
                     <AccordionMenu />
                     <FooterAside />
@@ -60,7 +59,6 @@ export const Layout = ({ children }: LayoutProps) => {
             </Hide>
             <Box
                 as='main'
-                // flexGrow='1'
                 pt={{ base: '82px', sm: '108px' }}
                 ml={{ base: '0', md: '256px' }}
                 mr={{ base: 0, md: '208px' }}
@@ -69,7 +67,7 @@ export const Layout = ({ children }: LayoutProps) => {
                 {children}
             </Box>
             <Hide breakpoint='(max-width: 1200px)'>
-                <Box w='208px' h='100vh' pos='fixed' right='0' pt='72px' bgColor='pink.50'>
+                <Box w='208px' h='100vh' pos='fixed' right='0' pt='72px'>
                     <UserNav />
                 </Box>
             </Hide>
