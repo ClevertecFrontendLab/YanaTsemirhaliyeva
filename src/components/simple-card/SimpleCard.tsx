@@ -63,7 +63,7 @@ export const SimpleCard = ({ item }: SimpleCardProps) => {
                 </Stack>
             </CardBody>
             <CardFooter pt={1} pb={{ base: 3, xl: 6 }} pl={{ base: 3, sm: 6, md: 4 }}>
-                <Tag size='md' variant='subtle' backgroundColor='lime.150' gap={{ base: 1, xl: 3 }}>
+                <Tag size='md' variant='subtle' backgroundColor='lime.50' gap={{ base: 1, xl: 3 }}>
                     <Image boxSize={4} src={tag.icon} />
                     <TagLabel>{tag.name}</TagLabel>
                 </Tag>

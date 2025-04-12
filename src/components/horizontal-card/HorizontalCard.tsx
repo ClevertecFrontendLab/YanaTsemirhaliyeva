@@ -82,7 +82,7 @@ export const HorizontalCard = ({ item }: HorizontalCardProps) => {
                         <Avatar
                             src={recomendation.avatar}
                             boxSize={4}
-                            name='Segun Adebayo'
+                            name={recomendation.name}
                             ml={-1}
                             mr={2}
                         />
@@ -100,7 +100,7 @@ export const HorizontalCard = ({ item }: HorizontalCardProps) => {
                     <Tag
                         size={{ base: 'sm', sm: 'md' }}
                         variant='subtle'
-                        backgroundColor='lime.150'
+                        backgroundColor='lime.50'
                         gap={{ base: '2p1', sm: 2 }}
                         pos={{ base: 'absolute', sm: 'static' }}
                         top='7px'

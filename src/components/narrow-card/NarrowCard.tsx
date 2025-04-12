@@ -42,6 +42,7 @@ export const NarrowCard = ({ title, icon }: NarrowCardProps) => (
                 fontSize={{ base: 12, xl: 14 }}
                 fontWeight={{ base: 400, lg: 600 }}
                 minW='70px'
+                ml={2}
                 sx={{
                     transition: 'all 0.3s ease-in-out',
                     paddingInline: { base: '0px', sm: '8px' },

@@ -72,7 +72,15 @@ export const Layout = ({ children }: LayoutProps) => {
                 </Box>
             </Hide>
             <Show below='md'>
-                <Box pos='fixed' left='0' bottom='0' w='100%' minW='360px' zIndex='2'>
+                <Box
+                    pos='fixed'
+                    left='0'
+                    bottom='0'
+                    w='100%'
+                    minW='360px'
+                    zIndex='2'
+                    data-test-id='footer'
+                >
                     <Footer />
                 </Box>
             </Show>

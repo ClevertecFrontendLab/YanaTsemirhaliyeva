@@ -14,6 +14,7 @@ export const ShadowIcon = ({ route = '#', title, icon, fontSize = '12px' }: Shad
         as={RouterLink}
         to={route}
         position='relative'
+        z-index={3}
         _hover={{
             textDecoration: 'none',
             color: 'black',
@@ -33,13 +34,13 @@ export const ShadowIcon = ({ route = '#', title, icon, fontSize = '12px' }: Shad
                 '&::after': {
                     content: '""',
                     position: 'absolute',
-                    top: '-20px',
+                    top: '-5px',
                     left: '-20px',
                     right: '-20px',
-                    bottom: '-20px',
+                    bottom: '-5px',
                     borderRadius: '50%',
                     background:
-                        'radial-gradient(circle, rgba(196, 255, 97, 0.7) 0%, rgba(255, 255, 255, 0) 100%)', // Радиальный градиент
+                        'radial-gradient(circle, rgba(196, 255, 97, 0.4) 0%, rgba(255, 255, 255, 0) 100%)', // Радиальный градиент
                     zIndex: -1,
                 },
             },
@@ -47,6 +48,8 @@ export const ShadowIcon = ({ route = '#', title, icon, fontSize = '12px' }: Shad
     >
         <VStack gap={0}>
             <Flex
+                pos='relative'
+                zIndex={2}
                 className='icon-container'
                 boxSize='48px'
                 alignItems='center'

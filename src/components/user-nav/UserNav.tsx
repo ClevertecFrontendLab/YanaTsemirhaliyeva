@@ -1,4 +1,4 @@
-import { Box, Flex, List, ListItem, Show } from '@chakra-ui/react';
+import { Box, Flex, List, ListItem, Show, Text, VStack } from '@chakra-ui/react';
 
 import {
     BookmarkIcon,
@@ -7,8 +7,6 @@ import {
     PeopleIcon,
     WriteDownRecipeIcon,
 } from '~/shared/custom-icons';
-
-import { ShadowIcon } from '../shadow-icon/ShadowIcon';
 
 export const UserNav = () => (
     <Box
@@ -74,19 +72,54 @@ export const UserNav = () => (
             </Flex>
         </Show>
         <Show above='md'>
-            <Flex
+            <VStack
+                gap={3}
                 boxSize='208px'
                 alignItems='center'
                 justifyContent='center'
                 color='blackAlpha.700'
                 pl={{ xl: 8 }}
+                as='button'
+                _hover={{ borderColor: 'transparent' }}
+                _focus={{ outline: 'none' }}
+                sx={{
+                    textDecoration: 'none',
+                    color: 'black',
+                    '& .icon-container': {
+                        position: 'relative',
+                        '&::before': {
+                            content: '""',
+                            position: 'absolute',
+                            top: '0',
+                            left: '0',
+                            right: '0',
+                            bottom: '0',
+                            borderRadius: '50%',
+                            boxShadow: '0 0 40px 10px rgba(196, 255, 97, 0.6)',
+                            zIndex: -1,
+                        },
+                        '&::after': {
+                            content: '""',
+                            position: 'absolute',
+                            top: '-20px',
+                            left: '-40px',
+                            right: '-40px',
+                            bottom: '-40px',
+                            borderRadius: '50%',
+                            background:
+                                'radial-gradient(circle, rgba(196, 255, 97, 0.3) 0%, rgba(255, 255, 255, 0) 100%)', // Радиальный градиент
+                            zIndex: -1,
+                        },
+                    },
+                }}
             >
-                <ShadowIcon
-                    route='#'
-                    title='Записать рецепт'
-                    icon={<WriteDownRecipeIcon boxSize='48px' />}
-                />
-            </Flex>
+                <Flex className='icon-container'>
+                    <WriteDownRecipeIcon boxSize='48px' />
+                </Flex>
+                <Text fontSize={12} color='blackAlpha.700'>
+                    Записать рецепт
+                </Text>
+            </VStack>
         </Show>
     </Box>
 );
