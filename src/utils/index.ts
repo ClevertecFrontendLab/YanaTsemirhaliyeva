@@ -34,7 +34,7 @@ export const filterRecipes = (state: RecipeState) => {
             .replace(/[^a-zа-яё\s]/g, '')
             .split(/\s+/);
 
-    // Нормализуем аллергены, извлекая первые три буквы каждого слова
+    //checks tests
     const normalizedAllergens = activeAllergens.flatMap((allergen) =>
         extractKeywords(allergen).map((word) => word.slice(0, 3)),
     );
