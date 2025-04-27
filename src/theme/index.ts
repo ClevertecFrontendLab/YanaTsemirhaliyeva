@@ -6,7 +6,8 @@ const breakpoints = {
     '2xl': '1920px',
     xl: '1536px',
     lg: '1440px',
-    md: '1200px',
+    '2md': '1360px',
+    md: '1200.9px',
     sm: '960px',
     xs: '768px',
     '2xs': '620px',
@@ -23,6 +24,17 @@ const theme = extendTheme({
     config,
     colors,
     breakpoints,
+    components: {
+        Switch: {
+            baseStyle: {
+                track: {
+                    _checked: {
+                        bg: 'lime.400',
+                    },
+                },
+            },
+        },
+    },
 });
 
 export default theme;

@@ -1,3 +1,19 @@
+import {
+    ChildFoodIcon,
+    DesertsFoodIcon,
+    DrinksFoodIcon,
+    FirstFoodIcon,
+    GrillFoodIcon,
+    HelathyFoodIcon,
+    NationalFoodIcon,
+    PrepFoodIcon,
+    SaladsFoodIcon,
+    SecondFoodIcon,
+    SnacksFoodIcon,
+    SouseFoodIcon,
+    VeganFoodIcon,
+} from '~/shared/custom-icons';
+
 export enum AppRoutes {
     'juiciest-collection' = 'Самое сочное',
     'vegan-cuisine' = 'Веганская кухня',
@@ -5,11 +21,11 @@ export enum AppRoutes {
 
 export const LIST_MENU = {
     Салаты: {
-        icon: './svg/dish-salads.svg',
+        icon: SaladsFoodIcon,
         subcategories: ['Мясные салаты', 'Рыбные салаты', 'Овощные салаты', 'Теплые салаты'],
     },
     Закуски: {
-        icon: './svg/dish-snacks.svg',
+        icon: SnacksFoodIcon,
         subcategories: [
             'Мясные закуски',
             'Рыбные закуски',
@@ -20,7 +36,7 @@ export const LIST_MENU = {
         ],
     },
     'Первые блюда': {
-        icon: './svg/dish-first.svg',
+        icon: FirstFoodIcon,
         subcategories: [
             'Мясные супы',
             'Овощные супы',
@@ -30,7 +46,7 @@ export const LIST_MENU = {
         ],
     },
     'Вторые блюда': {
-        icon: './svg/dish-second.svg',
+        icon: SecondFoodIcon,
         subcategories: [
             'Мясные',
             'Рыбные',
@@ -47,7 +63,7 @@ export const LIST_MENU = {
         ],
     },
     'Десерты, выпечка': {
-        icon: './svg/dish-deserts.svg',
+        icon: DesertsFoodIcon,
         subcategories: [
             'Блины и оладьи',
             'Пироги и пончики',
@@ -65,11 +81,11 @@ export const LIST_MENU = {
         ],
     },
     'Блюда на гриле': {
-        icon: './svg/dish-grill.svg',
+        icon: GrillFoodIcon,
         subcategories: ['Говядина', 'Свинина', 'Птица', 'Рыба', 'Грибы', 'Овощи'],
     },
     'Веганская кухня': {
-        icon: './svg/dish-vegan.svg',
+        icon: VeganFoodIcon,
         subcategories: [
             'Закуски',
             'Первые блюда',
@@ -82,7 +98,7 @@ export const LIST_MENU = {
         ],
     },
     'Детские блюда': {
-        icon: './svg/dish-child.svg',
+        icon: ChildFoodIcon,
         subcategories: [
             'Первые блюда',
             'Вторые блюда',
@@ -95,7 +111,7 @@ export const LIST_MENU = {
         ],
     },
     'Лечебное питание': {
-        icon: './svg/dish-nutrition.svg',
+        icon: HelathyFoodIcon,
         subcategories: [
             'Детская диета',
             'Диета №1',
@@ -116,7 +132,7 @@ export const LIST_MENU = {
         ],
     },
     Национальные: {
-        icon: './svg/dish-national.svg',
+        icon: NationalFoodIcon,
         subcategories: [
             'Американская кухня',
             'Армянская кухня',
@@ -136,11 +152,11 @@ export const LIST_MENU = {
         ],
     },
     Соусы: {
-        icon: './svg/dish-souse.svg',
+        icon: SouseFoodIcon,
         subcategories: ['Соусы мясные', 'Соусы сырные', 'Маринады'],
     },
     Напитки: {
-        icon: './svg/dish-drinks.svg',
+        icon: DrinksFoodIcon,
         subcategories: [
             'Соки и фреши',
             'Смузи',
@@ -154,7 +170,7 @@ export const LIST_MENU = {
         ],
     },
     Заготовки: {
-        icon: './svg/dish-prep.svg',
+        icon: PrepFoodIcon,
         subcategories: [
             'Мясные заготовки',
             'Рыбные заготовки',

@@ -11,14 +11,16 @@ import { VEGAN_HEADINGS, VEGAN_HIGHLIGHTS } from './mocks';
 export const Home = () => (
     <Box pl={{ base: '16px', xs: '20px', sm: '28px' }} pr={{ xs: '20px', sm: '54px', md: '70px' }}>
         <Box
-            m={{ base: '0 auto 30px', xs: '0 auto 36px', sm: '0 auto 56px', lg: '0 auto 52px' }}
+            m={{ base: '0 auto', xs: '0 auto 4px', sm: '0 auto 24px', lg: '0 auto 20px' }}
             maxW={{ base: '500px', sm: '700px' }}
             pr={{ base: 4, '2xs': 0 }}
         >
             <Intro title='Приятного аппетита!' />
         </Box>
-        <VStack gap={{ base: '34px', sm: 10, md: 9 }}>
-            <NewRecipes />
+        <VStack gap={{ base: '34px', sm: 10, md: 9 }} alignItems='stretch'>
+            <Box px={3}>
+                <NewRecipes />
+            </Box>
             <Box pr={{ base: '16px', xs: '0' }}>
                 <JuiciestList />
             </Box>

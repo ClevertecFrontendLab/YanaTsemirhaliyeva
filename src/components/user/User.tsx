@@ -1,8 +1,8 @@
 import { Avatar, Flex, Text } from '@chakra-ui/react';
 
 export const User = () => (
-    <Flex gap='12px'>
-        <Avatar size='md' name='user name' src='./img/avatar.jpg' />
+    <Flex gap={3}>
+        <Avatar size='md' name='user name' src='/img/avatar.jpg' />
         <Flex flexDirection='column'>
             <Text fontSize='18px' lineHeight='28px' fontWeight='600'>
                 Екатерина Константинопольская

@@ -6,6 +6,7 @@ import {
     CardBody,
     CardFooter,
     CardHeader,
+    Flex,
     Heading,
     HStack,
     Image,
@@ -17,20 +18,24 @@ import {
     Text,
     useBreakpointValue,
 } from '@chakra-ui/react';
+import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router';
 
+import { CategoriesData, getCategoryContent } from '~/consts/category-icons';
 import { BookmarkIcon } from '~/shared/custom-icons';
+import { serchInputSelector } from '~/store/slices/recipes-slice';
+import { highlightText } from '~/utils';
 
 type HorizontalCard = {
+    id: string;
     title: string;
-    desc: string;
-    img: string;
-    tag: {
-        icon: string;
-        name: string;
-    };
-    bookmark?: number;
+    description: string;
+    image: string;
+    category: string[];
+    subcategory: string[];
+    bookmarks?: number;
     likes?: number;
-    recomendation?: {
+    recommendation?: {
         avatar: string;
         name: string;
     };
@@ -38,14 +43,36 @@ type HorizontalCard = {
 
 type HorizontalCardProps = {
     item: HorizontalCard;
+    index: number;
 };
 
-export const HorizontalCard = ({ item }: HorizontalCardProps) => {
-    const { title, desc, img, tag, bookmark, likes, recomendation } = item;
+export const HorizontalCard = ({ item, index }: HorizontalCardProps) => {
+    const {
+        id,
+        title,
+        description,
+        image,
+        category,
+        subcategory,
+        bookmarks,
+        likes,
+        recommendation,
+    } = item;
+    const searchInputCurrent = useSelector(serchInputSelector);
     const isTruncated = useBreakpointValue({ base: false, sm: true });
+    const navigate = useNavigate();
+
+    const handleCardClick = () => {
+        if (category && subcategory) {
+            navigate(`/${category[0]}/${subcategory[0]}/${id}`);
+        }
+    };
+
+    const highlightedTitle = highlightText(title, searchInputCurrent);
 
     return (
         <Card
+            data-test-id={`food-card-${index}`}
             direction='row'
             overflow='hidden'
             variant='outline'
@@ -63,12 +90,12 @@ export const HorizontalCard = ({ item }: HorizontalCardProps) => {
             <Image
                 objectFit='cover'
                 width={{ base: '48%', xs: '44.5%', sm: '39.5%', xl: '52%' }}
-                src={img}
+                src={image}
                 alt={title}
                 pos='relative'
                 overflow='hidden'
             />
-            {recomendation && isTruncated && (
+            {recommendation && isTruncated && (
                 <Box pos='absolute' left={6} bottom={5} maxW='calc(50% - 20px)' overflow='hidden'>
                     <Tag
                         size='md'
@@ -80,37 +107,53 @@ export const HorizontalCard = ({ item }: HorizontalCardProps) => {
                         textOverflow='ellipsis'
                     >
                         <Avatar
-                            src={recomendation.avatar}
+                            src={recommendation.avatar}
                             boxSize={4}
-                            name={recomendation.name}
+                            name={recommendation.name}
                             ml={-1}
                             mr={2}
                         />
                         <TagLabel isTruncated fontSize={14} lineHeight={7}>
-                            {recomendation.name} рекомендует
+                            {recommendation.name} рекомендует
                         </TagLabel>
                     </Tag>
                 </Box>
             )}
             <Stack
-                width={{ base: '52', xs: '55.5%', sm: '60.5%', xl: '48%' }}
+                width={{ base: '52%', xs: '55.5%', sm: '60.5%', xl: '48%' }}
                 gap={{ base: '1px', sm: 2 }}
             >
                 <CardHeader display='flex' p={{ base: 3, sm: 5 }} pb={{ base: 1, lg: 2 }}>
-                    <Tag
-                        size={{ base: 'sm', sm: 'md' }}
-                        variant='subtle'
-                        backgroundColor='lime.50'
-                        gap={{ base: '2p1', sm: 2 }}
+                    <Flex
+                        flexWrap='wrap'
+                        gap={2}
+                        maxW={{ base: '30%', sm: '60%' }}
                         pos={{ base: 'absolute', sm: 'static' }}
-                        top='7px'
-                        left='8px'
-                        borderRadius={{ base: '4px', sm: 'lg' }}
-                        px={{ base: '2px', sm: '4px' }}
+                        top={3}
+                        left={3}
                     >
-                        <Image boxSize={5} src={tag.icon} />
-                        <TagLabel fontSize={{ base: 14, sm: 12, lg: 14 }}>{tag.name}</TagLabel>
-                    </Tag>
+                        {category.map((cat, idx) => {
+                            const { IconComponent, label } = getCategoryContent(
+                                cat as keyof typeof CategoriesData,
+                            );
+                            return (
+                                <Tag
+                                    key={`${item.id}-tag-${idx}`}
+                                    size={{ base: 'sm', sm: 'md' }}
+                                    variant='subtle'
+                                    backgroundColor='lime.50'
+                                    gap={{ base: '2px', sm: 2 }}
+                                    borderRadius={{ base: '4px', sm: 'lg' }}
+                                    px={{ base: '2px', sm: '4px' }}
+                                >
+                                    {IconComponent && <IconComponent boxSize={5} />}
+                                    <TagLabel fontSize={{ base: 14, sm: 12, lg: 14 }}>
+                                        {label}
+                                    </TagLabel>
+                                </Tag>
+                            );
+                        })}
+                    </Flex>
                     <Show above='sm'>
                         <Spacer />
                     </Show>
@@ -122,20 +165,20 @@ export const HorizontalCard = ({ item }: HorizontalCardProps) => {
                         lineHeight='140%'
                         pr={2}
                     >
-                        {bookmark && (
+                        {bookmarks && (
                             <HStack gap={1}>
                                 <Image
-                                    src='./svg/BsBookmarkHeart.svg'
+                                    src='/svg/BsBookmarkHeart.svg'
                                     boxSize={3}
                                     alt='bookmarks count'
                                 />
-                                <Box as='span'>{bookmark}</Box>
+                                <Box as='span'>{bookmarks}</Box>
                             </HStack>
                         )}
                         {likes && (
                             <HStack alignItems='center' gap={1}>
                                 <Image
-                                    src='./svg/BsEmojiHeartEyes.svg'
+                                    src='/svg/BsEmojiHeartEyes.svg'
                                     boxSize={3}
                                     alt='bookmarks count'
                                 />
@@ -157,11 +200,21 @@ export const HorizontalCard = ({ item }: HorizontalCardProps) => {
                         fontFamily='inherit'
                         noOfLines={isTruncated ? 1 : 2}
                     >
-                        {title}
+                        {highlightedTitle.map((part, index) =>
+                            part.toLowerCase() === searchInputCurrent.trim().toLowerCase() ? (
+                                <Text as='span' key={index} color='lime.600' fontWeight='bold'>
+                                    {part}
+                                </Text>
+                            ) : (
+                                <Text as='span' key={index}>
+                                    {part}
+                                </Text>
+                            ),
+                        )}
                     </Heading>
                     <Show above='sm'>
                         <Text pt={{ base: 2, lg: 1 }} noOfLines={3} fontSize={14} lineHeight='150%'>
-                            {desc}
+                            {description}
                         </Text>
                     </Show>
                 </CardBody>
@@ -205,6 +258,8 @@ export const HorizontalCard = ({ item }: HorizontalCardProps) => {
                             <Show above='sm'>Сохранить</Show>
                         </Button>
                         <Button
+                            data-test-id={`card-link-${index}`}
+                            onClick={handleCardClick}
                             size={{ base: 'sx', sm: 'sm' }}
                             colorScheme='black'
                             variant='solid'

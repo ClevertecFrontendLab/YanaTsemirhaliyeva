@@ -3,6 +3,7 @@ import {
     Card,
     CardBody,
     CardFooter,
+    Flex,
     Heading,
     HStack,
     Image,
@@ -13,27 +14,44 @@ import {
     TagLabel,
     Text,
 } from '@chakra-ui/react';
+import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router';
+
+import { CategoriesData, getCategoryContent } from '~/consts/category-icons';
+import { serchInputSelector } from '~/store/slices/recipes-slice';
+import { highlightText } from '~/utils';
 
 type VerticalCard = {
+    id: string;
     title: string;
-    desc: string;
-    img?: string;
-    tag: {
-        icon: string;
-        name: string;
-    };
-    bookmark?: number;
+    description: string;
+    image?: string;
+    category: string[];
+    subcategory?: string[];
+    bookmarks?: number;
     likes?: number;
 };
+
 type VerticalCardProps = {
     item: VerticalCard;
 };
 
 export const VerticalCard = ({ item }: VerticalCardProps) => {
-    const { img, title, desc, tag, bookmark, likes } = item;
+    const { id, image, title, description, category, subcategory, bookmarks, likes } = item;
+    const navigate = useNavigate();
+    const searchInputCurrent = useSelector(serchInputSelector);
+    const highlightedTitle = highlightText(title, searchInputCurrent);
+
+    const handleCardClick = () => {
+        if (category && subcategory) {
+            navigate(`/${category[0]}/${subcategory[0]}/${id}`);
+        }
+    };
 
     return (
         <Card
+            onClick={handleCardClick}
+            cursor='pointer'
             display='flex'
             flexDirection='column'
             h='100%'
@@ -48,9 +66,9 @@ export const VerticalCard = ({ item }: VerticalCardProps) => {
             }}
         >
             <CardBody p='0'>
-                {img && (
+                {image && (
                     <Image
-                        src={img}
+                        src={image}
                         alt={title}
                         width='100%'
                         h={{ base: '128px', sm: '230px' }}
@@ -69,11 +87,21 @@ export const VerticalCard = ({ item }: VerticalCardProps) => {
                         noOfLines={{ base: 2, sm: 1 }}
                         lineHeight={{ base: '24px', sm: '148%' }}
                     >
-                        {title}
+                        {highlightedTitle.map((part, index) =>
+                            part.toLowerCase() === searchInputCurrent.trim().toLowerCase() ? (
+                                <Text as='span' key={index} color='lime.600' fontWeight='bold'>
+                                    {part}
+                                </Text>
+                            ) : (
+                                <Text as='span' key={index}>
+                                    {part}
+                                </Text>
+                            ),
+                        )}
                     </Heading>
                     <Show above='sm'>
                         <Text noOfLines={3} fontSize={14} lineHeight='20px'>
-                            {desc}
+                            {description}
                         </Text>
                     </Show>
                 </Stack>
@@ -82,17 +110,31 @@ export const VerticalCard = ({ item }: VerticalCardProps) => {
                 px={{ base: 3, sm: '10px', xl: 6 }}
                 pb={{ base: 1, sm: 3, xl: 6 }}
                 pt={{ base: 1, sm: 6 }}
+                alignItems='flex-end'
             >
                 <Show above='sm'>
-                    <Tag
-                        size='md'
-                        variant='subtle'
-                        backgroundColor='lime.150'
-                        gap={{ sm: 2, lg: 3 }}
-                    >
-                        <Image boxSize={4} src={tag.icon} />
-                        <TagLabel>{tag.name}</TagLabel>
-                    </Tag>
+                    <Flex flexWrap='wrap' gap={2} maxW='60%'>
+                        {category.map((cat, idx) => {
+                            const { IconComponent, label } = getCategoryContent(
+                                cat as keyof typeof CategoriesData,
+                            );
+                            return (
+                                <Tag
+                                    key={idx}
+                                    size='sm'
+                                    variant='subtle'
+                                    backgroundColor='lime.150'
+                                    px={2}
+                                    py={1}
+                                    borderRadius='md'
+                                    mr={1}
+                                >
+                                    {IconComponent && <IconComponent boxSize={4} />}
+                                    <TagLabel>{label}</TagLabel>
+                                </Tag>
+                            );
+                        })}
+                    </Flex>
                     <Spacer />
                 </Show>
                 <HStack
@@ -103,19 +145,19 @@ export const VerticalCard = ({ item }: VerticalCardProps) => {
                     lineHeight='140%'
                     pr={2}
                 >
-                    {bookmark && (
+                    {bookmarks && (
                         <HStack>
                             <Image
-                                src='./svg/BsBookmarkHeart.svg'
+                                src='/svg/BsBookmarkHeart.svg'
                                 boxSize={3}
                                 alt='bookmarks count'
                             />
-                            <Box as='span'>{bookmark}</Box>
+                            <Box as='span'>{bookmarks}</Box>
                         </HStack>
                     )}
                     {likes && (
                         <HStack>
-                            <Image src='./svg/BsEmojiHeartEyes.svg' boxSize={3} alt='likes count' />
+                            <Image src='/svg/BsEmojiHeartEyes.svg' boxSize={3} alt='likes count' />
                             <Box as='span'>{likes}</Box>
                         </HStack>
                     )}
