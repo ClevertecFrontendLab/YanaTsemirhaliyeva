@@ -48,7 +48,7 @@ export const FullSizeCard = ({
     >
         <Image
             objectFit='cover'
-            width={{ base: '100%', '2xs': '30%', sm: '32%', md: '40%', xl: '41%' }}
+            width={{ base: '100%', '2xs': '33%', sm: '32%', md: '40%', xl: '41%' }}
             src={image}
             alt={title}
             overflow='hidden'
@@ -56,7 +56,7 @@ export const FullSizeCard = ({
         />
 
         <Stack
-            width={{ base: '100%', '2xs': '70%', sm: '68%', md: '60%', xl: '59%' }}
+            width={{ base: '100%', '2xs': '67%', sm: '68%', md: '60%', xl: '59%' }}
             gap={{ base: '1px', sm: 2 }}
         >
             <CardHeader
@@ -158,7 +158,7 @@ export const FullSizeCard = ({
                     <TimeIcon />
                     <Text>{time}</Text>
                 </Flex>
-                <Show above='md'>
+                <Show above='2xs'>
                     <Spacer />
                 </Show>
                 <Stack direction='row' spacing={2}>

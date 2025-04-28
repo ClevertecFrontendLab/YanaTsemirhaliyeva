@@ -64,6 +64,7 @@ export const Intro = ({ title, desc }: IntroProps) => {
         <VStack
             ml={{ xl: 5 }}
             pr={{ md: 2 }}
+            px={{ base: 3, '2xs': 1 }}
             pb={8}
             ref={introRef}
             borderRadius={16}

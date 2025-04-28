@@ -32,9 +32,18 @@ export const RecipePage = () => {
                         m={{ base: '0 auto 40px' }}
                     >
                         <CaloricContent {...recipe} />
-                        <Ingredients portions={recipe.portions!} ingredients={recipe.ingredients} />
-                        <CookSteps {...recipe} />
-                        <RecipeAuthor />
+                        <VStack
+                            px={{ '2xs': '60px', md: 0 }}
+                            spacing={{ base: 6, md: 10 }}
+                            alignItems='stretch'
+                        >
+                            <Ingredients
+                                portions={recipe.portions!}
+                                ingredients={recipe.ingredients}
+                            />
+                            <CookSteps {...recipe} />
+                            <RecipeAuthor />
+                        </VStack>
                     </VStack>
                 </Box>
             </Box>

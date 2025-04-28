@@ -170,7 +170,7 @@ export const Filters = () => {
                     data-test-id='filter-drawer'
                     p={4}
                     pr='6px'
-                    pl={3}
+                    pl={{ base: 3, md: 8 }}
                     minW={{ base: '344px', md: '463px' }}
                     sx={{
                         width: '344px',
@@ -186,7 +186,7 @@ export const Filters = () => {
                     <DrawerHeader
                         py={0}
                         pl={0}
-                        pr={5}
+                        pr={{ base: 5, md: 6 }}
                         display='flex'
                         justifyContent='space-between'
                         gap={4}
@@ -206,7 +206,7 @@ export const Filters = () => {
                     <DrawerBody
                         px={0}
                         pt={0}
-                        pr='6px'
+                        pr={{ base: '6px', md: 5 }}
                         pb='60px'
                         sx={{
                             '&::-webkit-scrollbar': {
@@ -316,7 +316,14 @@ export const Filters = () => {
                         </VStack>
                     </DrawerBody>
 
-                    <DrawerFooter pt={3} pb={0} px={0} flexDir='column' alignItems='stretch'>
+                    <DrawerFooter
+                        pr={{ base: '6px', md: 5 }}
+                        pt={3}
+                        pb={0}
+                        px={0}
+                        flexDir='column'
+                        alignItems='stretch'
+                    >
                         <HStack spacing={3} mb={4} flexWrap='wrap'>
                             {(
                                 [
@@ -333,7 +340,7 @@ export const Filters = () => {
                                         data-test-id='filter-tag'
                                         size='sm'
                                         key={`${filterType}-${index}`}
-                                        borderRadius='full'
+                                        borderRadius='md'
                                         border='1px solid'
                                         borderColor='lime.400'
                                         variant='solid'
@@ -351,7 +358,7 @@ export const Filters = () => {
                                 )),
                             )}
                         </HStack>
-                        <ButtonGroup>
+                        <ButtonGroup justifyContent='flex-end'>
                             <Button
                                 data-test-id='clear-filter-button'
                                 onClick={handleClearFilters}

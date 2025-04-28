@@ -27,7 +27,12 @@ export const CaloricContent = ({ nutritionValue }: CaloricContentprops) => (
                 <Text as='span' color='blackAlpha.600' fontSize={14}>
                     калорийность
                 </Text>
-                <Text as='span' color='lime.800' fontSize={{ base: 26, md: 36 }} fontWeight={500}>
+                <Text
+                    as='span'
+                    color='lime.800'
+                    fontSize={{ base: 26, '2xs': 36 }}
+                    fontWeight={500}
+                >
                     {nutritionValue.calories}
                 </Text>
                 <Text
@@ -55,7 +60,12 @@ export const CaloricContent = ({ nutritionValue }: CaloricContentprops) => (
                 <Text as='span' color='blackAlpha.600' fontSize={14}>
                     белки
                 </Text>
-                <Text as='span' color='lime.800' fontSize={{ base: 26, md: 36 }} fontWeight={500}>
+                <Text
+                    as='span'
+                    color='lime.800'
+                    fontSize={{ base: 26, '2xs': 36 }}
+                    fontWeight={500}
+                >
                     {nutritionValue.proteins}
                 </Text>
                 <Text
@@ -83,7 +93,12 @@ export const CaloricContent = ({ nutritionValue }: CaloricContentprops) => (
                 <Text as='span' color='blackAlpha.600' fontSize={14}>
                     жиры
                 </Text>
-                <Text as='span' color='lime.800' fontSize={{ base: 26, md: 36 }} fontWeight={500}>
+                <Text
+                    as='span'
+                    color='lime.800'
+                    fontSize={{ base: 26, '2xs': 36 }}
+                    fontWeight={500}
+                >
                     {nutritionValue.fats}
                 </Text>
                 <Text
@@ -111,7 +126,12 @@ export const CaloricContent = ({ nutritionValue }: CaloricContentprops) => (
                 <Text as='span' color='blackAlpha.600' fontSize={14}>
                     углеводы
                 </Text>
-                <Text as='span' color='lime.800' fontSize={{ base: 26, md: 36 }} fontWeight={500}>
+                <Text
+                    as='span'
+                    color='lime.800'
+                    fontSize={{ base: 26, '2xs': 36 }}
+                    fontWeight={500}
+                >
                     {nutritionValue.carbohydrates}
                 </Text>
                 <Text

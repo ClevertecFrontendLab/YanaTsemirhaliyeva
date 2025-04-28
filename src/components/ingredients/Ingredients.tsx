@@ -39,7 +39,7 @@ export const Ingredients = ({ portions = 1, ingredients }: IngredientsProps) => 
                 textTransform='uppercase'
                 fontSize={12}
                 fontWeight={700}
-                p={{ base: '8px 0 8px 5px', md: '8px 0 8px 32px' }}
+                p={{ base: '8px 0 8px 5px', '2xs': '8px 0 8px 24px', md: '8px 0 8px 32px' }}
             >
                 <Heading as='h3' fontSize='inherit'>
                     Ингредиенты
@@ -79,7 +79,7 @@ export const Ingredients = ({ portions = 1, ingredients }: IngredientsProps) => 
                         key={i}
                         display='flex'
                         alignItems='center'
-                        p={{ base: '9px', md: '16px 24px' }}
+                        p={{ base: '9px', '2xs': '16px 24px' }}
                         fontSize={{ base: 12, md: 14 }}
                     >
                         <Text>{item.title}</Text>

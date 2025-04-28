@@ -37,7 +37,7 @@ export const CookSteps = ({ steps }: CookStepsProps) => (
                             objectFit='cover'
                         />
                     )}
-                    <VStack py={{ base: 1, md: 5 }} px={{ base: 2, md: 6 }} alignItems='flex-start'>
+                    <VStack py={{ base: 2, md: 5 }} px={{ base: 2, md: 6 }} alignItems='flex-start'>
                         <Text
                             bgColor='blackAlpha.100'
                             px={2}
