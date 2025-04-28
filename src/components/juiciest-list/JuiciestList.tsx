@@ -2,31 +2,86 @@ import { Box, Button, Grid, Heading, HStack, Show, Spacer } from '@chakra-ui/rea
 import { Link } from 'react-router';
 
 import { HorizontalCard } from '~/components/horizontal-card/HorizontalCard';
-import { JUICIEST_LIST } from '~/consts/mocks';
+import { AppRoute } from '~/consts/consts';
 import { ArrowRightIcon } from '~/shared/custom-icons';
+import { useAppSelector } from '~/store/hooks';
+import { recipesSelector } from '~/store/slices/recipes-slice';
 
-export const JuiciestList = () => (
-    <Box as='section'>
-        <HStack mb={{ base: '10px', xs: 4, sm: 3, lg: 4 }}>
-            <Heading
-                as='h2'
-                fontSize={{ base: 24, sm: 36, xl: 48 }}
-                fontFamily='inherit'
-                fontWeight={500}
-            >
-                Самое сочное
-            </Heading>
-            <Spacer />
-            <Show above='md'>
+export const JuiciestList = () => {
+    const filteredRecipes = useAppSelector(recipesSelector);
+    const mostPopularRecipes = [...filteredRecipes].sort((a, b) => b.likes - a.likes).slice(0, 8);
+
+    return (
+        <Box as='section'>
+            <HStack mb={{ base: '10px', xs: 4, sm: 3, lg: 4 }}>
+                <Heading
+                    as='h2'
+                    fontSize={{ base: 24, sm: 36, xl: 48 }}
+                    fontFamily='inherit'
+                    fontWeight={500}
+                >
+                    Самое сочное
+                </Heading>
+                <Spacer />
+                <Show above='md'>
+                    <Button
+                        as={Link}
+                        to={AppRoute.Juicy}
+                        data-test-id='juiciest-link'
+                        rightIcon={<ArrowRightIcon />}
+                        bgColor='lime.400'
+                        size={{ sm: 'md', xl: 'lg' }}
+                        border='none'
+                        sx={{
+                            '&:focus': {
+                                outline: 'none',
+                            },
+                            '&:hover': {
+                                bgColor: 'lime.300',
+                                color: 'black',
+                            },
+                            '&:active': {
+                                bgColor: 'lime.150',
+                            },
+                        }}
+                    >
+                        Вся подборка
+                    </Button>
+                </Show>
+            </HStack>
+            {mostPopularRecipes.length > 0 ? (
+                <Grid
+                    templateColumns={{
+                        base: '1fr',
+                        xs: 'repeat(2, 1fr)',
+                        sm: '1fr',
+                        xl: 'repeat(2, 1fr)',
+                    }}
+                    gap={{ base: 3, xs: '14px', sm: '14px', xl: 5 }}
+                    alignItems='stretch'
+                    autoRows='1fr'
+                >
+                    {mostPopularRecipes.map((item, i) => (
+                        <HorizontalCard item={item} key={item.id} index={i} />
+                    ))}
+                </Grid>
+            ) : (
+                <Box textAlign='center' mt='16px' fontSize='lg' color='gray.500'>
+                    По вашему запросу не найдено рецептов
+                </Box>
+            )}
+            <Box textAlign='center' mt='10px'>
                 <Button
                     as={Link}
-                    to='/juiciest-collection'
-                    data-test-id='juiciest-link'
+                    to={AppRoute.Juicy}
+                    data-test-id='juiciest-link-mobile'
                     rightIcon={<ArrowRightIcon />}
                     bgColor='lime.400'
-                    size={{ sm: 'md', xl: 'lg' }}
+                    size='md'
+                    m='0 auto'
                     border='none'
                     sx={{
+                        display: { base: 'inline-flex', md: 'none' },
                         '&:focus': {
                             outline: 'none',
                         },
@@ -41,44 +96,7 @@ export const JuiciestList = () => (
                 >
                     Вся подборка
                 </Button>
-            </Show>
-        </HStack>
-        <Grid
-            templateColumns={{ base: '1fr', xs: 'repeat(2, 1fr)', sm: '1fr', xl: 'repeat(2, 1fr)' }}
-            gap={{ base: 3, xs: '14px', sm: '14px', xl: 5 }}
-            alignItems='stretch'
-            autoRows='1fr'
-        >
-            {JUICIEST_LIST.map((item) => (
-                <HorizontalCard item={item} key={item.id} />
-            ))}
-        </Grid>
-        <Box textAlign='center' mt='10px'>
-            <Button
-                as={Link}
-                to='/juiciest-collection'
-                data-test-id='juiciest-link-mobile'
-                rightIcon={<ArrowRightIcon />}
-                bgColor='lime.400'
-                size='md'
-                m='0 auto'
-                border='none'
-                sx={{
-                    display: { base: 'inline-flex', md: 'none' },
-                    '&:focus': {
-                        outline: 'none',
-                    },
-                    '&:hover': {
-                        bgColor: 'lime.300',
-                        color: 'black',
-                    },
-                    '&:active': {
-                        bgColor: 'lime.150',
-                    },
-                }}
-            >
-                Вся подборка
-            </Button>
+            </Box>
         </Box>
-    </Box>
-);
+    );
+};

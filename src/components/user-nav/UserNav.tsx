@@ -2,7 +2,6 @@ import { Box, Flex, List, ListItem, Show, Text, VStack } from '@chakra-ui/react'
 
 import {
     BookmarkIcon,
-    BurgerMenuIcon,
     HappyFaceIcon,
     PeopleIcon,
     WriteDownRecipeIcon,
@@ -26,6 +25,7 @@ export const UserNav = () => (
             px={{ md: 6 }}
             fontSize={{ base: 12, md: 16 }}
             mr={{ base: 4, '2xs': 5, md: 0 }}
+            ml={{ xl: 10 }}
         >
             <ListItem>
                 <Box as='button' display='flex' alignItems='center' gap={2} border='none'>
@@ -52,25 +52,15 @@ export const UserNav = () => (
                 </Box>
             </ListItem>
         </List>
-        <Show below='md'>
-            <Flex
-                alignItems='center'
-                as='button'
-                p={2}
-                border='none'
-                sx={{
-                    transition: 'opacity 0.3s ease-in-out',
-                    '&:hover': {
-                        opacity: 0.7,
-                    },
-                    '&:focus': {
-                        outline: 'none',
-                    },
-                }}
-            >
-                <BurgerMenuIcon boxSize={6} />
-            </Flex>
-        </Show>
+        {/* <Box
+            sx={{
+                '@media screen and (min-width: 1200px)': {
+                    display: 'none',
+                },
+            }}
+        >
+            <BurgerMenu />
+        </Box> */}
         <Show above='md'>
             <VStack
                 gap={3}

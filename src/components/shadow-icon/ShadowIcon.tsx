@@ -37,7 +37,7 @@ export const ShadowIcon = ({ route = '#', title, icon, fontSize = '12px' }: Shad
                     top: '-5px',
                     left: '-20px',
                     right: '-20px',
-                    bottom: '-5px',
+                    bottom: '-15px',
                     borderRadius: '50%',
                     background:
                         'radial-gradient(circle, rgba(196, 255, 97, 0.4) 0%, rgba(255, 255, 255, 0) 100%)', // Радиальный градиент

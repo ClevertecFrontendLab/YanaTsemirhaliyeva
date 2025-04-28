@@ -79,7 +79,7 @@ export const SimpleCard = ({ item }: SimpleCardProps) => {
                     {bookmark && (
                         <HStack>
                             <Image
-                                src='./svg/BsBookmarkHeart.svg'
+                                src='/svg/BsBookmarkHeart.svg'
                                 boxSize='12px'
                                 alt='bookmarks count'
                             />
@@ -89,7 +89,7 @@ export const SimpleCard = ({ item }: SimpleCardProps) => {
                     {likes && (
                         <HStack>
                             <Image
-                                src='./svg/BsEmojiHeartEyes.svg'
+                                src='/svg/BsEmojiHeartEyes.svg'
                                 boxSize='12px'
                                 alt='bookmarks count'
                             />

@@ -1,10 +1,16 @@
-import { Box, Flex, Hide, Show } from '@chakra-ui/react';
+import { Box, Flex, Hide } from '@chakra-ui/react';
 import { ReactNode, useEffect } from 'react';
-import { useLocation } from 'react-router';
+import { useLocation, useNavigate } from 'react-router';
 
-import { AppRoutes, LIST_MENU } from '~/consts/menu-list';
+import { ALL_RECIPES } from '~/consts/all-recipes';
+import {
+    getCategoryAndSubcategoryFromUrl,
+    getCategoryRoute,
+    getSubcategoryRoute,
+} from '~/consts/dictionary';
+import { LIST_MENU } from '~/consts/menu-list';
 import { useAppDispatch } from '~/store/hooks';
-import { setCategory, setSubcategory } from '~/store/slices/category-slice';
+import { setCategory, setRecipeTitle, setSubcategory } from '~/store/slices/recipes-slice';
 
 import { AccordionMenu } from '../accordion-menu/AccordionMenu';
 import { Footer } from '../footer/Footer';
@@ -19,31 +25,60 @@ type LayoutProps = {
 export const Layout = ({ children }: LayoutProps) => {
     const dispatch = useAppDispatch();
     const location = useLocation();
+    const navigate = useNavigate();
 
     useEffect(() => {
-        const pathParts = location.pathname.split('/');
-        const category = AppRoutes[pathParts[1] as keyof typeof AppRoutes];
+        const { category, subcategory, id } = getCategoryAndSubcategoryFromUrl(location.pathname);
+
+        if (id) {
+            const recipe = ALL_RECIPES.find((recipe) => recipe.id === id);
+
+            if (recipe) {
+                dispatch(setRecipeTitle(recipe.title));
+            } else {
+                console.warn(`Recipe with ID ${id} not found.`);
+            }
+
+            dispatch(setCategory(null));
+            dispatch(setSubcategory(null));
+
+            return;
+        } else {
+            dispatch(setRecipeTitle(null));
+        }
 
         if (category) {
             dispatch(setCategory(category));
 
-            const subcategories = LIST_MENU[category as keyof typeof LIST_MENU]?.subcategories;
-            if (subcategories && subcategories.length > 0) {
-                dispatch(setSubcategory(subcategories[0]));
-            } else {
-                dispatch(setSubcategory(null));
+            if (subcategory) {
+                dispatch(setSubcategory(subcategory));
+            } else if (category in LIST_MENU) {
+                const categoryKey = category as keyof typeof LIST_MENU;
+                const subcategories = LIST_MENU[categoryKey]?.subcategories;
+
+                if (subcategories && subcategories.length > 0) {
+                    const firstSubcategory = subcategories[0];
+
+                    dispatch(setSubcategory(firstSubcategory));
+
+                    const categoryPath = getCategoryRoute(category);
+                    if (categoryPath) {
+                        const subcategoryPath = getSubcategoryRoute(category, firstSubcategory);
+                        if (subcategoryPath) {
+                            navigate(`${categoryPath}/${subcategoryPath}`, { replace: true });
+                        }
+                    }
+                }
             }
-        } else {
-            dispatch(setCategory(null));
-            dispatch(setSubcategory(null));
         }
-    }, [location.pathname, dispatch]);
+    }, [dispatch, location.pathname, navigate]);
 
     return (
         <Flex flexDirection='column' h='100%' minH='100vh' w='100%' minW='360px'>
             <Header />
             <Hide breakpoint='(max-width: 1200px)'>
                 <Flex
+                    data-test-id='nav'
                     as='aside'
                     flexDirection='column'
                     justifyContent='space-between'
@@ -71,19 +106,22 @@ export const Layout = ({ children }: LayoutProps) => {
                     <UserNav />
                 </Box>
             </Hide>
-            <Show below='md'>
-                <Box
-                    pos='fixed'
-                    left='0'
-                    bottom='0'
-                    w='100%'
-                    minW='360px'
-                    zIndex='2'
-                    data-test-id='footer'
-                >
-                    <Footer />
-                </Box>
-            </Show>
+            <Box
+                pos='fixed'
+                left='0'
+                bottom='0'
+                w='100%'
+                minW='360px'
+                zIndex='2'
+                data-test-id='footer'
+                sx={{
+                    '@media screen and (min-width: 1200px)': {
+                        display: 'none',
+                    },
+                }}
+            >
+                <Footer />
+            </Box>
         </Flex>
     );
 };
