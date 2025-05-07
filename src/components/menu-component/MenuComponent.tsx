@@ -15,8 +15,19 @@ import {
 } from '@chakra-ui/react';
 import { useEffect, useRef, useState } from 'react';
 
+import { DataTestId } from '~/consts/consts';
 import { useAppDispatch, useAppSelector } from '~/store/hooks';
 import { selectedFiltersSelector, updateSelectedFilters } from '~/store/slices/recipes-slice';
+
+type MenuComponentProps = {
+    width?: string;
+    placeholder?: string;
+    list: string[];
+    isAddItem?: boolean;
+    newItem?: string;
+    type: 'categories' | 'authors';
+    dataTestId?: string;
+};
 
 export const MenuComponent = ({
     width = '100%',
@@ -26,15 +37,7 @@ export const MenuComponent = ({
     newItem,
     type,
     dataTestId,
-}: {
-    width?: string;
-    placeholder?: string;
-    list: string[];
-    isAddItem?: boolean;
-    newItem?: string;
-    type: 'categories' | 'authors';
-    dataTestId?: string;
-}) => {
+}: MenuComponentProps) => {
     const dispatch = useAppDispatch();
     const menuRef = useRef<HTMLDivElement>(null);
     const menuButtonRef = useRef<HTMLButtonElement>(null);
@@ -149,7 +152,7 @@ export const MenuComponent = ({
                         >
                             <Checkbox
                                 data-test-id={
-                                    el === 'Веганская кухня' ? 'checkbox-веганская кухня' : ''
+                                    el === 'Веганская кухня' ? DataTestId.VeganCheckbox : ''
                                 }
                                 isChecked={selectedItems.includes(el)}
                                 onChange={() => handleCheckboxChange(el)}

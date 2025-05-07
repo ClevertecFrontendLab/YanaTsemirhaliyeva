@@ -13,6 +13,9 @@ import {
 } from '@chakra-ui/react';
 import { useEffect, useRef, useState } from 'react';
 
+import { DataTestId } from '~/consts/consts';
+import { generateTestId } from '~/utils';
+
 import { Toggle } from '../toggle/Toggle';
 
 const allergens = [
@@ -21,11 +24,27 @@ const allergens = [
     'Рыба',
     'Моллюски',
     'Орехи',
-    'Томат (помидор)',
+    'Томат',
     'Цитрусовые',
     'Клубника (ягоды)',
     'Шоколад',
 ];
+
+type AllergenSelectProps = {
+    selectedAllergens: string[];
+    isFilterActive: boolean;
+    onToggleFilter: () => void;
+    onCheckboxChange: (allergen: string) => void;
+    onAddCustomAllergen: (allergen: string) => void;
+    allergensList?: string[];
+    setShadowVisible?: (visible: boolean) => void;
+    direction?: 'row' | 'column';
+    width?: string;
+    testIdSwitcher: string;
+    testIdMenuButton: string;
+    testIdMenuList?: string;
+    isIntro?: boolean;
+};
 
 export const AllergenSelect = ({
     selectedAllergens,
@@ -41,21 +60,7 @@ export const AllergenSelect = ({
     testIdMenuButton = '',
     testIdMenuList,
     isIntro = false,
-}: {
-    selectedAllergens: string[];
-    isFilterActive: boolean;
-    onToggleFilter: () => void;
-    onCheckboxChange: (allergen: string) => void;
-    onAddCustomAllergen: (allergen: string) => void;
-    allergensList?: string[];
-    setShadowVisible?: (visible: boolean) => void;
-    direction?: 'row' | 'column';
-    width?: string;
-    testIdSwitcher: string;
-    testIdMenuButton: string;
-    testIdMenuList?: string;
-    isIntro?: boolean;
-}) => {
+}: AllergenSelectProps) => {
     const menuRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
     const [isOpen, setIsOpen] = useState(false);
@@ -164,7 +169,6 @@ export const AllergenSelect = ({
                     )}
                 </Button>
 
-                {/* Псевдо-MenuList для теста*/}
                 {isOpen && isFilterActive && (
                     <Box
                         data-test-id={testIdMenuList ? testIdMenuList : ''}
@@ -210,7 +214,7 @@ export const AllergenSelect = ({
                                     onMouseDown={(e) => e.preventDefault()}
                                 >
                                     <Checkbox
-                                        data-test-id={`allergen-${index}`}
+                                        data-test-id={generateTestId(DataTestId.Allergen, index)}
                                         isChecked={selectedAllergens.includes(allergen)}
                                         onChange={() => {
                                             onCheckboxChange(allergen);
@@ -237,7 +241,7 @@ export const AllergenSelect = ({
                             <InputGroup alignItems='center' gap={2} ml={4} w='inherit'>
                                 <Input
                                     ref={inputRef}
-                                    data-test-id={isOpen ? 'add-other-allergen' : ''}
+                                    data-test-id={isOpen ? DataTestId.InputAddOtherAllergen : ''}
                                     value={customAllergen}
                                     onChange={(e) => setCustomAllergen(e.target.value)}
                                     onKeyDown={(e: React.KeyboardEvent) => {
@@ -254,7 +258,7 @@ export const AllergenSelect = ({
                                     }}
                                 />
                                 <IconButton
-                                    data-test-id={isOpen ? 'add-allergen-button' : ''}
+                                    data-test-id={isOpen ? DataTestId.BtnAddOtherAllergen : ''}
                                     aria-label='Добавить аллерген'
                                     icon={<AddIcon boxSize={2} />}
                                     size='xs'

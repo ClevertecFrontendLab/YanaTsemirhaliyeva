@@ -1,16 +1,64 @@
 import { Box, Button, Grid } from '@chakra-ui/react';
+import { useEffect, useState } from 'react';
 
 import { CategoryHighlight } from '~/components/category-highlight/CategoryHighlight';
 import { HorizontalCard } from '~/components/horizontal-card/HorizontalCard';
 import { Intro } from '~/components/intro/Intro';
-import { useAppSelector } from '~/store/hooks';
-import { recipesSelector } from '~/store/slices/recipes-slice';
+import { DataTestId } from '~/consts/consts';
+import { useGetPaginatedRecipesQuery } from '~/query/services/recipes';
+import { useAppDispatch, useAppSelector } from '~/store/hooks';
+import { searchParamsSelector, setError, setIsFetching } from '~/store/slices/recipes-slice';
+import { Category } from '~/types/category';
+import { getCategoriesFromDB } from '~/utils';
 
-import { VEGAN_HEADINGS, VEGAN_HIGHLIGHTS } from './mocks';
+const CARDS_PER_PAGE = 8;
 
 export const JuiciestCollection = () => {
-    const filteredRecipes = useAppSelector(recipesSelector);
-    const mostPopularRecipes = [...filteredRecipes].sort((a, b) => b.likes - a.likes).slice(0, 8);
+    const dispatch = useAppDispatch();
+    const searchParams = useAppSelector(searchParamsSelector);
+    const [page, setPage] = useState(1);
+    const [categories, setCategories] = useState<Category[]>([]);
+
+    useEffect(() => {
+        getCategoriesFromDB().then((storedCategories) =>
+            setCategories(storedCategories.categories),
+        );
+    }, []);
+
+    const {
+        data,
+        isError,
+        isFetching: isLoading,
+    } = useGetPaginatedRecipesQuery(
+        {
+            ...searchParams,
+            page,
+            sortBy: 'likes',
+            sortOrder: 'desc',
+            limit: CARDS_PER_PAGE,
+        },
+        {
+            refetchOnMountOrArgChange: true,
+        },
+    );
+
+    useEffect(() => {
+        if (isError) {
+            dispatch(setError(true));
+        }
+    }, [dispatch, isError]);
+
+    useEffect(() => {
+        dispatch(setIsFetching(isLoading));
+    }, [dispatch, isLoading]);
+
+    const handleLoadMore = () => {
+        setPage((prevPage) => prevPage + 1);
+    };
+
+    const recipes = data?.data || [];
+    const isBtnDisplay =
+        data?.meta && recipes.length < data?.meta.total && page < data?.meta.totalPages;
 
     return (
         <Box
@@ -35,38 +83,37 @@ export const JuiciestCollection = () => {
                 alignItems='stretch'
                 autoRows='1fr'
             >
-                {mostPopularRecipes.map((item, i) => (
-                    <HorizontalCard key={item.id} item={item} index={i} />
+                {recipes.map((item, i) => (
+                    <HorizontalCard key={i} item={item} index={i} categories={categories} />
                 ))}
             </Grid>
-            <Box textAlign='center' mt='14px' mb={10}>
-                <Button
-                    bgColor='lime.400'
-                    size='md'
-                    m='0 auto'
-                    border='none'
-                    sx={{
-                        '&:focus': {
-                            outline: 'none',
-                        },
-                        '&:hover': {
-                            bgColor: 'lime.300',
-                        },
-                        '&:active': {
-                            bgColor: 'lime.150',
-                        },
-                    }}
-                >
-                    Загрузить ещё
-                </Button>
-            </Box>
-            <CategoryHighlight
-                title='Веганская кухня'
-                desc='Интересны не только убеждённым вегетарианцам, но и тем, кто хочет  попробовать вегетарианскую диету и готовить вкусные  вегетарианские блюда.'
-                recipes={VEGAN_HIGHLIGHTS}
-                headings={VEGAN_HEADINGS}
-                isDivider
-            />
+            {isBtnDisplay && (
+                <Box textAlign='center' mt='14px' mb={10}>
+                    <Button
+                        data-test-id={DataTestId.BtnLoadMore}
+                        onClick={handleLoadMore}
+                        bgColor='lime.400'
+                        size='md'
+                        m='0 auto'
+                        border='none'
+                        sx={{
+                            '&:focus': {
+                                outline: 'none',
+                            },
+                            '&:hover': {
+                                bgColor: 'lime.300',
+                            },
+                            '&:active': {
+                                bgColor: 'lime.150',
+                            },
+                        }}
+                        disabled={isLoading}
+                    >
+                        {isLoading ? 'Загрузка' : 'Загрузить ещё'}
+                    </Button>
+                </Box>
+            )}
+            <CategoryHighlight isDivider />
         </Box>
     );
 };

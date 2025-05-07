@@ -1,24 +1,49 @@
 import './NewRecipes.css';
 
 import { Box, Heading, IconButton } from '@chakra-ui/react';
-import { useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Swiper as SwiperType } from 'swiper';
 import { Navigation } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 
 import { VerticalCard } from '~/components/vertical-card/VerticalCard';
+import { DataTestId } from '~/consts/consts';
+import { useGetRecipesQuery } from '~/query/services/recipes';
 import { ArrowRightIcon } from '~/shared/custom-icons';
-import { useAppSelector } from '~/store/hooks';
-import { recipesSelector } from '~/store/slices/recipes-slice';
+import { useAppDispatch, useAppSelector } from '~/store/hooks';
+import { searchParamsSelector, setError } from '~/store/slices/recipes-slice';
+import { generateTestId } from '~/utils';
 
 export const NewRecipes = () => {
+    const dispatch = useAppDispatch();
     const swiperRef = useRef<SwiperType | null>(null);
-    const filteredRecipes = useAppSelector(recipesSelector);
+    const searchParams = useAppSelector(searchParamsSelector);
+    const [params, setParams] = useState({
+        ...searchParams,
+        sortBy: 'createdAt' as const,
+        sortOrder: 'desc' as const,
+    });
 
-    const sortedRecipes = [...filteredRecipes].sort(
-        (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+    useEffect(() => {
+        setParams({ ...searchParams, sortBy: 'createdAt', sortOrder: 'desc', limit: 10 });
+    }, [searchParams]);
+
+    const { data, isError } = useGetRecipesQuery(params, {
+        // refetchOnMountOrArgChange: true,
+    });
+
+    useEffect(() => {
+        if (isError) {
+            dispatch(setError(true));
+        }
+    }, [dispatch, isError]);
+
+    const newestRecipes = data?.data || [];
+
+    const sortedRecipes = [...newestRecipes].sort(
+        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
     );
-    const newestRecipes = sortedRecipes.slice(0, 10);
+    if (sortedRecipes.length === 0) return;
 
     return (
         <Box as='section' w='100%' boxSizing='border-box'>
@@ -31,13 +56,12 @@ export const NewRecipes = () => {
             >
                 Новые рецепты
             </Heading>
-            <Box pos='relative' data-test-id='carousel'>
-                {newestRecipes.length > 0 ? (
+            <Box pos='relative' data-test-id={DataTestId.Carousel}>
+                {sortedRecipes.length > 0 ? (
                     <>
                         <Swiper
                             modules={[Navigation]}
                             slidesPerView={2.1}
-                            // speed={10}
                             spaceBetween={12}
                             loop={true}
                             onSwiper={(swiper) => {
@@ -53,23 +77,23 @@ export const NewRecipes = () => {
                                 1536: { slidesPerView: 4, spaceBetween: 18 },
                             }}
                         >
-                            {newestRecipes.map((recipe, i) => (
+                            {sortedRecipes.map((recipe, i) => (
                                 <SwiperSlide
-                                    key={recipe.id}
+                                    key={recipe._id}
                                     style={{ minHeight: '100%' }}
-                                    data-test-id={`carousel-card-${i}`}
+                                    data-test-id={generateTestId(DataTestId.CarouselCard, i)}
                                 >
                                     <Box w='100%' minH='100%' pb='6px'>
-                                        <VerticalCard item={recipe} />
+                                        <VerticalCard item={{ ...recipe }} />
                                     </Box>
                                 </SwiperSlide>
                             ))}
                         </Swiper>
 
-                        {newestRecipes.length > 3 && (
+                        {sortedRecipes.length > 3 && (
                             <Box className='swiper-btns'>
                                 <IconButton
-                                    data-test-id='carousel-back'
+                                    data-test-id={DataTestId.CarouselCardBtnBack}
                                     aria-label='left'
                                     className='slider-controls slider-controls--prev'
                                     icon={
@@ -90,7 +114,7 @@ export const NewRecipes = () => {
                                     boxSize={12}
                                 />
                                 <IconButton
-                                    data-test-id='carousel-forward'
+                                    data-test-id={DataTestId.CarouselCardBtnForward}
                                     aria-label='right'
                                     className='slider-controls slider-controls--next'
                                     icon={<ArrowRightIcon color='white' boxSize={6} />}

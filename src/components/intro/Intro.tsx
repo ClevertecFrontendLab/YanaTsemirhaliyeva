@@ -1,17 +1,39 @@
-import { Heading, Show, Text, useOutsideClick, VStack } from '@chakra-ui/react';
+import {
+    Center,
+    Heading,
+    HStack,
+    Show,
+    Tag,
+    TagCloseButton,
+    TagLabel,
+    Text,
+    useOutsideClick,
+    VStack,
+} from '@chakra-ui/react';
 import { useRef, useState } from 'react';
+import { useSelector } from 'react-redux';
 
+import { DataTestId } from '~/consts/consts';
+import { useGetRecipesQuery } from '~/query/services/recipes';
 import { useAppDispatch, useAppSelector } from '~/store/hooks';
 import {
     addAllergen,
     allergensSelector,
     clearAllergens,
     isIntroActiveSelector,
+    isSearchTriggeredSelector,
     removeAllergen,
+    searchParamsSelector,
+    selectedFiltersSelector,
+    serchInputSelector,
+    setIsSearchTriggered,
     toggleIntroAllergen,
+    updateSearchParams,
+    updateSelectedFilters,
 } from '~/store/slices/recipes-slice';
 
 import { AllergenSelect } from '../allergens/Allergens';
+import { Loader } from '../loader/Loader';
 import { Search } from '../search/Search';
 
 type IntroProps = {
@@ -20,12 +42,27 @@ type IntroProps = {
 };
 
 export const Intro = ({ title, desc }: IntroProps) => {
-    const [isShadowVisible, setShadowVisible] = useState(false);
-
-    const selectedAllergens = useAppSelector(allergensSelector);
-    const isToggleActive = useAppSelector(isIntroActiveSelector);
     const introRef = useRef<HTMLDivElement>(null);
     const dispatch = useAppDispatch();
+    const [isShadowVisible, setShadowVisible] = useState(false);
+    const selectedAllergens = useAppSelector(allergensSelector);
+    const searchInputCurrent = useSelector(serchInputSelector);
+    const isToggleActive = useAppSelector(isIntroActiveSelector);
+    const isSearchTriggered = useAppSelector(isSearchTriggeredSelector);
+    const searchParams = useAppSelector(searchParamsSelector);
+    const selectedFilters = useAppSelector(selectedFiltersSelector);
+    const filterKeysToShow: Array<
+        keyof Pick<typeof searchParams, 'allergens' | 'meat' | 'garnish'>
+    > = ['allergens', 'meat', 'garnish'];
+
+    const { data: recipesData, isFetching: isLoading } = useGetRecipesQuery(
+        isToggleActive
+            ? { searchString: searchInputCurrent, allergens: selectedAllergens, limit: 8 }
+            : { searchString: searchInputCurrent, limit: 8 },
+        {
+            skip: !isSearchTriggered,
+        },
+    );
 
     const handleAddCustomAllergen = (customAllergen: string) => {
         if (customAllergen.trim() && !selectedAllergens.includes(customAllergen)) {
@@ -42,8 +79,22 @@ export const Intro = ({ title, desc }: IntroProps) => {
     const handleToggleFilter = () => {
         if (isToggleActive) {
             dispatch(clearAllergens());
+            dispatch(setIsSearchTriggered(false));
         }
         dispatch(toggleIntroAllergen());
+    };
+
+    const handleRemoveFilter = (type: keyof typeof selectedFilters, value: string) => {
+        const updatedFilter = selectedFilters[type]?.filter((item) => item !== value);
+        dispatch(updateSelectedFilters({ type, value: updatedFilter || [] }));
+
+        const updatedSearchParams = {
+            ...searchParams,
+            allergens: type === 'allergens' ? updatedFilter || [] : searchParams.allergens,
+            meat: type === 'meatTypes' ? updatedFilter || [] : searchParams.meat,
+            garnish: type === 'garnishTypes' ? updatedFilter || [] : searchParams.garnish,
+        };
+        dispatch(updateSearchParams(updatedSearchParams));
     };
 
     // Активируем тень при клике внутри Intro
@@ -99,23 +150,74 @@ export const Intro = ({ title, desc }: IntroProps) => {
             </VStack>
 
             <VStack maxW={{ base: '447px', sm: '518px' }} gap={4} w='100%'>
-                <Search />
-                <Show above='md'>
-                    <AllergenSelect
-                        width='270px'
-                        selectedAllergens={selectedAllergens}
-                        isFilterActive={isToggleActive}
-                        onToggleFilter={handleToggleFilter}
-                        onCheckboxChange={handleCheckboxChange}
-                        onAddCustomAllergen={handleAddCustomAllergen}
-                        setShadowVisible={setShadowVisible}
-                        testIdSwitcher='allergens-switcher'
-                        testIdMenuButton='allergens-menu-button'
-                        testIdMenuList='allergens-menu'
-                        isIntro
-                    />
-                </Show>
+                {isLoading ? (
+                    <Center data-test-id={DataTestId.LoaderSearchBlock}>
+                        <Loader boxSize={100} />
+                    </Center>
+                ) : (
+                    <>
+                        <Search recipesData={recipesData?.data} />
+                        <Show above='md'>
+                            <AllergenSelect
+                                width='270px'
+                                selectedAllergens={selectedAllergens}
+                                isFilterActive={isToggleActive}
+                                onToggleFilter={handleToggleFilter}
+                                onCheckboxChange={handleCheckboxChange}
+                                onAddCustomAllergen={handleAddCustomAllergen}
+                                setShadowVisible={setShadowVisible}
+                                testIdSwitcher={DataTestId.AllergensSwitcher}
+                                testIdMenuButton={DataTestId.AllergensMenuBtn}
+                                testIdMenuList={DataTestId.AllergensMenu}
+                                isIntro
+                            />
+                        </Show>
+                    </>
+                )}
             </VStack>
+            {filterKeysToShow.some(
+                (key) => Array.isArray(searchParams[key]) && searchParams[key]?.length,
+            ) && (
+                <HStack spacing={3} mb={4} flexWrap='wrap'>
+                    {filterKeysToShow.flatMap((filterType) => {
+                        const filterKey = filterType as keyof typeof searchParams;
+
+                        const formattedKey =
+                            filterKey === 'meat'
+                                ? 'meatTypes'
+                                : filterKey === 'garnish'
+                                  ? 'garnishTypes'
+                                  : filterKey;
+
+                        return Array.isArray(searchParams[filterKey])
+                            ? searchParams[filterKey]?.map((item, index) => (
+                                  <Tag
+                                      data-test-id={DataTestId.FilterTag}
+                                      size='sm'
+                                      key={`${filterKey}-${index}`}
+                                      borderRadius='md'
+                                      border='1px solid'
+                                      borderColor='lime.400'
+                                      variant='solid'
+                                      bgColor='lime.100'
+                                      color='lime.700'
+                                  >
+                                      <TagLabel>{item}</TagLabel>
+                                      <TagCloseButton
+                                          onClick={() =>
+                                              handleRemoveFilter(
+                                                  formattedKey as keyof typeof selectedFilters,
+                                                  item,
+                                              )
+                                          }
+                                          _focus={{ outline: 'none' }}
+                                      />
+                                  </Tag>
+                              ))
+                            : [];
+                    })}
+                </HStack>
+            )}
         </VStack>
     );
 };

@@ -14,7 +14,9 @@ import {
 } from '@chakra-ui/react';
 import { useState } from 'react';
 
+import { DataTestId } from '~/consts/consts';
 import { Ingredient } from '~/types/recipe';
+import { generateTestId } from '~/utils';
 
 type IngredientsProps = {
     portions: number;
@@ -54,12 +56,12 @@ export const Ingredients = ({ portions = 1, ingredients }: IngredientsProps) => 
                         value={currentPortions}
                         min={1}
                         max={10}
-                        onChange={(valueString) => setCurrentPortions(Number(valueString))} // Устанавливаем новое значение
+                        onChange={(valueString) => setCurrentPortions(Number(valueString))}
                     >
                         <NumberInputField />
                         <NumberInputStepper>
-                            <NumberIncrementStepper data-test-id='increment-stepper' />
-                            <NumberDecrementStepper data-test-id='decrement-stepper' />
+                            <NumberIncrementStepper data-test-id={DataTestId.IncrementStepper} />
+                            <NumberDecrementStepper data-test-id={DataTestId.DecrementStepper} />
                         </NumberInputStepper>
                     </NumberInput>
                 </HStack>
@@ -75,7 +77,7 @@ export const Ingredients = ({ portions = 1, ingredients }: IngredientsProps) => 
             >
                 {ingredients.map((item, i) => (
                     <ListItem
-                        data-test-id={`ingredient-quantity-${i}`}
+                        data-test-id={generateTestId(DataTestId.IngredientQuantity, i)}
                         key={i}
                         display='flex'
                         alignItems='center'

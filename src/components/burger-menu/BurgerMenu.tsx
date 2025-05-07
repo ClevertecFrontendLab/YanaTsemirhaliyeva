@@ -7,6 +7,8 @@ import {
     DrawerOverlay,
 } from '@chakra-ui/react';
 
+import { DataTestId } from '~/consts/consts';
+
 import { AccordionMenu } from '../accordion-menu/AccordionMenu';
 import { Breadcrumbs } from '../breadcrumbs/Breadcrumbs';
 import { FooterAside } from '../footer-aside/FooterAside';
@@ -20,7 +22,7 @@ export const BurgerMenu = ({ onClose, isOpen }: BurgerMenuProps) => (
     <Drawer isOpen={isOpen} placement='right' onClose={onClose}>
         <DrawerOverlay />
         <DrawerContent
-            data-test-id='nav'
+            data-test-id={DataTestId.Nav}
             minW='344px'
             style={{
                 top: '64px',

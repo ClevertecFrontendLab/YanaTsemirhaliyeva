@@ -1,15 +1,58 @@
-import { Box, Button, Grid, Heading, HStack, Show, Spacer } from '@chakra-ui/react';
+import {
+    Box,
+    Button,
+    Grid,
+    Heading,
+    HStack,
+    Show,
+    Spacer,
+    useBreakpointValue,
+} from '@chakra-ui/react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router';
 
 import { HorizontalCard } from '~/components/horizontal-card/HorizontalCard';
-import { AppRoute } from '~/consts/consts';
+import { AppRoute, DataTestId } from '~/consts/consts';
+import { useGetRecipesQuery } from '~/query/services/recipes';
 import { ArrowRightIcon } from '~/shared/custom-icons';
-import { useAppSelector } from '~/store/hooks';
-import { recipesSelector } from '~/store/slices/recipes-slice';
+import { useAppDispatch, useAppSelector } from '~/store/hooks';
+import { searchParamsSelector, setError } from '~/store/slices/recipes-slice';
+import { Category } from '~/types/category';
+import { getCategoriesFromDB } from '~/utils';
 
 export const JuiciestList = () => {
-    const filteredRecipes = useAppSelector(recipesSelector);
-    const mostPopularRecipes = [...filteredRecipes].sort((a, b) => b.likes - a.likes).slice(0, 8);
+    const dispatch = useAppDispatch();
+    const isTabletOrAbove = useBreakpointValue({ base: false, '2xs': true, sm: false });
+    const searchParams = useAppSelector(searchParamsSelector);
+    const [params, setParams] = useState({
+        ...searchParams,
+        sortBy: 'likes' as const,
+        sortOrder: 'desc' as const,
+    });
+    const [categories, setCategories] = useState<Category[]>([]);
+
+    useEffect(() => {
+        getCategoriesFromDB().then((storedCategories) =>
+            setCategories(storedCategories.categories),
+        );
+    }, []);
+
+    useEffect(() => {
+        setParams({ ...searchParams, sortBy: 'likes', sortOrder: 'desc' });
+    }, [searchParams]);
+
+    const { data, isError } = useGetRecipesQuery(params, {
+        refetchOnMountOrArgChange: true,
+    });
+
+    useEffect(() => {
+        if (isError) {
+            dispatch(setError(true));
+        }
+    }, [dispatch, isError]);
+
+    const mostPopularRecipes = data?.data || [];
+    if (mostPopularRecipes.length === 0) return;
 
     return (
         <Box as='section'>
@@ -27,7 +70,7 @@ export const JuiciestList = () => {
                     <Button
                         as={Link}
                         to={AppRoute.Juicy}
-                        data-test-id='juiciest-link'
+                        data-test-id={DataTestId.JuicyLink}
                         rightIcon={<ArrowRightIcon />}
                         bgColor='lime.400'
                         size={{ sm: 'md', xl: 'lg' }}
@@ -62,7 +105,12 @@ export const JuiciestList = () => {
                     autoRows='1fr'
                 >
                     {mostPopularRecipes.map((item, i) => (
-                        <HorizontalCard item={item} key={item.id} index={i} />
+                        <HorizontalCard
+                            item={item}
+                            key={item._id}
+                            index={i}
+                            categories={categories}
+                        />
                     ))}
                 </Grid>
             ) : (
@@ -74,7 +122,9 @@ export const JuiciestList = () => {
                 <Button
                     as={Link}
                     to={AppRoute.Juicy}
-                    data-test-id='juiciest-link-mobile'
+                    data-test-id={
+                        isTabletOrAbove ? DataTestId.JuicyLink : DataTestId.JuicyLinkMobile
+                    }
                     rightIcon={<ArrowRightIcon />}
                     bgColor='lime.400'
                     size='md'

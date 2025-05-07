@@ -1,6 +1,10 @@
+export const API_URL = 'https://marathon-api.clevertec.ru/';
+export const API_IMG = 'https://training-api.clevertec.ru';
+
 export enum AppRoute {
     Index = '/',
     Juicy = '/the-juiciest',
+    NotFound = '/not-found',
 }
 
 export enum CategoryRoute {
@@ -21,9 +25,55 @@ export enum CategoryRoute {
 
 // Шаблоны динамических маршрутов
 export const DynamicRoutes = {
+    CategoryRoot: '/:category',
     SubcategoryPage: '/:category/:subcategory',
     RecipePage: '/:category/:subcategory/:id',
 };
+
+export enum DataTestId {
+    VeganCuisine = 'vegan-cuisine',
+    InputAddOtherAllergen = 'add-other-allergen',
+    BtnAddOtherAllergen = 'add-allergen-button',
+    Allergen = 'allergen-',
+    Breadcrumbs = 'breadcrumbs',
+    Nav = 'nav',
+    FilterBtn = 'filter-button',
+    FilterDrawer = 'filter-drawer',
+    FilterCloseBtn = 'close-filter-drawer',
+    CheckboxPotato = 'checkbox-картошка',
+    FilterTag = 'filter-tag',
+    FilterClearBtn = 'clear-filter-button',
+    FilterFindRecipe = 'find-recipe-button',
+    Header = 'header',
+    Hamburger = 'hamburger-icon',
+    HamburgerCloseBtn = 'close-icon',
+    FoodCard = 'food-card-',
+    CardLink = 'card-link-',
+    IncrementStepper = 'increment-stepper',
+    DecrementStepper = 'decrement-stepper',
+    IngredientQuantity = 'ingredient-quantity-',
+    JuicyLink = 'juiciest-link',
+    JuicyLinkMobile = 'juiciest-link-mobile',
+    Footer = 'footer',
+    VeganCheckbox = 'checkbox-веганская кухня',
+    Carousel = 'carousel',
+    CarouselCard = 'carousel-card-',
+    CarouselCardBtnBack = 'carousel-back',
+    CarouselCardBtnForward = 'carousel-forward',
+    SearchInput = 'search-input',
+    SearchBtn = 'search-button',
+    AllergensSwitcher = 'allergens-switcher',
+    AllergensMenuBtn = 'allergens-menu-button',
+    AllergensMenu = 'allergens-menu',
+    AllergensSwitcherFilter = 'allergens-switcher-filter',
+    AllergensMenuBtnFilter = 'allergens-menu-button-filter',
+    ErrorNotification = 'error-notification',
+    CloseAlertBtn = 'close-alert-button',
+    LoaderSearchBlock = 'loader-search-block',
+    AppLoader = 'app-loader',
+    LinkErrorPage = 'error-page-go-home',
+    BtnLoadMore = 'load-more-button',
+}
 
 // Enum для подкатегорий салатов
 export enum SaladsSubcategory {

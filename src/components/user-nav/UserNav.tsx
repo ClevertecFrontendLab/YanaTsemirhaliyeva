@@ -52,15 +52,6 @@ export const UserNav = () => (
                 </Box>
             </ListItem>
         </List>
-        {/* <Box
-            sx={{
-                '@media screen and (min-width: 1200px)': {
-                    display: 'none',
-                },
-            }}
-        >
-            <BurgerMenu />
-        </Box> */}
         <Show above='md'>
             <VStack
                 gap={3}

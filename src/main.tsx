@@ -1,6 +1,6 @@
 import './index.css';
 
-import { ChakraProvider } from '@chakra-ui/react';
+import { ChakraProvider, createStandaloneToast } from '@chakra-ui/react';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
@@ -11,6 +11,8 @@ import { store } from '~/store/configure-store.ts';
 
 import theme from './theme';
 
+const { ToastContainer } = createStandaloneToast();
+
 createRoot(document.getElementById('root')!).render(
     <StrictMode>
         <Provider store={store}>
@@ -18,6 +20,7 @@ createRoot(document.getElementById('root')!).render(
                 <BrowserRouter>
                     <App />
                 </BrowserRouter>
+                <ToastContainer />
             </ChakraProvider>
         </Provider>
     </StrictMode>,
