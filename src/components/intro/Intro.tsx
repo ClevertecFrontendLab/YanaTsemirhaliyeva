@@ -13,7 +13,7 @@ import {
 import { useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 
-import { DataTestId } from '~/consts/consts';
+import { DataTestId, DEFAULT_CARDS_PER_PAGE } from '~/consts/consts';
 import { useGetRecipesQuery } from '~/query/services/recipes';
 import { useAppDispatch, useAppSelector } from '~/store/hooks';
 import {
@@ -55,14 +55,15 @@ export const Intro = ({ title, desc }: IntroProps) => {
         keyof Pick<typeof searchParams, 'allergens' | 'meat' | 'garnish'>
     > = ['allergens', 'meat', 'garnish'];
 
-    const { data: recipesData, isFetching: isLoading } = useGetRecipesQuery(
-        isToggleActive
-            ? { searchString: searchInputCurrent, allergens: selectedAllergens, limit: 8 }
-            : { searchString: searchInputCurrent, limit: 8 },
-        {
-            skip: !isSearchTriggered,
-        },
-    );
+    const recipesQueryParams = {
+        searchString: searchInputCurrent,
+        limit: DEFAULT_CARDS_PER_PAGE,
+        ...(isToggleActive ? { allergens: selectedAllergens } : {}),
+    };
+
+    const { data: recipesData, isFetching: isLoading } = useGetRecipesQuery(recipesQueryParams, {
+        skip: !isSearchTriggered,
+    });
 
     const handleAddCustomAllergen = (customAllergen: string) => {
         if (customAllergen.trim() && !selectedAllergens.includes(customAllergen)) {

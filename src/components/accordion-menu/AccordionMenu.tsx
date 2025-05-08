@@ -14,6 +14,7 @@ import { useNavigate } from 'react-router';
 import { API_IMG, DataTestId } from '~/consts/consts';
 import { useGetCategoriesQuery } from '~/query/services/categories';
 import { useAppDispatch, useAppSelector } from '~/store/hooks';
+import { categoriesSelector } from '~/store/slices/categories-slice';
 import {
     currentCategorySelector,
     currentSubcategorySelector,
@@ -21,7 +22,6 @@ import {
     setSubcategory,
 } from '~/store/slices/recipes-slice';
 import { Category, SubCategory } from '~/types/category';
-import { getCategoriesFromDB, saveCategoriesToDB } from '~/utils';
 
 import { Loader } from '../loader/Loader';
 
@@ -31,57 +31,22 @@ export const AccordionMenu = () => {
     const [activeIndex, setActiveIndex] = useState<number>(-1);
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
-
-    const [cachedCategories, setCachedCategories] = useState<{
-        categories: Category[];
-        subCategories: SubCategory[];
-    }>({
-        categories: [],
-        subCategories: [],
-    });
-
-    useEffect(() => {
-        getCategoriesFromDB().then((storedCategories) => {
-            setCachedCategories(storedCategories);
-        });
-    }, []);
+    const categories = useAppSelector(categoriesSelector);
 
     useEffect(() => {
         if (currentCategory) {
-            const index = cachedCategories.categories.findIndex(
+            const index = categories.findIndex(
                 (category) => category.title === currentCategory.title,
             );
             setActiveIndex(index);
         } else {
             setActiveIndex(-1);
         }
-    }, [currentCategory, cachedCategories.categories]);
+    }, [currentCategory, categories]);
 
-    const {
-        data: categoriesData,
-        isLoading: isCategoriesDataLoading,
-        refetch,
-    } = useGetCategoriesQuery();
+    const { isLoading: isCategoriesDataLoading } = useGetCategoriesQuery();
 
-    useEffect(() => {
-        if (!isCategoriesDataLoading && categoriesData) {
-            saveCategoriesToDB(categoriesData);
-            setCachedCategories(categoriesData);
-        }
-    }, [categoriesData, isCategoriesDataLoading]);
-
-    useEffect(() => {
-        getCategoriesFromDB().then((storedCategories) => {
-            if (!storedCategories.categories.length) {
-                refetch();
-            } else {
-                setCachedCategories(storedCategories);
-            }
-        });
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
-    if (isCategoriesDataLoading || !cachedCategories.categories.length) {
+    if (isCategoriesDataLoading || !categories.length) {
         return <Loader boxSize={80} />;
     }
 
@@ -105,7 +70,7 @@ export const AccordionMenu = () => {
         navigate(`/${category.category}/${subcategory.category}`);
     };
 
-    if (!cachedCategories.categories.length) {
+    if (!categories.length) {
         return <p>Ошибка загрузки категорий</p>;
     }
 
@@ -149,107 +114,101 @@ export const AccordionMenu = () => {
                 }}
                 index={activeIndex}
             >
-                {(cachedCategories?.categories || cachedCategories.categories).map(
-                    (category, index) => (
-                        <AccordionItem key={index} border='none'>
-                            <AccordionButton
-                                data-test-id={category.category}
-                                p={3}
-                                pl={2}
-                                pr={4}
-                                border='none'
-                                borderRadius='none'
-                                _hover={{
-                                    backgroundColor: 'lime.50',
-                                    border: 'none',
-                                }}
-                                _expanded={{
-                                    fontWeight: '600',
-                                    backgroundColor: 'lime.100',
-                                }}
-                                _focus={{
-                                    outline: 'none',
-                                }}
-                                onClick={() =>
-                                    handleCategoryClick(category, category.subCategories[0])
-                                }
+                {categories.map((category, index) => (
+                    <AccordionItem key={index} border='none'>
+                        <AccordionButton
+                            data-test-id={category.category}
+                            p={3}
+                            pl={2}
+                            pr={4}
+                            border='none'
+                            borderRadius='none'
+                            _hover={{
+                                backgroundColor: 'lime.50',
+                                border: 'none',
+                            }}
+                            _expanded={{
+                                fontWeight: '600',
+                                backgroundColor: 'lime.100',
+                            }}
+                            _focus={{
+                                outline: 'none',
+                            }}
+                            onClick={() => handleCategoryClick(category, category.subCategories[0])}
+                        >
+                            <Image src={`${API_IMG}/${category.icon}`} boxSize={6} mr={3} />
+                            <Box
+                                flex='1'
+                                textAlign='left'
+                                isTruncated
+                                {...(category.title === 'Веганская кухня' && {
+                                    'data-test-id': DataTestId.VeganCuisine,
+                                })}
                             >
-                                <Image src={`${API_IMG}/${category.icon}`} boxSize={6} mr={3} />
-                                <Box
-                                    flex='1'
-                                    textAlign='left'
-                                    isTruncated
-                                    {...(category.title === 'Веганская кухня' && {
-                                        'data-test-id': DataTestId.VeganCuisine,
-                                    })}
+                                {category.title}
+                            </Box>
+                            <AccordionIcon boxSize={6} />
+                        </AccordionButton>
+                        <AccordionPanel
+                            pb={4}
+                            display='flex'
+                            flexDirection='column'
+                            alignItems='flex-start'
+                        >
+                            {category.subCategories.map((subcategory, idx) => (
+                                <Button
+                                    data-test-id={
+                                        currentSubcategory?.title === subcategory.title
+                                            ? `${subcategory.category}-active`
+                                            : ''
+                                    }
+                                    h={6}
+                                    width='100%'
+                                    justifyContent='flex-start'
+                                    key={idx}
+                                    border='none'
+                                    pos='relative'
+                                    bgColor='inherit'
+                                    onClick={() => handleSubcategoryClick(subcategory, category)}
+                                    py={4}
+                                    pl={4}
+                                    borderRadius='none'
+                                    fontWeight={
+                                        currentSubcategory?.title === subcategory.title
+                                            ? '600'
+                                            : '500'
+                                    }
+                                    _hover={{
+                                        backgroundColor: 'lime.50',
+                                        color: 'inherit',
+                                    }}
+                                    _focus={{
+                                        outline: 'none',
+                                    }}
                                 >
-                                    {category.title}
-                                </Box>
-                                <AccordionIcon boxSize={6} />
-                            </AccordionButton>
-                            <AccordionPanel
-                                pb={4}
-                                display='flex'
-                                flexDirection='column'
-                                alignItems='flex-start'
-                            >
-                                {category.subCategories.map((subcategory, idx) => (
-                                    <Button
-                                        data-test-id={
+                                    {subcategory.title}
+                                    <Box
+                                        as='span'
+                                        pos='absolute'
+                                        left={
                                             currentSubcategory?.title === subcategory.title
-                                                ? `${subcategory.category}-active`
-                                                : ''
+                                                ? '-8px'
+                                                : '0'
                                         }
                                         h={6}
-                                        width='100%'
-                                        justifyContent='flex-start'
-                                        key={idx}
-                                        border='none'
-                                        pos='relative'
-                                        bgColor='inherit'
-                                        onClick={() =>
-                                            handleSubcategoryClick(subcategory, category)
-                                        }
-                                        py={4}
-                                        pl={4}
-                                        borderRadius='none'
-                                        fontWeight={
+                                        w={
                                             currentSubcategory?.title === subcategory.title
-                                                ? '600'
-                                                : '500'
+                                                ? '8px'
+                                                : '1px'
                                         }
-                                        _hover={{
-                                            backgroundColor: 'lime.50',
-                                            color: 'inherit',
-                                        }}
-                                        _focus={{
-                                            outline: 'none',
-                                        }}
-                                    >
-                                        {subcategory.title}
-                                        <Box
-                                            as='span'
-                                            pos='absolute'
-                                            left={
-                                                currentSubcategory?.title === subcategory.title
-                                                    ? '-8px'
-                                                    : '0'
-                                            }
-                                            h={6}
-                                            w={
-                                                currentSubcategory?.title === subcategory.title
-                                                    ? '8px'
-                                                    : '1px'
-                                            }
-                                            bg='lime.300'
-                                            transition='all 0.2s ease-in-out'
-                                        />
-                                    </Button>
-                                ))}
-                            </AccordionPanel>
-                        </AccordionItem>
-                    ),
-                )}
+                                        bg='lime.300'
+                                        transition='all 0.2s ease-in-out'
+                                    />
+                                </Button>
+                            ))}
+                        </AccordionPanel>
+                    </AccordionItem>
+                ))}
             </Accordion>
         </Box>
     );

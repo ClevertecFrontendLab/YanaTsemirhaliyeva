@@ -24,7 +24,7 @@ const allergens = [
     'Рыба',
     'Моллюски',
     'Орехи',
-    'Томат',
+    'Томат (помидоры)',
     'Цитрусовые',
     'Клубника (ягоды)',
     'Шоколад',
@@ -33,6 +33,8 @@ const allergens = [
 type AllergenSelectProps = {
     selectedAllergens: string[];
     isFilterActive: boolean;
+    testIdSwitcher: string;
+    testIdMenuButton: string;
     onToggleFilter: () => void;
     onCheckboxChange: (allergen: string) => void;
     onAddCustomAllergen: (allergen: string) => void;
@@ -40,8 +42,6 @@ type AllergenSelectProps = {
     setShadowVisible?: (visible: boolean) => void;
     direction?: 'row' | 'column';
     width?: string;
-    testIdSwitcher: string;
-    testIdMenuButton: string;
     testIdMenuList?: string;
     isIntro?: boolean;
 };

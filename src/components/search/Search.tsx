@@ -7,6 +7,7 @@ import { DataTestId } from '~/consts/consts';
 import { useAppDispatch, useAppSelector } from '~/store/hooks';
 import {
     allergensSelector,
+    applyIntroAllergens,
     clearSearch,
     serchInputSelector,
     setIsSearchTriggered,
@@ -46,6 +47,7 @@ export const Search = ({ recipesData }: SearchProps) => {
     const handleSearch = () => {
         if (searchInput.trim().length >= 2 || selectedAllergens.length > 0) {
             dispatch(setSearchQuery(searchInput.trim()));
+            dispatch(applyIntroAllergens());
             dispatch(setIsSearchTriggered(true));
         }
     };

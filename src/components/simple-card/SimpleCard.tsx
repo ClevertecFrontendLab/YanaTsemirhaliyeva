@@ -13,12 +13,12 @@ import {
     Text,
     VStack,
 } from '@chakra-ui/react';
-import { useEffect, useState } from 'react';
 
 import { API_IMG } from '~/consts/consts';
-import { Category } from '~/types/category';
+import { useAppSelector } from '~/store/hooks';
+import { categoriesSelector } from '~/store/slices/categories-slice';
 import { Recipe } from '~/types/recipe';
-import { getCategoriesFromDB } from '~/utils';
+import { getUniqueCategories } from '~/utils';
 
 type SimpleCardProps = {
     item: Recipe;
@@ -26,25 +26,8 @@ type SimpleCardProps = {
 
 export const SimpleCard = ({ item }: SimpleCardProps) => {
     const { title, description, bookmarks, likes, categoriesIds } = item;
-
-    const [categories, setCategories] = useState<Category[]>([]);
-
-    useEffect(() => {
-        if (!categoriesIds) return;
-        const loadCategories = async () => {
-            const storedCategories = await getCategoriesFromDB();
-            const matchedCategories = storedCategories.categories.filter((category) =>
-                category.subCategories?.some((sub) => categoriesIds.includes(sub._id)),
-            );
-            const uniqueCategories = matchedCategories.filter(
-                (cat, index, self) => self.findIndex((c) => c._id === cat._id) === index,
-            );
-
-            setCategories(uniqueCategories);
-        };
-
-        loadCategories();
-    }, [categoriesIds]);
+    const categories = useAppSelector(categoriesSelector);
+    const uniqueCategories = getUniqueCategories(categories, categoriesIds);
 
     return (
         <Card
@@ -80,7 +63,7 @@ export const SimpleCard = ({ item }: SimpleCardProps) => {
             </CardBody>
             <CardFooter pt={1} pb={{ base: 3, xl: 6 }} pl={{ base: 3, sm: 6, md: 4 }}>
                 <VStack maxW='65%' alignItems='flex-start'>
-                    {categories.map((cat, idx) => (
+                    {uniqueCategories.map((cat, idx) => (
                         <Tag
                             key={idx}
                             size='md'

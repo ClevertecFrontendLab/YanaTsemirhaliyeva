@@ -1,5 +1,4 @@
 import {
-    // Avatar,
     Box,
     Button,
     Card,
@@ -31,14 +30,11 @@ type HorizontalCard = {
     _id: string;
     title: string;
     description: string;
+
+    categoriesIds: string[];
     image?: string;
     bookmarks?: number;
     likes?: number;
-    categoriesIds: string[];
-    // recommendation?: {
-    //     avatar: string;
-    //     name: string;
-    // };
 };
 
 type HorizontalCardProps = {
@@ -48,16 +44,7 @@ type HorizontalCardProps = {
 };
 
 export const HorizontalCard = ({ item, index, categories }: HorizontalCardProps) => {
-    const {
-        _id,
-        title,
-        description,
-        image,
-        bookmarks,
-        likes,
-        categoriesIds,
-        // recommendation,
-    } = item;
+    const { _id, title, description, image, bookmarks, likes, categoriesIds } = item;
     const searchInputCurrent = useSelector(serchInputSelector);
     const isTruncated = useBreakpointValue({ base: false, sm: true });
     const navigate = useNavigate();
@@ -101,30 +88,6 @@ export const HorizontalCard = ({ item, index, categories }: HorizontalCardProps)
                 pos='relative'
                 overflow='hidden'
             />
-            {/* {recommendation && isTruncated && (
-                <Box pos='absolute' left={6} bottom={5} maxW='calc(50% - 20px)' overflow='hidden'>
-                    <Tag
-                        size='md'
-                        backgroundColor='lime.150'
-                        borderRadius='sm'
-                        minW={0}
-                        overflow='hidden'
-                        whiteSpace='nowrap'
-                        textOverflow='ellipsis'
-                    >
-                        <Avatar
-                            src={recommendation.avatar}
-                            boxSize={4}
-                            name={recommendation.name}
-                            ml={-1}
-                            mr={2}
-                        />
-                        <TagLabel isTruncated fontSize={14} lineHeight={7}>
-                            {recommendation.name} рекомендует
-                        </TagLabel>
-                    </Tag>
-                </Box>
-            )} */}
             <Stack
                 width={{ base: '52%', xs: '55.5%', sm: '60.5%', xl: '48%' }}
                 gap={{ base: '1px', sm: 2 }}

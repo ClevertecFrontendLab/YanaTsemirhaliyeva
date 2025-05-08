@@ -20,12 +20,12 @@ import { useAppDispatch, useAppSelector } from '~/store/hooks';
 import { selectedFiltersSelector, updateSelectedFilters } from '~/store/slices/recipes-slice';
 
 type MenuComponentProps = {
+    list: string[];
+    type: 'categories' | 'authors';
     width?: string;
     placeholder?: string;
-    list: string[];
     isAddItem?: boolean;
     newItem?: string;
-    type: 'categories' | 'authors';
     dataTestId?: string;
 };
 

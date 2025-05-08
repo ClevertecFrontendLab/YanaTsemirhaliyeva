@@ -8,123 +8,6 @@ export const highlightText = (text: string, search: string) => {
     return text.split(regex).filter(Boolean);
 };
 
-// export const filterRecipes = (state: RecipeState) => {
-//     const {
-//         recipes,
-//         searchQuery,
-//         appliedFilters,
-//         currentCategory,
-//         currentSubcategory,
-//         isFilterAllergenActive,
-//         isIntroAllergenActive,
-//         allergens,
-//     } = state;
-
-//     const activeAllergens = Array.from(
-//         new Set([
-//             ...(isFilterAllergenActive ? appliedFilters.allergens || [] : []),
-//             ...(isIntroAllergenActive ? allergens : []),
-//         ]),
-//     );
-
-//     const extractKeywords = (text: string) =>
-//         text
-//             .toLowerCase()
-//             .replace(/[^a-zа-яё\s]/g, '')
-//             .split(/\s+/);
-
-//     //checks tests
-//     const normalizedAllergens = activeAllergens.flatMap((allergen) =>
-//         extractKeywords(allergen).map((word) => word.slice(0, 3)),
-//     );
-
-//     return recipes.filter((recipe) => {
-//         const matchesSearch =
-//             !searchQuery || recipe.title.toLowerCase().includes(searchQuery.trim().toLowerCase());
-
-//         const categoryKey = currentCategory
-//             ? getCategoryRoute(currentCategory.title).replace(/^\//, '')
-//             : null;
-//         const subcategoryKey = currentSubcategory
-//             ? getSubcategoryRoute(currentCategory?.title || '', currentSubcategory.title).replace(
-//                   /^\//,
-//                   '',
-//               )
-//             : null;
-
-//         const allSelectedCategories = Array.from(new Set(appliedFilters.categories || []));
-//         const realCategory = JSON.parse(JSON.stringify(recipe.category));
-
-//         const currentCategoryMatch = categoryKey ? realCategory.includes(categoryKey) : true;
-
-//         const drawerCategoryMatch =
-//             allSelectedCategories.length > 0
-//                 ? allSelectedCategories.some((drawerCategory) => {
-//                       const drawerCategoryKey = getCategoryRoute(drawerCategory).replace(/^\//, '');
-//                       return realCategory.includes(drawerCategoryKey);
-//                   })
-//                 : true;
-
-//         const categoryMatch = currentCategoryMatch && drawerCategoryMatch;
-
-//         const subcategoryMatch = subcategoryKey
-//             ? recipe.subcategory.includes(subcategoryKey)
-//             : true;
-
-//         const meatMatch =
-//             appliedFilters.meatTypes && appliedFilters.meatTypes?.length > 0
-//                 ? appliedFilters.meatTypes.some((meat) =>
-//                       recipe.ingredients.some(
-//                           (ingredient) =>
-//                               ingredient.title.trim().toLowerCase() === meat.trim().toLowerCase(),
-//                       ),
-//                   )
-//                 : true;
-
-//         const garnishMatch =
-//             appliedFilters.garnishTypes && appliedFilters.garnishTypes.length > 0
-//                 ? appliedFilters.garnishTypes.some((garnish) => {
-//                       const normalizedGarnish = garnish.trim();
-//                       const mappedGarnish = garnishMapping[normalizedGarnish]?.toLowerCase();
-
-//                       return (
-//                           recipe.side?.toLowerCase() === mappedGarnish ||
-//                           recipe.ingredients.some((ingredient) => {
-//                               const ingredientName = ingredient.title.trim().toLowerCase();
-
-//                               return (
-//                                   ingredientName === normalizedGarnish ||
-//                                   garnishMapping[ingredientName]?.toLowerCase() === mappedGarnish
-//                               );
-//                           })
-//                       );
-//                   })
-//                 : true;
-
-//         const allergensMatch =
-//             normalizedAllergens.length > 0
-//                 ? recipe.ingredients.every((ingredient) => {
-//                       const normalizedIngredientKeywords = extractKeywords(
-//                           ingredient.title.trim(),
-//                       ).map((word) => word.slice(0, 3));
-
-//                       return !normalizedIngredientKeywords.some((keyword) =>
-//                           normalizedAllergens.includes(keyword),
-//                       );
-//                   })
-//                 : true;
-
-//         const result =
-//             matchesSearch &&
-//             categoryMatch &&
-//             subcategoryMatch &&
-//             meatMatch &&
-//             garnishMatch &&
-//             allergensMatch;
-//         return result;
-//     });
-// };
-
 // Функция для генерации dynamic test-id
 export const generateTestId = (baseId: DataTestId, dynamicPart: string | number): string =>
     `${baseId}${dynamicPart}`;
@@ -182,7 +65,6 @@ export const saveCategoriesToDB = async (data: {
         };
 
         tx.onerror = () => {
-            console.error('❌ Ошибка при сохранении данных в IndexedDB', tx.error);
             reject(tx.error);
         };
     });
@@ -200,7 +82,6 @@ export const getCategoriesFromDB = async (): Promise<{
             !db.objectStoreNames.contains('categories') ||
             !db.objectStoreNames.contains('subCategories')
         ) {
-            console.error("❌ Object store 'categories' или 'subCategories' не найден!");
             resolve({ categories: [], subCategories: [] });
             return;
         }
@@ -279,3 +160,74 @@ export async function getCategoryAndSubcategoryFromUrl(pathname: string): Promis
     result.id = id;
     return result;
 }
+
+// utils/categoryUtils.ts
+export const getUniqueCategories = (categories: Category[], categoriesIds: string[]) =>
+    categories.filter(
+        (category) =>
+            category.subCategories?.some((sub) => categoriesIds.includes(sub._id)) &&
+            categories.findIndex((c) => c._id === category._id) === categories.indexOf(category),
+    );
+
+export const getCategoryTitles = (selectedCategories: string[], categories: Category[]) => {
+    const uniqueRootIds = new Set(
+        selectedCategories
+            .map((subId) => {
+                const subcategory = categories
+                    .flatMap((cat) => cat.subCategories)
+                    .find((sub) => sub._id === subId);
+                return subcategory?.rootCategoryId;
+            })
+            .filter(Boolean),
+    );
+
+    return categories.filter((cat) => uniqueRootIds.has(cat._id)).map((cat) => cat.title);
+};
+
+export const transformCategoryResponse = (
+    response: Array<Category | SubCategory>,
+): { categories: Category[]; subCategories: SubCategory[] } => {
+    const subCategorySet = new Set();
+
+    return response.reduce<{ categories: Category[]; subCategories: SubCategory[] }>(
+        (acc, item) => {
+            if ('subCategories' in item && Array.isArray(item.subCategories)) {
+                acc.categories.push({
+                    _id: item._id,
+                    title: item.title,
+                    category: item.category,
+                    icon: item.icon,
+                    description: item.description,
+                    subCategories: item.subCategories,
+                });
+
+                item.subCategories.forEach((sub) => {
+                    if (!subCategorySet.has(sub._id)) {
+                        subCategorySet.add(sub._id);
+                        acc.subCategories.push({
+                            _id: sub._id,
+                            title: sub.title,
+                            category: sub.category,
+                            rootCategoryId: item._id,
+                        });
+                    }
+                });
+            } else if ('rootCategoryId' in item) {
+                if (!subCategorySet.has(item._id)) {
+                    subCategorySet.add(item._id);
+                    acc.subCategories.push({
+                        _id: item._id,
+                        title: item.title,
+                        category: item.category,
+                        rootCategoryId: item.rootCategoryId,
+                    });
+                }
+            } else {
+                console.warn(`⚠️ Неизвестный формат объекта:`, item);
+            }
+
+            return acc;
+        },
+        { categories: [], subCategories: [] },
+    );
+};

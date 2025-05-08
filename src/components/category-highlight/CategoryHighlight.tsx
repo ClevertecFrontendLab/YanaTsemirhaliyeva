@@ -3,12 +3,14 @@ import { useEffect, useRef, useState } from 'react';
 
 import { useGetRecipesByCategoryQuery } from '~/query/services/recipes';
 import { useAppDispatch, useAppSelector } from '~/store/hooks';
+import { categoriesSelector } from '~/store/slices/categories-slice';
 import { currentCategorySelector, setError } from '~/store/slices/recipes-slice';
 import { Category } from '~/types/category';
-import { getCategoriesFromDB } from '~/utils';
 
 import { NarrowCard } from '../narrow-card/NarrowCard';
 import { SimpleCard } from '../simple-card/SimpleCard';
+
+const LIMIT_CARDS_VALUE = 5;
 
 type CategoryHighlightProps = {
     isDivider?: boolean;
@@ -17,32 +19,27 @@ type CategoryHighlightProps = {
 export const CategoryHighlight = ({ isDivider = false }: CategoryHighlightProps) => {
     const dispatch = useAppDispatch();
     const currentCategory = useAppSelector(currentCategorySelector);
+    const categories = useAppSelector(categoriesSelector);
     const [randomCategory, setRandomCategory] = useState<Category | null>(null);
 
     const randomCategoryRef = useRef<Category | null>(null);
 
     useEffect(() => {
-        const fetchCategoryDetails = async () => {
-            const storedCategories = await getCategoriesFromDB();
-            if (!storedCategories.categories.length) return;
+        if (!categories.length) return;
+        let newRandomCategory = randomCategoryRef.current;
+        do {
+            const randomIndex = Math.floor(Math.random() * categories.length);
+            newRandomCategory = categories[randomIndex];
+        } while (newRandomCategory?.category === currentCategory?.category);
 
-            let newRandomCategory = randomCategoryRef.current;
-            do {
-                const randomIndex = Math.floor(Math.random() * storedCategories.categories.length);
-                newRandomCategory = storedCategories.categories[randomIndex];
-            } while (newRandomCategory?.category === currentCategory?.category);
-
-            randomCategoryRef.current = newRandomCategory;
-            setRandomCategory(newRandomCategory);
-        };
-
-        fetchCategoryDetails();
-    }, [currentCategory?.category]);
+        randomCategoryRef.current = newRandomCategory;
+        setRandomCategory(newRandomCategory);
+    }, [currentCategory?.category, categories]);
 
     const { data, isError } = useGetRecipesByCategoryQuery(
         {
             subCategoryId: randomCategory?.subCategories[0]?._id ?? '',
-            limit: 5,
+            limit: LIMIT_CARDS_VALUE,
         },
         {
             skip: !randomCategory?.subCategories[0]?._id,

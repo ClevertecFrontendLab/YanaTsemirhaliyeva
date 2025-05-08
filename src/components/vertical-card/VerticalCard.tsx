@@ -14,21 +14,21 @@ import {
     TagLabel,
     Text,
 } from '@chakra-ui/react';
-import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
 
 import { API_IMG } from '~/consts/consts';
+import { useAppSelector } from '~/store/hooks';
+import { categoriesSelector } from '~/store/slices/categories-slice';
 import { serchInputSelector } from '~/store/slices/recipes-slice';
-import { Category } from '~/types/category';
-import { getCategoriesFromDB, highlightText } from '~/utils';
+import { getUniqueCategories, highlightText } from '~/utils';
 
 type VerticalCard = {
     _id: string;
     title: string;
     description: string;
-    image?: string;
     categoriesIds: string[];
+    image?: string;
     bookmarks?: number;
     likes?: number;
 };
@@ -42,27 +42,12 @@ export const VerticalCard = ({ item }: VerticalCardProps) => {
     const navigate = useNavigate();
     const searchInputCurrent = useSelector(serchInputSelector);
     const highlightedTitle = highlightText(title, searchInputCurrent);
-    const [categories, setCategories] = useState<Category[]>([]);
-
-    useEffect(() => {
-        const loadCategories = async () => {
-            const storedCategories = await getCategoriesFromDB();
-            const matchedCategories = storedCategories.categories.filter((category) =>
-                category.subCategories?.some((sub) => categoriesIds.includes(sub._id)),
-            );
-            const uniqueCategories = matchedCategories.filter(
-                (cat, index, self) => self.findIndex((c) => c._id === cat._id) === index,
-            );
-
-            setCategories(uniqueCategories);
-        };
-
-        loadCategories();
-    }, [categoriesIds]);
+    const categories = useAppSelector(categoriesSelector);
+    const uniqueCategories = getUniqueCategories(categories, categoriesIds);
 
     const handleCardClick = () => {
-        if (categories.length) {
-            const recipeUrl = `/${categories[0].category}/${categories[0].subCategories?.[0]?.category}/${_id}`;
+        if (uniqueCategories.length) {
+            const recipeUrl = `/${uniqueCategories[0].category}/${uniqueCategories[0].subCategories?.[0]?.category}/${_id}`;
             navigate(recipeUrl);
         }
     };
@@ -133,7 +118,7 @@ export const VerticalCard = ({ item }: VerticalCardProps) => {
             >
                 <Show above='sm'>
                     <Flex flexWrap='wrap' gap={2} maxW='60%'>
-                        {categories.map((cat, idx) => (
+                        {uniqueCategories.map((cat, idx) => (
                             <Tag
                                 key={idx}
                                 size='sm'

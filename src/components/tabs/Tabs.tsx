@@ -13,19 +13,16 @@ import {
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
 
-import {
-    useGetRecipesByCategoryWithPaginateQuery,
-    // useGetRecipesWithFiltersAndPaginateQuery
-} from '~/query/services/recipes';
+import { DEFAULT_CARDS_PER_PAGE } from '~/consts/consts';
+import { useGetRecipesWithFiltersAndPaginateQuery } from '~/query/services/recipes';
 import { useAppDispatch, useAppSelector } from '~/store/hooks';
+import { categoriesSelector } from '~/store/slices/categories-slice';
 import {
     currentCategorySelector,
     currentSubcategorySelector,
     searchParamsSelector,
     setSubcategory,
 } from '~/store/slices/recipes-slice';
-import { Category } from '~/types/category';
-import { getCategoriesFromDB } from '~/utils';
 
 import { HorizontalCard } from '../horizontal-card/HorizontalCard';
 
@@ -35,15 +32,9 @@ export const TabsComponent = () => {
     const currentCategory = useAppSelector(currentCategorySelector);
     const currentSubcategory = useAppSelector(currentSubcategorySelector);
     const searchParams = useAppSelector(searchParamsSelector);
-    const [categories, setCategories] = useState<Category[]>([]);
+    const categories = useAppSelector(categoriesSelector);
     const [page, setPage] = useState(1);
     const [activeTabIndex, setActiveTabIndex] = useState(0);
-
-    useEffect(() => {
-        getCategoriesFromDB().then((storedCategories) =>
-            setCategories(storedCategories.categories),
-        );
-    }, []);
 
     const subcategories = useMemo(() => currentCategory?.subCategories || [], [currentCategory]);
 
@@ -59,29 +50,13 @@ export const TabsComponent = () => {
         setPage(1);
     }, [searchParams]);
 
-    // const { data, isLoading } = useGetRecipesWithFiltersAndPaginateQuery(
-    //     {
-    //         subcategoriesIds: selectedSubCategoryId,
-    //         searchString: searchParams.searchString || '',
-    //         allergens: searchParams.allergens || [],
-    //         meat: searchParams.meat || [],
-    //         garnish: searchParams.garnish || [],
-    //         page,
-    //         limit: 8,
-    //     },
-    //     {
-    //         skip: !selectedSubCategoryId,
-    //         refetchOnMountOrArgChange: true,
-    //     },
-    // );
-
-    const { data, isLoading } = useGetRecipesByCategoryWithPaginateQuery(
+    const { data, isLoading } = useGetRecipesWithFiltersAndPaginateQuery(
         {
-            subCategoryId: selectedSubCategoryId,
+            subcategoriesIds: [selectedSubCategoryId],
             searchString: searchParams.searchString || '',
             allergens: searchParams.allergens || [],
             page,
-            limit: 8,
+            limit: DEFAULT_CARDS_PER_PAGE,
         },
         {
             skip: !selectedSubCategoryId,

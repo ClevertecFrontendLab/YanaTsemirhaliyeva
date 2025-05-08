@@ -16,13 +16,13 @@ import {
     TagLabel,
     Text,
 } from '@chakra-ui/react';
-import { useEffect, useState } from 'react';
 
 import { API_IMG } from '~/consts/consts';
 import { BookmarkIcon, HappyFaceIcon, TimeIcon } from '~/shared/custom-icons';
-import { Category } from '~/types/category';
+import { useAppSelector } from '~/store/hooks';
+import { categoriesSelector } from '~/store/slices/categories-slice';
 import { Recipe } from '~/types/recipe';
-import { getCategoriesFromDB } from '~/utils';
+import { getUniqueCategories } from '~/utils';
 
 type FullSizeCardProps = {
     item: Recipe;
@@ -30,24 +30,8 @@ type FullSizeCardProps = {
 
 export const FullSizeCard = ({ item }: FullSizeCardProps) => {
     const { title, bookmarks, image, likes, time, description, categoriesIds } = item;
-
-    const [categories, setCategories] = useState<Category[]>([]);
-
-    useEffect(() => {
-        const loadCategories = async () => {
-            const storedCategories = await getCategoriesFromDB();
-            const matchedCategories = storedCategories.categories.filter((category) =>
-                category.subCategories?.some((sub) => categoriesIds.includes(sub._id)),
-            );
-            const uniqueCategories = matchedCategories.filter(
-                (cat, index, self) => self.findIndex((c) => c._id === cat._id) === index,
-            );
-
-            setCategories(uniqueCategories);
-        };
-
-        loadCategories();
-    }, [categoriesIds]);
+    const categories = useAppSelector(categoriesSelector);
+    const uniqueCategories = getUniqueCategories(categories, categoriesIds);
 
     return (
         <Card
@@ -78,7 +62,7 @@ export const FullSizeCard = ({ item }: FullSizeCardProps) => {
                     pt={{ md: 0 }}
                 >
                     <HStack flexWrap='wrap'>
-                        {categories.map((cat, i) => (
+                        {uniqueCategories.map((cat, i) => (
                             <Box key={i}>
                                 <Tag
                                     size={{ base: 'sm', sm: 'md' }}

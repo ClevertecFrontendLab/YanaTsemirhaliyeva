@@ -13,12 +13,19 @@ import { DataTestId } from '~/consts/consts';
 import { useAppDispatch, useAppSelector } from '~/store/hooks';
 import { clearError, isErrorSelector } from '~/store/slices/recipes-slice';
 
-export const AlertComponent = () => {
+const TIME = 5000;
+
+type AlertComponentProps = {
+    title: string;
+    desc: string;
+};
+
+export const AlertComponent = ({ title, desc }: AlertComponentProps) => {
     const dispatch = useAppDispatch();
     const isError = useAppSelector(isErrorSelector);
 
     useEffect(() => {
-        const timer = setTimeout(() => dispatch(clearError()), 20000);
+        const timer = setTimeout(() => dispatch(clearError()), TIME);
         return () => {
             clearTimeout(timer);
         };
@@ -42,8 +49,8 @@ export const AlertComponent = () => {
                 >
                     <AlertIcon />
                     <Box width='100%'>
-                        <AlertTitle>Ошибка сервера</AlertTitle>
-                        <AlertDescription>Попробуйте поискать снова попозже</AlertDescription>
+                        <AlertTitle>{title}</AlertTitle>
+                        <AlertDescription>{desc}</AlertDescription>
                     </Box>
                     <CloseButton
                         data-test-id={DataTestId.CloseAlertBtn}

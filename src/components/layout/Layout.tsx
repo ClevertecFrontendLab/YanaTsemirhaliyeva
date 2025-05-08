@@ -1,19 +1,14 @@
 import { Box, Flex, Hide } from '@chakra-ui/react';
 import { ReactNode, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router';
 
-import { AppRoute, DataTestId } from '~/consts/consts';
+import { DataTestId, DEFAULT_CARDS_PER_PAGE, DEFAULT_PAGE } from '~/consts/consts';
+import { useCategoryData } from '~/hooks/use-category-data';
 import { useGetCategoriesQuery } from '~/query/services/categories';
 import { useGetRecipeByIdQuery, useGetRecipesQuery } from '~/query/services/recipes';
 import { useAppDispatch, useAppSelector } from '~/store/hooks';
-import {
-    currentRecipeIdSelector,
-    isFetching,
-    setCategory,
-    setRecipeTitle,
-    setSubcategory,
-} from '~/store/slices/recipes-slice';
-import { getCategoriesFromDB, getCategoryAndSubcategoryFromUrl, saveCategoriesToDB } from '~/utils';
+import { setCategories, setSubCategories } from '~/store/slices/categories-slice';
+import { currentRecipeIdSelector, isFetching } from '~/store/slices/recipes-slice';
+import { saveCategoriesToDB } from '~/utils';
 
 import { AccordionMenu } from '../accordion-menu/AccordionMenu';
 import { AlertComponent } from '../alert/Alert';
@@ -29,16 +24,17 @@ type LayoutProps = {
 
 export const Layout = ({ children }: LayoutProps) => {
     const dispatch = useAppDispatch();
-    const location = useLocation();
-    const navigate = useNavigate();
     const recipeId = useAppSelector(currentRecipeIdSelector);
     const isJuiciestFetching = useAppSelector(isFetching);
     const { data: categoriesData, isLoading: isCategoriesDataLoading } = useGetCategoriesQuery();
-    const { isFetching: isRecipesLoading } = useGetRecipesQuery({ limit: 8, sortBy: 'createdAt' });
+    const { isFetching: isRecipesLoading } = useGetRecipesQuery({
+        limit: DEFAULT_CARDS_PER_PAGE,
+        sortBy: 'createdAt',
+    });
     const { isFetching: isJuiciestRecipesLoading } = useGetRecipesQuery({
-        limit: 8,
+        limit: DEFAULT_CARDS_PER_PAGE,
         sortBy: 'likes',
-        page: 1,
+        page: DEFAULT_PAGE,
     });
     const { isFetching: isRecipeLoading } = useGetRecipeByIdQuery(recipeId ?? '', {
         skip: !recipeId,
@@ -54,64 +50,12 @@ export const Layout = ({ children }: LayoutProps) => {
     useEffect(() => {
         if (categoriesData) {
             saveCategoriesToDB(categoriesData);
+            dispatch(setCategories(categoriesData.categories));
+            dispatch(setSubCategories(categoriesData.subCategories));
         }
-    }, [categoriesData]);
+    }, [categoriesData, dispatch]);
 
-    useEffect(() => {
-        const fetchCategoryData = async () => {
-            const { category, subcategory, id, isValid } = await getCategoryAndSubcategoryFromUrl(
-                location.pathname,
-            );
-            const { categories } = await getCategoriesFromDB();
-
-            const excludedRoutes = [AppRoute.Index, AppRoute.Juicy, AppRoute.NotFound].map(String);
-            if (excludedRoutes.includes(location.pathname)) return;
-
-            if (!isValid) {
-                navigate(AppRoute.NotFound, { replace: true });
-                return;
-            }
-
-            if (id) {
-                dispatch(setCategory(null));
-                dispatch(setSubcategory(null));
-                return;
-            } else {
-                dispatch(setRecipeTitle(null));
-            }
-
-            const validCategory = categories.find((cat) => cat.category === category?.category);
-            if (!validCategory) {
-                navigate(AppRoute.NotFound, { replace: true });
-                return;
-            }
-
-            dispatch(setCategory(category));
-
-            if (subcategory) {
-                const validSubcategory = validCategory.subCategories?.find(
-                    (sub) => sub.category === subcategory.category,
-                );
-
-                if (!validSubcategory) {
-                    navigate(AppRoute.NotFound, { replace: true });
-                    return;
-                }
-
-                dispatch(setSubcategory(subcategory));
-            } else {
-                const firstSubcategory = validCategory.subCategories?.[0];
-                if (category && firstSubcategory) {
-                    dispatch(setSubcategory(firstSubcategory));
-                    navigate(`/${category.category}/${firstSubcategory.category}`, {
-                        replace: true,
-                    });
-                }
-            }
-        };
-
-        fetchCategoryData();
-    }, [dispatch, location.pathname, navigate]);
+    useCategoryData();
 
     return (
         <Flex flexDirection='column' h='100%' minH='100vh' w='100%' minW='359px'>
@@ -166,7 +110,7 @@ export const Layout = ({ children }: LayoutProps) => {
                 <Footer />
             </Box>
             <LoaderFullsize isOpen={isDataLoading} />
-            <AlertComponent />
+            <AlertComponent title='Ошибка сервера' desc='Попробуйте поискать снова попозже' />
         </Flex>
     );
 };

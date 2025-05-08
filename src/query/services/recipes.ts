@@ -1,29 +1,30 @@
+import { DEFAULT_CARDS_PER_PAGE, DEFAULT_PAGE } from '~/consts/consts';
 import { Recipe } from '~/types/recipe';
 
 import { baseApiSlice } from '../base-api';
 import { ApiEndpoints } from '../constants/api';
 import { Tags } from '../constants/tags';
-
-type RecipeResponse = {
-    data: Recipe[];
-    meta: { total: number; page: number; limit: number; totalPages: number };
-};
+import {
+    GetPaginatedRecipesParams,
+    GetRecipesByCategoryParams,
+    GetRecipesByCategoryWithPaginateParams,
+    GetRecipesParams,
+    GetRecipesWithFiltersAndPaginateParams,
+    RecipeResponse,
+} from '../types/recipeApi.types';
 
 export const recipeApiSlice = baseApiSlice
     .enhanceEndpoints({ addTagTypes: [Tags.RECIPES] })
     .injectEndpoints({
         endpoints: (builder) => ({
-            getRecipesByCategory: builder.query<
-                RecipeResponse,
-                {
-                    subCategoryId: string;
-                    searchString?: string;
-                    allergens?: string[];
-                    page?: number;
-                    limit?: number;
-                }
-            >({
-                query: ({ subCategoryId, searchString, allergens, page = 1, limit = 8 }) => ({
+            getRecipesByCategory: builder.query<RecipeResponse, GetRecipesByCategoryParams>({
+                query: ({
+                    subCategoryId,
+                    searchString,
+                    allergens,
+                    page = DEFAULT_PAGE,
+                    limit = DEFAULT_CARDS_PER_PAGE,
+                }) => ({
                     url: `${ApiEndpoints.RECIPES}/category/${subCategoryId}`,
                     params: {
                         page,
@@ -32,21 +33,15 @@ export const recipeApiSlice = baseApiSlice
                         ...(allergens?.length ? { allergens: allergens.join(',') } : {}),
                     },
                 }),
+                forceRefetch({ currentArg, previousArg }) {
+                    return (
+                        currentArg?.searchString !== previousArg?.searchString ||
+                        JSON.stringify(currentArg?.allergens) !==
+                            JSON.stringify(previousArg?.allergens)
+                    );
+                },
             }),
-            getRecipes: builder.query<
-                RecipeResponse,
-                {
-                    searchString?: string;
-                    allergens?: string[];
-                    meat?: string[];
-                    garnish?: string[];
-                    subcategoriesIds?: string[];
-                    sortBy?: 'createdAt' | 'likes';
-                    sortOrder?: 'asc' | 'desc';
-                    page?: number;
-                    limit?: number;
-                }
-            >({
+            getRecipes: builder.query<RecipeResponse, GetRecipesParams>({
                 query: ({
                     searchString,
                     allergens,
@@ -55,8 +50,8 @@ export const recipeApiSlice = baseApiSlice
                     subcategoriesIds,
                     sortBy = 'createdAt',
                     sortOrder = 'desc',
-                    page = 1,
-                    limit = 8,
+                    page = DEFAULT_PAGE,
+                    limit = DEFAULT_CARDS_PER_PAGE,
                 }) => ({
                     url: `${ApiEndpoints.RECIPES}`,
                     params: {
@@ -73,26 +68,20 @@ export const recipeApiSlice = baseApiSlice
                         sortOrder,
                     },
                 }),
+                forceRefetch({ currentArg, previousArg }) {
+                    return (
+                        currentArg?.searchString !== previousArg?.searchString ||
+                        JSON.stringify(currentArg?.subcategoriesIds) !==
+                            JSON.stringify(previousArg?.subcategoriesIds)
+                    );
+                },
             }),
             getRecipeById: builder.query<Recipe, string>({
                 query: (recipeId) => ({
                     url: `${ApiEndpoints.RECIPES}/${recipeId}`,
                 }),
             }),
-            getPaginatedRecipes: builder.query<
-                RecipeResponse,
-                {
-                    searchString?: string;
-                    allergens?: string[];
-                    meat?: string[];
-                    garnish?: string[];
-                    subcategoriesIds?: string[];
-                    sortBy?: 'createdAt' | 'likes';
-                    sortOrder?: 'asc' | 'desc';
-                    page: number;
-                    limit?: number;
-                }
-            >({
+            getPaginatedRecipes: builder.query<RecipeResponse, GetPaginatedRecipesParams>({
                 query: ({
                     searchString,
                     allergens,
@@ -102,7 +91,7 @@ export const recipeApiSlice = baseApiSlice
                     sortBy = 'createdAt',
                     sortOrder = 'desc',
                     page,
-                    limit = 8,
+                    limit = DEFAULT_CARDS_PER_PAGE,
                 }) => ({
                     url: ApiEndpoints.RECIPES,
                     params: {
@@ -120,23 +109,32 @@ export const recipeApiSlice = baseApiSlice
                     },
                 }),
                 serializeQueryArgs: ({ endpointName }) => endpointName,
-                merge: (currentCache, newData) => {
+                merge: (currentCache, newData, { arg }) => {
+                    if (arg.page === 1) {
+                        return newData;
+                    }
                     currentCache.data.push(...newData.data);
+                    currentCache.meta = newData.meta;
                     return currentCache;
                 },
                 forceRefetch({ currentArg, previousArg }) {
-                    return currentArg?.page !== previousArg?.page;
+                    return (
+                        currentArg?.page !== previousArg?.page ||
+                        JSON.stringify(currentArg?.searchString) !==
+                            JSON.stringify(previousArg?.searchString) ||
+                        JSON.stringify(currentArg?.allergens) !==
+                            JSON.stringify(previousArg?.allergens) ||
+                        JSON.stringify(currentArg?.meat) !== JSON.stringify(previousArg?.meat) ||
+                        JSON.stringify(currentArg?.garnish) !==
+                            JSON.stringify(previousArg?.garnish) ||
+                        JSON.stringify(currentArg?.subcategoriesIds) !==
+                            JSON.stringify(previousArg?.subcategoriesIds)
+                    );
                 },
             }),
             getRecipesByCategoryWithPaginate: builder.query<
                 RecipeResponse,
-                {
-                    subCategoryId: string;
-                    searchString?: string;
-                    allergens?: string[];
-                    page: number;
-                    limit?: number;
-                }
+                GetRecipesByCategoryWithPaginateParams
             >({
                 query: ({ subCategoryId, searchString, allergens, page, limit = 8 }) => ({
                     url: `${ApiEndpoints.RECIPES}/category/${subCategoryId}`,
@@ -149,10 +147,10 @@ export const recipeApiSlice = baseApiSlice
                 }),
                 serializeQueryArgs: ({ endpointName }) => endpointName,
                 merge: (currentCache, newData, { arg }) => {
-                    if (arg.page === 1) {
-                        return newData; // ✅ Очищаем кеш при смене категории
+                    if (arg.page === DEFAULT_PAGE) {
+                        return newData; // Очищаем кеш при смене категории
                     }
-                    currentCache.data.push(...newData.data); // ✅ Добавляем новые рецепты при загрузке
+                    currentCache.data.push(...newData.data); // Добавляем новые рецепты при загрузке
                     currentCache.meta = newData.meta;
                     return currentCache;
                 },
@@ -167,15 +165,7 @@ export const recipeApiSlice = baseApiSlice
             }),
             getRecipesWithFiltersAndPaginate: builder.query<
                 RecipeResponse,
-                {
-                    searchString?: string;
-                    allergens?: string[];
-                    meat?: string[];
-                    garnish?: string[];
-                    subcategoriesIds?: string;
-                    page: number;
-                    limit?: number;
-                }
+                GetRecipesWithFiltersAndPaginateParams
             >({
                 query: ({
                     searchString,
@@ -184,17 +174,19 @@ export const recipeApiSlice = baseApiSlice
                     garnish,
                     subcategoriesIds,
                     page,
-                    limit = 8,
+                    limit = DEFAULT_CARDS_PER_PAGE,
                 }) => ({
-                    url: ApiEndpoints.RECIPES, // ✅ Обновляем эндпоинт
+                    url: ApiEndpoints.RECIPES,
                     params: {
                         page,
                         limit,
                         ...(searchString ? { searchString } : {}),
-                        ...(allergens?.length ? { allergens: allergens.join(',') } : {}),
-                        ...(meat?.length ? { meat: meat.join(',') } : {}),
-                        ...(garnish?.length ? { garnish: garnish.join(',') } : {}),
-                        ...(subcategoriesIds ? { subcategoriesIds } : {}),
+                        ...(allergens?.length ? { allergens: allergens.join('') } : {}),
+                        ...(meat?.length ? { meat: meat.join('') } : {}),
+                        ...(garnish?.length ? { garnish: garnish.join('') } : {}),
+                        ...(subcategoriesIds?.length
+                            ? { subcategoriesIds: subcategoriesIds.join(',') }
+                            : {}),
                     },
                 }),
                 serializeQueryArgs: ({ endpointName }) => endpointName,

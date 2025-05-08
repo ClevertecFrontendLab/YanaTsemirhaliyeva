@@ -19,14 +19,15 @@ import { DataTestId } from '~/consts/consts';
 import { useAppDispatch, useAppSelector } from '~/store/hooks';
 import { selectedFiltersSelector, updateSelectedFilters } from '~/store/slices/recipes-slice';
 import { Category } from '~/types/category';
+import { getCategoryTitles } from '~/utils';
 
 type MenuCategoryProps = {
-    width?: string;
-    placeholder?: string;
     list: Category[];
+    type: 'categories';
     isAddItem?: boolean;
     newItem?: string;
-    type: 'categories';
+    width?: string;
+    placeholder?: string;
     dataTestId?: string;
 };
 
@@ -43,19 +44,7 @@ export const MenuCategory = ({
     const selectedFilters = useAppSelector(selectedFiltersSelector);
     const { isOpen, onToggle, onClose } = useDisclosure();
     const [menuWidth, setMenuWidth] = useState<string>('auto');
-
-    const uniqueRootIds = new Set(
-        (selectedFilters.categories ?? [])
-            .map((subId) => {
-                const subcategory = list
-                    .flatMap((cat) => cat.subCategories)
-                    .find((sub) => sub._id === subId);
-                return subcategory?.rootCategoryId;
-            })
-            .filter(Boolean),
-    );
-
-    const selectedTitles = list.filter((cat) => uniqueRootIds.has(cat._id)).map((cat) => cat.title);
+    const selectedTitles = getCategoryTitles(selectedFilters.categories ?? [], list);
 
     useEffect(() => {
         if (menuButtonRef.current) {

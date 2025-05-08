@@ -6,6 +6,12 @@ import { Recipe } from '~/types/recipe';
 import { ApplicationState } from '../configure-store';
 
 export type FilterTypes = 'meatTypes' | 'garnishTypes' | 'allergens' | 'categories' | 'authors';
+const formatAllergensForUrl = (allergens: string[]) =>
+    allergens
+        .map((allergen) =>
+            allergen.includes('(') ? allergen.replace(/\(|\)/g, '').split(' ') : [allergen],
+        )
+        .flat();
 
 export type RecipeState = {
     recipes: Recipe[];
@@ -107,13 +113,14 @@ export const recipeSlice = createSlice({
             const allergen = action.payload;
             if (!state.allergens.includes(allergen)) {
                 state.allergens.push(allergen);
-                state.searchQueryParams.allergens = [...state.allergens];
             }
         },
         removeAllergen(state, action: PayloadAction<string>) {
             const allergen = action.payload;
             state.allergens = state.allergens.filter((item) => item !== allergen);
-            state.searchQueryParams.allergens = [...state.allergens];
+        },
+        applyIntroAllergens(state) {
+            state.searchQueryParams.allergens = formatAllergensForUrl([...state.allergens]);
         },
         clearAllergens(state) {
             state.allergens = [];
@@ -131,7 +138,10 @@ export const recipeSlice = createSlice({
             state.searchQueryParams = {
                 ...state.searchQueryParams,
                 searchString: state.searchQuery || '',
-                allergens: [...state.allergens, ...(state.appliedFilters.allergens || [])],
+                allergens: formatAllergensForUrl([
+                    ...state.allergens,
+                    ...(state.appliedFilters.allergens || []),
+                ]),
                 garnish: state.appliedFilters.garnishTypes || [],
                 meat: state.appliedFilters.meatTypes || [],
                 subcategoriesIds: state.appliedFilters.categories || [],
@@ -165,6 +175,9 @@ export const recipeSlice = createSlice({
             state.searchQueryParams = {
                 ...state.searchQueryParams,
                 ...action.payload,
+                allergens: formatAllergensForUrl(
+                    action.payload.allergens || state.searchQueryParams.allergens || [],
+                ),
             };
         },
         setRecipeTitle(state, action: PayloadAction<string | null>) {
@@ -214,6 +227,7 @@ export const {
     clearError,
     setIsSearchTriggered,
     setIsFetching,
+    applyIntroAllergens,
 } = recipeSlice.actions;
 
 // Селекторы

@@ -24,6 +24,7 @@ import { useEffect, useRef, useState } from 'react';
 import { authors, DataTestId, garnishTypes, meatTypes } from '~/consts/consts';
 import { FilterIcon } from '~/shared/custom-icons';
 import { useAppDispatch, useAppSelector } from '~/store/hooks';
+import { categoriesSelector } from '~/store/slices/categories-slice';
 import {
     applyFilters,
     clearFilters,
@@ -33,12 +34,19 @@ import {
     toggleFilterAllergen,
     updateSelectedFilters,
 } from '~/store/slices/recipes-slice';
-import { Category } from '~/types/category';
-import { getCategoriesFromDB } from '~/utils';
+import { getCategoryTitles } from '~/utils';
 
 import { AllergenSelect } from '../allergens/Allergens';
 import { MenuCategory } from '../menu-category/MenuCategory';
 import { MenuComponent } from '../menu-component/MenuComponent';
+
+type LocalFilters = {
+    meatTypes: string[];
+    garnishTypes: string[];
+    allergens: string[];
+    categories: string[];
+    authors: string[];
+};
 
 export const Filters = () => {
     const { isOpen, onOpen, onClose } = useDisclosure();
@@ -46,26 +54,18 @@ export const Filters = () => {
     const selectedFilters = useAppSelector(selectedFiltersSelector);
     const isFilterActive = useAppSelector(isFilterActiveSelector);
     const dispatch = useAppDispatch();
-    const [categories, setCategories] = useState<Category[]>([]);
-
-    useEffect(() => {
-        const loadCategories = async () => {
-            const storedCategories = await getCategoriesFromDB();
-            setCategories(storedCategories.categories);
-        };
-
-        loadCategories();
-    }, []);
+    const categories = useAppSelector(categoriesSelector);
+    const categoryTitles = getCategoryTitles(selectedFilters.categories || [], categories);
+    const filterTypes: Array<keyof typeof selectedFilters> = [
+        'meatTypes',
+        'garnishTypes',
+        'authors',
+        'categories',
+        'allergens',
+    ];
 
     const [isLocalFilterActive, setIsLocalFilterActive] = useState(isFilterActive);
-
-    const [localFilters, setLocalFilters] = useState<{
-        meatTypes: string[];
-        garnishTypes: string[];
-        allergens: string[];
-        categories: string[];
-        authors: string[];
-    }>({
+    const [localFilters, setLocalFilters] = useState<LocalFilters>({
         meatTypes: [],
         garnishTypes: [],
         allergens: [],
@@ -96,10 +96,7 @@ export const Filters = () => {
         onClose();
     };
 
-    const handleFilterChange = (
-        type: 'allergens' | 'meatTypes' | 'garnishTypes' | 'authors' | 'categories',
-        value: string,
-    ) => {
+    const handleFilterChange = (type: keyof LocalFilters, value: string) => {
         const updatedFilter = selectedFilters[type]?.includes(value)
             ? selectedFilters[type]?.filter((item) => item !== value)
             : [...(selectedFilters[type] || []), value];
@@ -346,36 +343,13 @@ export const Filters = () => {
                         alignItems='stretch'
                     >
                         <HStack spacing={3} mb={4} flexWrap='wrap'>
-                            {(
-                                [
-                                    'meatTypes',
-                                    'garnishTypes',
-                                    'authors',
-                                    'categories',
-                                    'allergens',
-                                ] as Array<keyof typeof selectedFilters>
-                            ).map((filterType) => {
+                            {filterTypes.map((filterType) => {
                                 if (filterType === 'categories' && selectedFilters.categories) {
-                                    const uniqueRootIds = new Set(
-                                        selectedFilters.categories
-                                            .map((subId) => {
-                                                const subcategory = categories
-                                                    .flatMap((cat) => cat.subCategories)
-                                                    .find((sub) => sub._id === subId);
-                                                return subcategory?.rootCategoryId;
-                                            })
-                                            .filter(Boolean),
-                                    );
-
-                                    const categoryTitles = categories
-                                        .filter((cat) => uniqueRootIds.has(cat._id))
-                                        .map((cat) => cat.title);
-
                                     return categoryTitles.map((title, index) => (
                                         <Tag
+                                            key={`${filterType}-${index}`}
                                             data-test-id={DataTestId.FilterTag}
                                             size='sm'
-                                            key={`${filterType}-${index}`}
                                             borderRadius='md'
                                             border='1px solid'
                                             borderColor='lime.400'
@@ -396,9 +370,9 @@ export const Filters = () => {
 
                                 return selectedFilters[filterType]?.map((item, index) => (
                                     <Tag
+                                        key={`${filterType}-${index}`}
                                         data-test-id={DataTestId.FilterTag}
                                         size='sm'
-                                        key={`${filterType}-${index}`}
                                         borderRadius='md'
                                         border='1px solid'
                                         borderColor='lime.400'
@@ -415,6 +389,7 @@ export const Filters = () => {
                                 ));
                             })}
                         </HStack>
+
                         <ButtonGroup justifyContent='flex-end'>
                             <Button
                                 data-test-id={DataTestId.FilterClearBtn}

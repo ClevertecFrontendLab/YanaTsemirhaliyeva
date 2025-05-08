@@ -1,35 +1,24 @@
-import { Box, Button, Grid } from '@chakra-ui/react';
+import { Box, Button, Grid, Spinner } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
 
 import { CategoryHighlight } from '~/components/category-highlight/CategoryHighlight';
 import { HorizontalCard } from '~/components/horizontal-card/HorizontalCard';
 import { Intro } from '~/components/intro/Intro';
-import { DataTestId } from '~/consts/consts';
+import { DataTestId, DEFAULT_PAGE } from '~/consts/consts';
 import { useGetPaginatedRecipesQuery } from '~/query/services/recipes';
 import { useAppDispatch, useAppSelector } from '~/store/hooks';
+import { categoriesSelector } from '~/store/slices/categories-slice';
 import { searchParamsSelector, setError, setIsFetching } from '~/store/slices/recipes-slice';
-import { Category } from '~/types/category';
-import { getCategoriesFromDB } from '~/utils';
 
 const CARDS_PER_PAGE = 8;
 
 export const JuiciestCollection = () => {
     const dispatch = useAppDispatch();
     const searchParams = useAppSelector(searchParamsSelector);
-    const [page, setPage] = useState(1);
-    const [categories, setCategories] = useState<Category[]>([]);
+    const [page, setPage] = useState(DEFAULT_PAGE);
+    const categories = useAppSelector(categoriesSelector);
 
-    useEffect(() => {
-        getCategoriesFromDB().then((storedCategories) =>
-            setCategories(storedCategories.categories),
-        );
-    }, []);
-
-    const {
-        data,
-        isError,
-        isFetching: isLoading,
-    } = useGetPaginatedRecipesQuery(
+    const { data, isError, isFetching, isLoading } = useGetPaginatedRecipesQuery(
         {
             ...searchParams,
             page,
@@ -107,9 +96,19 @@ export const JuiciestCollection = () => {
                                 bgColor: 'lime.150',
                             },
                         }}
-                        disabled={isLoading}
+                        _disabled={{
+                            bgColor: 'blackAlpha.300',
+                            pointerEvents: 'none',
+                        }}
+                        isDisabled={isLoading || isFetching}
                     >
-                        {isLoading ? 'Загрузка' : 'Загрузить ещё'}
+                        {isLoading || isFetching ? (
+                            <>
+                                <Spinner size='sm' mr={2} /> Загрузка...
+                            </>
+                        ) : (
+                            'Загрузить ещё'
+                        )}
                     </Button>
                 </Box>
             )}

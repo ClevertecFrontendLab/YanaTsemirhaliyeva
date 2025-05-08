@@ -14,6 +14,12 @@ import {
 import { Category, SubCategory } from '~/types/category';
 import { getCategoryAndSubcategoryFromUrl } from '~/utils';
 
+type CategoryData = {
+    category: Category | null;
+    subcategory: SubCategory | null;
+    id: string | null;
+};
+
 type BreadcrumbsProps = {
     onBreadcrumbClick?: () => void;
 };
@@ -24,11 +30,11 @@ export const Breadcrumbs = ({ onBreadcrumbClick }: BreadcrumbsProps) => {
     const shouldWrap = useBreakpointValue({ base: true, md: false });
     const dispatch = useAppDispatch();
 
-    const [categoryData, setCategoryData] = useState<{
-        category: Category | null;
-        subcategory: SubCategory | null;
-        id: string | null;
-    }>({ category: null, subcategory: null, id: null });
+    const [categoryData, setCategoryData] = useState<CategoryData>({
+        category: null,
+        subcategory: null,
+        id: null,
+    });
 
     useEffect(() => {
         const fetchCategoryData = async () => {

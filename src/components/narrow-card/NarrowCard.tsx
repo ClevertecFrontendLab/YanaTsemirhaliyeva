@@ -1,9 +1,9 @@
 import { Button, Card, CardBody, Image, Spacer, Text } from '@chakra-ui/react';
-import { useEffect, useState } from 'react';
 
 import { API_IMG } from '~/consts/consts';
-import { Category } from '~/types/category';
-import { getCategoriesFromDB } from '~/utils';
+import { useAppSelector } from '~/store/hooks';
+import { categoriesSelector } from '~/store/slices/categories-slice';
+import { getUniqueCategories } from '~/utils';
 
 type NarrowCardProps = {
     title: string;
@@ -11,23 +11,8 @@ type NarrowCardProps = {
 };
 
 export const NarrowCard = ({ title, categoriesIds }: NarrowCardProps) => {
-    const [categories, setCategories] = useState<Category[]>([]);
-
-    useEffect(() => {
-        const loadCategories = async () => {
-            const storedCategories = await getCategoriesFromDB();
-            const matchedCategories = storedCategories.categories.filter((category) =>
-                category.subCategories?.some((sub) => categoriesIds.includes(sub._id)),
-            );
-            const uniqueCategories = matchedCategories.filter(
-                (cat, index, self) => self.findIndex((c) => c._id === cat._id) === index,
-            );
-
-            setCategories(uniqueCategories);
-        };
-
-        loadCategories();
-    }, [categories.length, categoriesIds]);
+    const categories = useAppSelector(categoriesSelector);
+    const uniqueCategories = getUniqueCategories(categories, categoriesIds);
 
     return (
         <Card
@@ -47,8 +32,8 @@ export const NarrowCard = ({ title, categoriesIds }: NarrowCardProps) => {
                 py={{ base: '10px', xs: 2, md: '10px', xl: 3 }}
                 px={{ base: 2, xl: 6 }}
             >
-                {categories.length > 0 && (
-                    <Image src={`${API_IMG}${categories[0].icon}`} mr='2px' />
+                {uniqueCategories.length > 0 && (
+                    <Image src={`${API_IMG}${uniqueCategories[0].icon}`} mr='2px' />
                 )}
                 <Text
                     fontSize={{ base: 16, sm: 18, xl: 20 }}

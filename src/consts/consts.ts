@@ -30,6 +30,9 @@ export const DynamicRoutes = {
     RecipePage: '/:category/:subcategory/:id',
 };
 
+export const DEFAULT_CARDS_PER_PAGE = 8;
+export const DEFAULT_PAGE = 1;
+
 export enum DataTestId {
     VeganCuisine = 'vegan-cuisine',
     InputAddOtherAllergen = 'add-other-allergen',

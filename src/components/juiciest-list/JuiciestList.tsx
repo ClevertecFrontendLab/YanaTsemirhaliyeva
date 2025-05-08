@@ -16,26 +16,19 @@ import { AppRoute, DataTestId } from '~/consts/consts';
 import { useGetRecipesQuery } from '~/query/services/recipes';
 import { ArrowRightIcon } from '~/shared/custom-icons';
 import { useAppDispatch, useAppSelector } from '~/store/hooks';
+import { categoriesSelector } from '~/store/slices/categories-slice';
 import { searchParamsSelector, setError } from '~/store/slices/recipes-slice';
-import { Category } from '~/types/category';
-import { getCategoriesFromDB } from '~/utils';
 
 export const JuiciestList = () => {
     const dispatch = useAppDispatch();
     const isTabletOrAbove = useBreakpointValue({ base: false, '2xs': true, sm: false });
+    const categories = useAppSelector(categoriesSelector);
     const searchParams = useAppSelector(searchParamsSelector);
     const [params, setParams] = useState({
         ...searchParams,
         sortBy: 'likes' as const,
         sortOrder: 'desc' as const,
     });
-    const [categories, setCategories] = useState<Category[]>([]);
-
-    useEffect(() => {
-        getCategoriesFromDB().then((storedCategories) =>
-            setCategories(storedCategories.categories),
-        );
-    }, []);
 
     useEffect(() => {
         setParams({ ...searchParams, sortBy: 'likes', sortOrder: 'desc' });

@@ -14,6 +14,8 @@ import { useAppDispatch, useAppSelector } from '~/store/hooks';
 import { searchParamsSelector, setError } from '~/store/slices/recipes-slice';
 import { generateTestId } from '~/utils';
 
+const DEFAULT_CARDS_PER_CAROUSEL = 10;
+
 export const NewRecipes = () => {
     const dispatch = useAppDispatch();
     const swiperRef = useRef<SwiperType | null>(null);
@@ -25,12 +27,15 @@ export const NewRecipes = () => {
     });
 
     useEffect(() => {
-        setParams({ ...searchParams, sortBy: 'createdAt', sortOrder: 'desc', limit: 10 });
+        setParams({
+            ...searchParams,
+            sortBy: 'createdAt',
+            sortOrder: 'desc',
+            limit: DEFAULT_CARDS_PER_CAROUSEL,
+        });
     }, [searchParams]);
 
-    const { data, isError } = useGetRecipesQuery(params, {
-        // refetchOnMountOrArgChange: true,
-    });
+    const { data, isError } = useGetRecipesQuery(params);
 
     useEffect(() => {
         if (isError) {
