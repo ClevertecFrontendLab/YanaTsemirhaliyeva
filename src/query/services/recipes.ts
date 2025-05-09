@@ -5,6 +5,7 @@ import { baseApiSlice } from '../base-api';
 import { ApiEndpoints } from '../constants/api';
 import { Tags } from '../constants/tags';
 import {
+    BaseRecipeQueryParams,
     GetPaginatedRecipesParams,
     GetRecipesByCategoryParams,
     GetRecipesByCategoryWithPaginateParams,
@@ -13,17 +14,7 @@ import {
     RecipeResponse,
 } from '../types/recipeApi.types';
 
-type QueryParamsOptions = {
-    searchString?: string;
-    allergens?: string[];
-    meat?: string[];
-    garnish?: string[];
-    subcategoriesIds?: string[];
-    page?: number;
-    limit?: number;
-    sortBy?: string;
-    sortOrder?: string;
-};
+type QueryParamsOptions = Partial<BaseRecipeQueryParams>;
 
 const buildQueryParams = (options: QueryParamsOptions) => {
     const {
@@ -64,15 +55,16 @@ const handlePaginationMerge = (
     return currentCache;
 };
 
+type ArgKey = keyof BaseRecipeQueryParams | 'subCategoryId';
 type ArgValue = string | number | boolean | string[] | number[] | undefined;
 
 type ForceRefetchArg = {
-    currentArg: Record<string, ArgValue> | undefined;
-    previousArg: Record<string, ArgValue> | undefined;
+    currentArg: Partial<Record<ArgKey, ArgValue>> | undefined;
+    previousArg: Partial<Record<ArgKey, ArgValue>> | undefined;
 };
 
 const createForceRefetchHandler =
-    (fields: string[]) =>
+    (fields: ArgKey[]) =>
     ({ currentArg, previousArg }: ForceRefetchArg): boolean => {
         if (!currentArg || !previousArg) return true;
 
