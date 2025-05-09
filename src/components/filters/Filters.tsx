@@ -21,10 +21,10 @@ import {
 } from '@chakra-ui/react';
 import { useEffect, useRef, useState } from 'react';
 
-import { authors, garnishTypes, meatTypes } from '~/consts/consts';
-import { LIST_MENU } from '~/consts/menu-list';
+import { authors, DataTestId, garnishTypes, meatTypes } from '~/consts/consts';
 import { FilterIcon } from '~/shared/custom-icons';
 import { useAppDispatch, useAppSelector } from '~/store/hooks';
+import { categoriesSelector } from '~/store/slices/categories-slice';
 import {
     applyFilters,
     clearFilters,
@@ -34,25 +34,38 @@ import {
     toggleFilterAllergen,
     updateSelectedFilters,
 } from '~/store/slices/recipes-slice';
+import { getCategoryTitles } from '~/utils';
 
 import { AllergenSelect } from '../allergens/Allergens';
-import { MenuComponent } from '../menuComponent/MenuComponent';
+import { MenuCategory } from '../menu-category/MenuCategory';
+import { MenuComponent } from '../menu-component/MenuComponent';
+
+type LocalFilters = {
+    meatTypes: string[];
+    garnishTypes: string[];
+    allergens: string[];
+    categories: string[];
+    authors: string[];
+};
 
 export const Filters = () => {
     const { isOpen, onOpen, onClose } = useDisclosure();
     const btnRef = useRef<HTMLButtonElement | null>(null);
-    const categories = Object.keys(LIST_MENU);
     const selectedFilters = useAppSelector(selectedFiltersSelector);
     const isFilterActive = useAppSelector(isFilterActiveSelector);
     const dispatch = useAppDispatch();
+    const categories = useAppSelector(categoriesSelector);
+    const categoryTitles = getCategoryTitles(selectedFilters.categories || [], categories);
+    const filterTypes: Array<keyof typeof selectedFilters> = [
+        'meatTypes',
+        'garnishTypes',
+        'authors',
+        'categories',
+        'allergens',
+    ];
+
     const [isLocalFilterActive, setIsLocalFilterActive] = useState(isFilterActive);
-    const [localFilters, setLocalFilters] = useState<{
-        meatTypes: string[];
-        garnishTypes: string[];
-        allergens: string[];
-        categories: string[];
-        authors: string[];
-    }>({
+    const [localFilters, setLocalFilters] = useState<LocalFilters>({
         meatTypes: [],
         garnishTypes: [],
         allergens: [],
@@ -69,7 +82,6 @@ export const Filters = () => {
             authors: selectedFilters.authors || [],
         });
     }, [selectedFilters]);
-    console.log(selectedFilters);
 
     useEffect(() => {
         dispatch(setDrawerStatus(isOpen));
@@ -84,10 +96,7 @@ export const Filters = () => {
         onClose();
     };
 
-    const handleFilterChange = (
-        type: 'allergens' | 'meatTypes' | 'garnishTypes' | 'authors' | 'categories',
-        value: string,
-    ) => {
+    const handleFilterChange = (type: keyof LocalFilters, value: string) => {
         const updatedFilter = selectedFilters[type]?.includes(value)
             ? selectedFilters[type]?.filter((item) => item !== value)
             : [...(selectedFilters[type] || []), value];
@@ -104,12 +113,21 @@ export const Filters = () => {
         handleDrawerClose();
     };
 
-    const handleRemoveFilter = (
-        type: 'allergens' | 'meatTypes' | 'garnishTypes' | 'authors' | 'categories',
-        value: string,
-    ) => {
-        const updatedFilter = selectedFilters[type]?.filter((item) => item !== value);
-        dispatch(updateSelectedFilters({ type, value: updatedFilter || [] }));
+    const handleRemoveFilter = (type: keyof typeof selectedFilters, value: string) => {
+        if (type === 'categories') {
+            const category = categories.find((cat) => cat.title === value);
+            if (!category) return;
+            const subcategoryIds = category.subCategories.map((sub) => sub._id);
+
+            const updatedFilter = selectedFilters.categories?.filter(
+                (subId) => !subcategoryIds.includes(subId),
+            );
+
+            dispatch(updateSelectedFilters({ type, value: updatedFilter || [] }));
+        } else {
+            const updatedFilter = selectedFilters[type]?.filter((item) => item !== value);
+            dispatch(updateSelectedFilters({ type, value: updatedFilter || [] }));
+        }
     };
 
     const handleClearFilters = () => {
@@ -135,7 +153,7 @@ export const Filters = () => {
     return (
         <>
             <IconButton
-                data-test-id='filter-button'
+                data-test-id={DataTestId.FilterBtn}
                 onClick={() => {
                     onOpen();
                     dispatch(clearFilters());
@@ -167,7 +185,7 @@ export const Filters = () => {
             >
                 <DrawerOverlay />
                 <DrawerContent
-                    data-test-id='filter-drawer'
+                    data-test-id={DataTestId.FilterDrawer}
                     p={4}
                     pr='6px'
                     pl={{ base: 3, md: 8 }}
@@ -194,7 +212,7 @@ export const Filters = () => {
                     >
                         <Text>Фильтр</Text>
                         <DrawerCloseButton
-                            data-test-id='close-filter-drawer'
+                            data-test-id={DataTestId.FilterCloseBtn}
                             color='white'
                             bgColor='black'
                             borderRadius='50%'
@@ -227,7 +245,7 @@ export const Filters = () => {
                     >
                         <VStack spacing={4} alignItems='stretch' pl={1} pt={1}>
                             <Box>
-                                <MenuComponent
+                                <MenuCategory
                                     list={categories}
                                     placeholder='Категория'
                                     type='categories'
@@ -274,7 +292,7 @@ export const Filters = () => {
                                     {garnishTypes.map((type) => (
                                         <Checkbox
                                             data-test-id={
-                                                type === 'Картошка' ? 'checkbox-картошка' : ''
+                                                type === 'Картошка' ? DataTestId.CheckboxPotato : ''
                                             }
                                             key={type}
                                             isChecked={localFilters.garnishTypes?.includes(type)}
@@ -310,8 +328,8 @@ export const Filters = () => {
                                 onAddCustomAllergen={(allergen) =>
                                     handleFilterChange('allergens', allergen)
                                 }
-                                testIdSwitcher='allergens-switcher-filter'
-                                testIdMenuButton='allergens-menu-button-filter'
+                                testIdSwitcher={DataTestId.AllergensSwitcherFilter}
+                                testIdMenuButton={DataTestId.AllergensMenuBtnFilter}
                             />
                         </VStack>
                     </DrawerBody>
@@ -325,21 +343,36 @@ export const Filters = () => {
                         alignItems='stretch'
                     >
                         <HStack spacing={3} mb={4} flexWrap='wrap'>
-                            {(
-                                [
-                                    'meatTypes',
-                                    'garnishTypes',
-                                    'authors',
-                                    'categories',
-                                    'allergens',
-                                ] as Array<keyof typeof selectedFilters>
-                            ).map((filterType) =>
-                                selectedFilters[filterType]?.map((item, index) => (
+                            {filterTypes.map((filterType) => {
+                                if (filterType === 'categories' && selectedFilters.categories) {
+                                    return categoryTitles.map((title, index) => (
+                                        <Tag
+                                            key={`${filterType}-${index}`}
+                                            data-test-id={DataTestId.FilterTag}
+                                            size='sm'
+                                            borderRadius='md'
+                                            border='1px solid'
+                                            borderColor='lime.400'
+                                            variant='solid'
+                                            bgColor='lime.100'
+                                            color='lime.700'
+                                        >
+                                            <TagLabel>{title}</TagLabel>
+                                            <TagCloseButton
+                                                onClick={() =>
+                                                    handleRemoveFilter(filterType, title)
+                                                }
+                                                _focus={{ outline: 'none' }}
+                                            />
+                                        </Tag>
+                                    ));
+                                }
+
+                                return selectedFilters[filterType]?.map((item, index) => (
                                     <Tag
-                                        // data-test-id={`filter-tag-${filterType}-${index}`}
-                                        data-test-id='filter-tag'
-                                        size='sm'
                                         key={`${filterType}-${index}`}
+                                        data-test-id={DataTestId.FilterTag}
+                                        size='sm'
                                         borderRadius='md'
                                         border='1px solid'
                                         borderColor='lime.400'
@@ -350,17 +383,16 @@ export const Filters = () => {
                                         <TagLabel>{item}</TagLabel>
                                         <TagCloseButton
                                             onClick={() => handleRemoveFilter(filterType, item)}
-                                            _focus={{
-                                                outline: 'none',
-                                            }}
+                                            _focus={{ outline: 'none' }}
                                         />
                                     </Tag>
-                                )),
-                            )}
+                                ));
+                            })}
                         </HStack>
+
                         <ButtonGroup justifyContent='flex-end'>
                             <Button
-                                data-test-id='clear-filter-button'
+                                data-test-id={DataTestId.FilterClearBtn}
                                 onClick={handleClearFilters}
                                 variant='outline'
                                 borderColor='blackAlpha.600'
@@ -374,7 +406,7 @@ export const Filters = () => {
                                 Очистить фильтр
                             </Button>
                             <Button
-                                data-test-id='find-recipe-button'
+                                data-test-id={DataTestId.FilterFindRecipe}
                                 onClick={handleApplyFilters}
                                 isDisabled={
                                     !Object.values(selectedFilters).some(

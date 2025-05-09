@@ -15,33 +15,36 @@ import {
 } from '@chakra-ui/react';
 import { useEffect, useRef, useState } from 'react';
 
+import { DataTestId } from '~/consts/consts';
 import { useAppDispatch, useAppSelector } from '~/store/hooks';
 import { selectedFiltersSelector, updateSelectedFilters } from '~/store/slices/recipes-slice';
+import { Category } from '~/types/category';
+import { getCategoryTitles } from '~/utils';
 
-export const MenuComponent = ({
+type MenuCategoryProps = {
+    list: Category[];
+    type: 'categories';
+    isAddItem?: boolean;
+    newItem?: string;
+    width?: string;
+    placeholder?: string;
+    dataTestId?: string;
+};
+
+export const MenuCategory = ({
     width = '100%',
     placeholder = 'Выберите из списка',
     list,
-    isAddItem = false,
-    newItem,
     type,
     dataTestId,
-}: {
-    width?: string;
-    placeholder?: string;
-    list: string[];
-    isAddItem?: boolean;
-    newItem?: string;
-    type: 'categories' | 'authors';
-    dataTestId?: string;
-}) => {
+}: MenuCategoryProps) => {
     const dispatch = useAppDispatch();
     const menuRef = useRef<HTMLDivElement>(null);
     const menuButtonRef = useRef<HTMLButtonElement>(null);
     const selectedFilters = useAppSelector(selectedFiltersSelector);
-    const selectedItems = selectedFilters[type] || [];
     const { isOpen, onToggle, onClose } = useDisclosure();
     const [menuWidth, setMenuWidth] = useState<string>('auto');
+    const selectedTitles = getCategoryTitles(selectedFilters.categories ?? [], list);
 
     useEffect(() => {
         if (menuButtonRef.current) {
@@ -58,12 +61,19 @@ export const MenuComponent = ({
         },
     });
 
-    const handleCheckboxChange = (item: string) => {
-        const updatedItems = selectedItems.includes(item)
-            ? selectedItems.filter((elem) => elem !== item)
-            : [...selectedItems, item];
+    const handleCheckboxChange = (category: Category) => {
+        const updatedSubcategoryIds = selectedFilters.categories?.some((subId) =>
+            category.subCategories.some((sub) => sub._id === subId),
+        )
+            ? selectedFilters.categories?.filter(
+                  (subId) => !category.subCategories.some((sub) => sub._id === subId),
+              )
+            : [
+                  ...(selectedFilters.categories ?? []),
+                  ...category.subCategories.map((sub) => sub._id),
+              ];
 
-        dispatch(updateSelectedFilters({ type, value: updatedItems }));
+        dispatch(updateSelectedFilters({ type, value: updatedSubcategoryIds }));
     };
 
     return (
@@ -100,9 +110,9 @@ export const MenuComponent = ({
                         },
                     }}
                 >
-                    {selectedItems.length > 0 ? (
+                    {selectedTitles.length > 0 ? (
                         <HStack gap={2} flexWrap='wrap'>
-                            {selectedItems.map((elem) => (
+                            {selectedTitles.map((elem) => (
                                 <Tag
                                     key={elem}
                                     size='sm'
@@ -130,7 +140,7 @@ export const MenuComponent = ({
                     borderTopRadius='none'
                     color='blackAlpha.800'
                     sx={{
-                        '& > *:nth-of-type(odd):not(:last-child)': {
+                        '& > *:nth-of-type(odd)': {
                             bg: 'blackAlpha.100',
                         },
                     }}
@@ -149,9 +159,9 @@ export const MenuComponent = ({
                         >
                             <Checkbox
                                 data-test-id={
-                                    el === 'Веганская кухня' ? 'checkbox-веганская кухня' : ''
+                                    el.title === 'Веганская кухня' ? DataTestId.VeganCheckbox : ''
                                 }
-                                isChecked={selectedItems.includes(el)}
+                                isChecked={selectedTitles.includes(el.title)}
                                 onChange={() => handleCheckboxChange(el)}
                                 borderColor='lime.150'
                                 sx={{
@@ -165,42 +175,10 @@ export const MenuComponent = ({
                                     },
                                 }}
                             >
-                                {el}
+                                {el.title}
                             </Checkbox>
                         </MenuItem>
                     ))}
-
-                    {/* для добавления пользовательского элемента */}
-                    {isAddItem && newItem && (
-                        <MenuItem
-                            closeOnSelect={false}
-                            borderRadius='none'
-                            fontWeight={400}
-                            sx={{
-                                '.chakra-checkbox': {
-                                    width: '100%',
-                                },
-                            }}
-                        >
-                            <Checkbox
-                                isChecked={selectedItems.includes(newItem)}
-                                onChange={() => handleCheckboxChange(newItem)}
-                                borderColor='lime.150'
-                                sx={{
-                                    '.chakra-checkbox__control': {
-                                        borderWidth: 3,
-                                    },
-                                    '&[data-checked] .chakra-checkbox__control': {
-                                        background: 'lime.150 !important',
-                                        borderColor: 'lime.150 !important',
-                                        color: 'black !important',
-                                    },
-                                }}
-                            >
-                                {newItem}
-                            </Checkbox>
-                        </MenuItem>
-                    )}
                 </MenuList>
             </Menu>
         </Box>

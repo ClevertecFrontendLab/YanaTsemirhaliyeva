@@ -66,7 +66,7 @@ export const CaloricContent = ({ nutritionValue }: CaloricContentprops) => (
                     fontSize={{ base: 26, '2xs': 36 }}
                     fontWeight={500}
                 >
-                    {nutritionValue.proteins}
+                    {nutritionValue.proteins ? nutritionValue.proteins : nutritionValue.protein}
                 </Text>
                 <Text
                     as='span'

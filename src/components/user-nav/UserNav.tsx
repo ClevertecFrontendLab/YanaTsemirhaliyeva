@@ -52,15 +52,6 @@ export const UserNav = () => (
                 </Box>
             </ListItem>
         </List>
-        {/* <Box
-            sx={{
-                '@media screen and (min-width: 1200px)': {
-                    display: 'none',
-                },
-            }}
-        >
-            <BurgerMenu />
-        </Box> */}
         <Show above='md'>
             <VStack
                 gap={3}
@@ -97,7 +88,7 @@ export const UserNav = () => (
                             bottom: '-40px',
                             borderRadius: '50%',
                             background:
-                                'radial-gradient(circle, rgba(196, 255, 97, 0.3) 0%, rgba(255, 255, 255, 0) 100%)', // Радиальный градиент
+                                'radial-gradient(circle, rgba(196, 255, 97, 0.3) 0%, rgba(255, 255, 255, 0) 100%)',
                             zIndex: -1,
                         },
                     },

@@ -13,6 +13,7 @@ import {
 import { useRef } from 'react';
 import { Link as RouterLink } from 'react-router';
 
+import { DataTestId } from '~/consts/consts';
 import { useAppDispatch } from '~/store/hooks';
 import { setCategory, setSubcategory } from '~/store/slices/recipes-slice';
 
@@ -41,9 +42,9 @@ export const Header = () => {
             top='0'
             left='0'
             width='100%'
-            minW='360px'
+            minW='359px'
             zIndex={isOpen ? '1500' : '3'}
-            data-test-id='header'
+            data-test-id={DataTestId.Header}
         >
             <Flex
                 m='0 auto'
@@ -69,7 +70,7 @@ export const Header = () => {
                 {isMdOrAbove && <Breadcrumbs />}
                 <Spacer />
                 <Show above='md'>
-                    <Flex minW='360px' justifyContent='flex-end'>
+                    <Flex minW='359px' justifyContent='flex-end'>
                         <User />
                     </Flex>
                 </Show>
@@ -83,7 +84,7 @@ export const Header = () => {
                 >
                     {!isOpen && (
                         <IconButton
-                            data-test-id='hamburger-icon'
+                            data-test-id={DataTestId.Hamburger}
                             ref={burgerButtonRef}
                             aria-label='Toggle menu'
                             icon={<HamburgerIcon />}
@@ -102,7 +103,7 @@ export const Header = () => {
                     )}
                     {isOpen && (
                         <IconButton
-                            data-test-id='close-icon'
+                            data-test-id={DataTestId.HamburgerCloseBtn}
                             boxSize={10}
                             minW={0}
                             aria-label='Close menu'

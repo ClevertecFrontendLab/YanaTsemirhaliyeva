@@ -1,19 +1,24 @@
 import { ChevronRightIcon } from '@chakra-ui/icons';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, useBreakpointValue } from '@chakra-ui/react';
+import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router';
 
-import { AppRoute } from '~/consts/consts';
-import {
-    getCategoryAndSubcategoryFromUrl,
-    getCategoryRoute,
-    getSubcategoryRoute,
-} from '~/consts/dictionary';
+import { AppRoute, DataTestId } from '~/consts/consts';
 import { useAppDispatch, useAppSelector } from '~/store/hooks';
 import {
     currentRecipeTitleSelector,
     setCategory,
+    setRecipeTitle,
     setSubcategory,
 } from '~/store/slices/recipes-slice';
+import { Category, SubCategory } from '~/types/category';
+import { getCategoryAndSubcategoryFromUrl } from '~/utils';
+
+type CategoryData = {
+    category: Category | null;
+    subcategory: SubCategory | null;
+    id: string | null;
+};
 
 type BreadcrumbsProps = {
     onBreadcrumbClick?: () => void;
@@ -25,16 +30,28 @@ export const Breadcrumbs = ({ onBreadcrumbClick }: BreadcrumbsProps) => {
     const shouldWrap = useBreakpointValue({ base: true, md: false });
     const dispatch = useAppDispatch();
 
-    const { category, subcategory, id } = getCategoryAndSubcategoryFromUrl(location.pathname);
+    const [categoryData, setCategoryData] = useState<CategoryData>({
+        category: null,
+        subcategory: null,
+        id: null,
+    });
 
-    const categoryRoute = category ? getCategoryRoute(category) : '';
-    const subcategoryRoute =
-        category && subcategory ? getSubcategoryRoute(category, subcategory) : '';
+    useEffect(() => {
+        const fetchCategoryData = async () => {
+            const data = await getCategoryAndSubcategoryFromUrl(location.pathname);
+            setCategoryData(data);
+        };
+
+        fetchCategoryData();
+    }, [location.pathname]);
+
+    const { category, subcategory, id } = categoryData;
 
     const handleCategoryClick = () => {
         if (category) {
             dispatch(setCategory(category));
             dispatch(setSubcategory(null));
+            dispatch(setRecipeTitle(null));
             onBreadcrumbClick?.();
         }
     };
@@ -43,6 +60,7 @@ export const Breadcrumbs = ({ onBreadcrumbClick }: BreadcrumbsProps) => {
         if (category && subcategory) {
             dispatch(setCategory(category));
             dispatch(setSubcategory(subcategory));
+            dispatch(setRecipeTitle(null));
             onBreadcrumbClick?.();
         }
     };
@@ -51,13 +69,14 @@ export const Breadcrumbs = ({ onBreadcrumbClick }: BreadcrumbsProps) => {
         if (category) {
             dispatch(setCategory(null));
             dispatch(setSubcategory(null));
+            dispatch(setRecipeTitle(null));
             onBreadcrumbClick?.();
         }
     };
 
     return (
         <Breadcrumb
-            data-test-id='breadcrumbs'
+            data-test-id={DataTestId.Breadcrumbs}
             separator={<ChevronRightIcon color='black' />}
             color='blackAlpha.700'
             sx={{
@@ -104,7 +123,7 @@ export const Breadcrumbs = ({ onBreadcrumbClick }: BreadcrumbsProps) => {
                     <BreadcrumbLink
                         onClick={handleCategoryClick}
                         as={Link}
-                        to={`${categoryRoute}`}
+                        to={`${category.category}`}
                         sx={{
                             '&:hover': {
                                 color: 'lime.800',
@@ -112,7 +131,7 @@ export const Breadcrumbs = ({ onBreadcrumbClick }: BreadcrumbsProps) => {
                             },
                         }}
                     >
-                        {category}
+                        {category.title}
                     </BreadcrumbLink>
                 </BreadcrumbItem>
             )}
@@ -123,7 +142,7 @@ export const Breadcrumbs = ({ onBreadcrumbClick }: BreadcrumbsProps) => {
                     <BreadcrumbLink
                         onClick={handleSubcategoryClick}
                         as={Link}
-                        to={`${categoryRoute}/${subcategoryRoute}`}
+                        to={`${category?.category}/${subcategory.category}`}
                         sx={{
                             color: !id ? 'black' : 'inherit',
                             pointerEvents: !id ? 'none' : 'auto',
@@ -133,7 +152,7 @@ export const Breadcrumbs = ({ onBreadcrumbClick }: BreadcrumbsProps) => {
                             },
                         }}
                     >
-                        {subcategory}
+                        {subcategory.title}
                     </BreadcrumbLink>
                 </BreadcrumbItem>
             )}

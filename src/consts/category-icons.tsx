@@ -64,7 +64,6 @@ export const getCategoryContent = (categoryKey: keyof typeof CategoriesData) => 
     const category = CategoriesData[categoryKey];
 
     if (!category) {
-        console.warn(`Category "${categoryKey}" not found.`);
         return { IconComponent: null, label: 'Неизвестная категория' };
     }
 

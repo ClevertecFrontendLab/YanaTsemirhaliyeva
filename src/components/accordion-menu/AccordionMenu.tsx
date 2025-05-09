@@ -6,19 +6,24 @@ import {
     AccordionPanel,
     Box,
     Button,
+    Image,
 } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 
-import { getCategoryRoute, getSubcategoryRoute } from '~/consts/dictionary';
-import { LIST_MENU } from '~/consts/menu-list';
+import { API_IMG, DataTestId } from '~/consts/consts';
+import { useGetCategoriesQuery } from '~/query/services/categories';
 import { useAppDispatch, useAppSelector } from '~/store/hooks';
+import { categoriesSelector } from '~/store/slices/categories-slice';
 import {
     currentCategorySelector,
     currentSubcategorySelector,
     setCategory,
     setSubcategory,
 } from '~/store/slices/recipes-slice';
+import { Category, SubCategory } from '~/types/category';
+
+import { Loader } from '../loader/Loader';
 
 export const AccordionMenu = () => {
     const currentCategory = useAppSelector(currentCategorySelector);
@@ -26,58 +31,48 @@ export const AccordionMenu = () => {
     const [activeIndex, setActiveIndex] = useState<number>(-1);
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
+    const categories = useAppSelector(categoriesSelector);
 
     useEffect(() => {
         if (currentCategory) {
-            const index = Object.keys(LIST_MENU).findIndex(
-                (category) => category === currentCategory,
+            const index = categories.findIndex(
+                (category) => category.title === currentCategory.title,
             );
             setActiveIndex(index);
         } else {
             setActiveIndex(-1);
         }
-    }, [currentCategory]);
+    }, [currentCategory, categories]);
 
-    const handleCategoryClick = (category: string, subcategories: string[]) => {
+    const { isLoading: isCategoriesDataLoading } = useGetCategoriesQuery();
+
+    if (isCategoriesDataLoading || !categories.length) {
+        return <Loader boxSize={80} />;
+    }
+
+    const handleCategoryClick = (category: Category, subCategory: SubCategory) => {
         dispatch(setCategory(category));
 
-        if (subcategories && subcategories.length > 0) {
-            const firstSubcategory = subcategories[0];
-            dispatch(setSubcategory(firstSubcategory));
+        if (subCategory) {
+            dispatch(setSubcategory(subCategory));
 
-            const categoryPath = getCategoryRoute(category);
-            if (categoryPath) {
-                const subcategoryPath = getSubcategoryRoute(category, firstSubcategory);
-
-                if (subcategoryPath) {
-                    navigate(`${categoryPath}/${subcategoryPath}`);
-                } else {
-                    navigate(categoryPath);
-                }
-            } else {
-                navigate('/vegan');
-            }
+            navigate(`/${category.category}/${subCategory.category}`);
+        } else {
+            navigate(`/${category.category}`);
         }
     };
 
-    const handleSubcategoryClick = (subcategory: string) => {
+    const handleSubcategoryClick = (subcategory: SubCategory, category: Category) => {
         if (!currentCategory) return;
-
-        if (subcategory === currentSubcategory) return;
+        if (subcategory.category === currentSubcategory?.category) return;
 
         dispatch(setSubcategory(subcategory));
-
-        const categoryPath = getCategoryRoute(currentCategory);
-        if (categoryPath) {
-            const subcategoryPath = getSubcategoryRoute(currentCategory, subcategory);
-
-            if (subcategoryPath) {
-                const fullPath = `${categoryPath}/${subcategoryPath}`;
-
-                navigate(fullPath, { replace: true });
-            }
-        }
+        navigate(`/${category.category}/${subcategory.category}`);
     };
+
+    if (!categories.length) {
+        return <p>Ошибка загрузки категорий</p>;
+    }
 
     return (
         <Box
@@ -119,117 +114,101 @@ export const AccordionMenu = () => {
                 }}
                 index={activeIndex}
             >
-                {Object.entries(LIST_MENU).map(
-                    ([category, { icon: IconComponent, subcategories }], index) => {
-                        const categoryKey = category
-                            ? getCategoryRoute(category).replace(/^\//, '')
-                            : null;
-                        return (
-                            <AccordionItem key={index} border='none'>
-                                <AccordionButton
-                                    data-test-id={`${categoryKey}`}
-                                    p={3}
-                                    pl={2}
-                                    pr={4}
+                {categories.map((category, index) => (
+                    <AccordionItem key={index} border='none'>
+                        <AccordionButton
+                            data-test-id={category.category}
+                            p={3}
+                            pl={2}
+                            pr={4}
+                            border='none'
+                            borderRadius='none'
+                            _hover={{
+                                backgroundColor: 'lime.50',
+                                border: 'none',
+                            }}
+                            _expanded={{
+                                fontWeight: '600',
+                                backgroundColor: 'lime.100',
+                            }}
+                            _focus={{
+                                outline: 'none',
+                            }}
+                            onClick={() => handleCategoryClick(category, category.subCategories[0])}
+                        >
+                            <Image src={`${API_IMG}/${category.icon}`} boxSize={6} mr={3} />
+                            <Box
+                                flex='1'
+                                textAlign='left'
+                                isTruncated
+                                {...(category.title === 'Веганская кухня' && {
+                                    'data-test-id': DataTestId.VeganCuisine,
+                                })}
+                            >
+                                {category.title}
+                            </Box>
+                            <AccordionIcon boxSize={6} />
+                        </AccordionButton>
+                        <AccordionPanel
+                            pb={4}
+                            display='flex'
+                            flexDirection='column'
+                            alignItems='flex-start'
+                        >
+                            {category.subCategories.map((subcategory, idx) => (
+                                <Button
+                                    data-test-id={
+                                        currentSubcategory?.title === subcategory.title
+                                            ? `${subcategory.category}-active`
+                                            : ''
+                                    }
+                                    h={6}
+                                    width='100%'
+                                    justifyContent='flex-start'
+                                    key={idx}
                                     border='none'
+                                    pos='relative'
+                                    bgColor='inherit'
+                                    onClick={() => handleSubcategoryClick(subcategory, category)}
+                                    py={4}
+                                    pl={4}
                                     borderRadius='none'
+                                    fontWeight={
+                                        currentSubcategory?.title === subcategory.title
+                                            ? '600'
+                                            : '500'
+                                    }
                                     _hover={{
                                         backgroundColor: 'lime.50',
-                                        border: 'none',
-                                    }}
-                                    _expanded={{
-                                        fontWeight: '600',
-                                        backgroundColor: 'lime.100',
+                                        color: 'inherit',
                                     }}
                                     _focus={{
                                         outline: 'none',
                                     }}
-                                    onClick={() => handleCategoryClick(category, subcategories)}
                                 >
-                                    <Box as={IconComponent} boxSize={6} mr='12px'></Box>
+                                    {subcategory.title}
                                     <Box
-                                        flex='1'
-                                        textAlign='left'
-                                        isTruncated
-                                        {...(category === 'Веганская кухня' && {
-                                            'data-test-id': 'vegan-cuisine',
-                                        })}
-                                    >
-                                        {category}
-                                    </Box>
-                                    <AccordionIcon boxSize={6} />
-                                </AccordionButton>
-                                <AccordionPanel
-                                    pb={4}
-                                    display='flex'
-                                    flexDirection='column'
-                                    alignItems='flex-start'
-                                >
-                                    {subcategories.map((subcategory, idx) => {
-                                        const subcategoryKey = subcategory
-                                            ? getSubcategoryRoute(
-                                                  category || '',
-                                                  subcategory,
-                                              ).replace(/^\//, '')
-                                            : null;
-
-                                        return (
-                                            <Button
-                                                data-test-id={
-                                                    currentSubcategory === subcategory
-                                                        ? `${subcategoryKey}-active`
-                                                        : ''
-                                                }
-                                                h={6}
-                                                width='100%'
-                                                justifyContent='flex-start'
-                                                key={idx}
-                                                border='none'
-                                                pos='relative'
-                                                bgColor='inherit'
-                                                onClick={() => handleSubcategoryClick(subcategory)}
-                                                py={4}
-                                                pl={4}
-                                                borderRadius='none'
-                                                fontWeight={
-                                                    currentSubcategory === subcategory
-                                                        ? '600'
-                                                        : '500'
-                                                }
-                                                _hover={{
-                                                    backgroundColor: 'lime.50',
-                                                    color: 'inherit',
-                                                }}
-                                                _focus={{
-                                                    outline: 'none',
-                                                }}
-                                            >
-                                                {subcategory}
-                                                <Box
-                                                    as='span'
-                                                    pos='absolute'
-                                                    left={
-                                                        currentSubcategory === subcategory
-                                                            ? '-8px'
-                                                            : '0'
-                                                    }
-                                                    h={6}
-                                                    w={
-                                                        currentSubcategory === subcategory
-                                                            ? '8px'
-                                                            : '1px'
-                                                    }
-                                                    bg='lime.300'
-                                                    transition='all 0.2s ease-in-out'
-                                                />
-                                            </Button>
-                                        );
-                                    })}
-                                </AccordionPanel>
-                            </AccordionItem>
-                        );
-                    },
-                )}
+                                        as='span'
+                                        pos='absolute'
+                                        left={
+                                            currentSubcategory?.title === subcategory.title
+                                                ? '-8px'
+                                                : '0'
+                                        }
+                                        h={6}
+                                        w={
+                                            currentSubcategory?.title === subcategory.title
+                                                ? '8px'
+                                                : '1px'
+                                        }
+                                        bg='lime.300'
+                                        transition='all 0.2s ease-in-out'
+                                    />
+                                </Button>
+                            ))}
+                        </AccordionPanel>
+                    </AccordionItem>
+                ))}
             </Accordion>
         </Box>
     );

@@ -17,17 +17,18 @@ import {
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
 
-import { CategoriesData, getCategoryContent } from '~/consts/category-icons';
+import { API_IMG } from '~/consts/consts';
+import { useAppSelector } from '~/store/hooks';
+import { categoriesSelector } from '~/store/slices/categories-slice';
 import { serchInputSelector } from '~/store/slices/recipes-slice';
-import { highlightText } from '~/utils';
+import { getUniqueCategories, highlightText } from '~/utils';
 
 type VerticalCard = {
-    id: string;
+    _id: string;
     title: string;
     description: string;
+    categoriesIds: string[];
     image?: string;
-    category: string[];
-    subcategory?: string[];
     bookmarks?: number;
     likes?: number;
 };
@@ -37,14 +38,17 @@ type VerticalCardProps = {
 };
 
 export const VerticalCard = ({ item }: VerticalCardProps) => {
-    const { id, image, title, description, category, subcategory, bookmarks, likes } = item;
+    const { _id, image, title, description, categoriesIds, bookmarks, likes } = item;
     const navigate = useNavigate();
     const searchInputCurrent = useSelector(serchInputSelector);
     const highlightedTitle = highlightText(title, searchInputCurrent);
+    const categories = useAppSelector(categoriesSelector);
+    const uniqueCategories = getUniqueCategories(categories, categoriesIds);
 
     const handleCardClick = () => {
-        if (category && subcategory) {
-            navigate(`/${category[0]}/${subcategory[0]}/${id}`);
+        if (uniqueCategories.length) {
+            const recipeUrl = `/${uniqueCategories[0].category}/${uniqueCategories[0].subCategories?.[0]?.category}/${_id}`;
+            navigate(recipeUrl);
         }
     };
 
@@ -68,7 +72,7 @@ export const VerticalCard = ({ item }: VerticalCardProps) => {
             <CardBody p='0'>
                 {image && (
                     <Image
-                        src={image}
+                        src={`${API_IMG}${image}`}
                         alt={title}
                         width='100%'
                         h={{ base: '128px', sm: '230px' }}
@@ -114,26 +118,21 @@ export const VerticalCard = ({ item }: VerticalCardProps) => {
             >
                 <Show above='sm'>
                     <Flex flexWrap='wrap' gap={2} maxW='60%'>
-                        {category.map((cat, idx) => {
-                            const { IconComponent, label } = getCategoryContent(
-                                cat as keyof typeof CategoriesData,
-                            );
-                            return (
-                                <Tag
-                                    key={idx}
-                                    size='sm'
-                                    variant='subtle'
-                                    backgroundColor='lime.150'
-                                    px={2}
-                                    py={1}
-                                    borderRadius='md'
-                                    mr={1}
-                                >
-                                    {IconComponent && <IconComponent boxSize={4} />}
-                                    <TagLabel>{label}</TagLabel>
-                                </Tag>
-                            );
-                        })}
+                        {uniqueCategories.map((cat, idx) => (
+                            <Tag
+                                key={idx}
+                                size='sm'
+                                variant='subtle'
+                                backgroundColor='lime.150'
+                                px={2}
+                                py={1}
+                                borderRadius='md'
+                                mr={1}
+                            >
+                                <Image src={`${API_IMG}${cat.icon}`} boxSize={5} />
+                                <TagLabel>{cat.title}</TagLabel>
+                            </Tag>
+                        ))}
                     </Flex>
                     <Spacer />
                 </Show>

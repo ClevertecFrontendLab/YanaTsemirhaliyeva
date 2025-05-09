@@ -1,22 +1,24 @@
 import { Box, Flex, Hide } from '@chakra-ui/react';
 import { ReactNode, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router';
 
-import { ALL_RECIPES } from '~/consts/all-recipes';
-import {
-    getCategoryAndSubcategoryFromUrl,
-    getCategoryRoute,
-    getSubcategoryRoute,
-} from '~/consts/dictionary';
-import { LIST_MENU } from '~/consts/menu-list';
-import { useAppDispatch } from '~/store/hooks';
-import { setCategory, setRecipeTitle, setSubcategory } from '~/store/slices/recipes-slice';
+import { DataTestId, DEFAULT_CARDS_PER_PAGE, DEFAULT_PAGE } from '~/consts/consts';
+import { useCategoryData } from '~/hooks/use-category-data';
+import { useGetCategoriesQuery } from '~/query/services/categories';
+import { useGetRecipeByIdQuery, useGetRecipesQuery } from '~/query/services/recipes';
+import { useAppDispatch, useAppSelector } from '~/store/hooks';
+import { setCategories, setSubCategories } from '~/store/slices/categories-slice';
+import { currentRecipeIdSelector, isFetching } from '~/store/slices/recipes-slice';
+import { saveCategoriesToDB } from '~/utils';
 
 import { AccordionMenu } from '../accordion-menu/AccordionMenu';
+import { AlertComponent } from '../alert/Alert';
 import { Footer } from '../footer/Footer';
 import { FooterAside } from '../footer-aside/FooterAside';
 import { Header } from '../header/Header';
+import { LoaderFullsize } from '../loader-fullsize/LoaderFullsize';
 import { UserNav } from '../user-nav/UserNav';
+
+const DEFAULT_SWIPER_SLIDES_COUNT = 10;
 
 type LayoutProps = {
     children: ReactNode;
@@ -24,61 +26,45 @@ type LayoutProps = {
 
 export const Layout = ({ children }: LayoutProps) => {
     const dispatch = useAppDispatch();
-    const location = useLocation();
-    const navigate = useNavigate();
+    const recipeId = useAppSelector(currentRecipeIdSelector);
+    const isJuiciestFetching = useAppSelector(isFetching);
+    const { data: categoriesData, isLoading: isCategoriesDataLoading } = useGetCategoriesQuery();
+    const { data: recipesData, isFetching: isRecipesLoading } = useGetRecipesQuery({
+        limit: DEFAULT_SWIPER_SLIDES_COUNT,
+        sortBy: 'createdAt',
+    });
+    const { isFetching: isJuiciestRecipesLoading } = useGetRecipesQuery({
+        limit: DEFAULT_CARDS_PER_PAGE,
+        sortBy: 'likes',
+        page: DEFAULT_PAGE,
+    });
+    const { isFetching: isRecipeLoading } = useGetRecipeByIdQuery(recipeId ?? '', {
+        skip: !recipeId,
+    });
+
+    const isDataLoading =
+        isCategoriesDataLoading ||
+        (isRecipesLoading && !recipesData) ||
+        isRecipeLoading ||
+        isJuiciestRecipesLoading ||
+        isJuiciestFetching;
 
     useEffect(() => {
-        const { category, subcategory, id } = getCategoryAndSubcategoryFromUrl(location.pathname);
-
-        if (id) {
-            const recipe = ALL_RECIPES.find((recipe) => recipe.id === id);
-
-            if (recipe) {
-                dispatch(setRecipeTitle(recipe.title));
-            } else {
-                console.warn(`Recipe with ID ${id} not found.`);
-            }
-
-            dispatch(setCategory(null));
-            dispatch(setSubcategory(null));
-
-            return;
-        } else {
-            dispatch(setRecipeTitle(null));
+        if (categoriesData) {
+            saveCategoriesToDB(categoriesData);
+            dispatch(setCategories(categoriesData.categories));
+            dispatch(setSubCategories(categoriesData.subCategories));
         }
+    }, [categoriesData, dispatch]);
 
-        if (category) {
-            dispatch(setCategory(category));
-
-            if (subcategory) {
-                dispatch(setSubcategory(subcategory));
-            } else if (category in LIST_MENU) {
-                const categoryKey = category as keyof typeof LIST_MENU;
-                const subcategories = LIST_MENU[categoryKey]?.subcategories;
-
-                if (subcategories && subcategories.length > 0) {
-                    const firstSubcategory = subcategories[0];
-
-                    dispatch(setSubcategory(firstSubcategory));
-
-                    const categoryPath = getCategoryRoute(category);
-                    if (categoryPath) {
-                        const subcategoryPath = getSubcategoryRoute(category, firstSubcategory);
-                        if (subcategoryPath) {
-                            navigate(`${categoryPath}/${subcategoryPath}`, { replace: true });
-                        }
-                    }
-                }
-            }
-        }
-    }, [dispatch, location.pathname, navigate]);
+    useCategoryData();
 
     return (
-        <Flex flexDirection='column' h='100%' minH='100vh' w='100%' minW='360px'>
+        <Flex flexDirection='column' h='100%' minH='100vh' w='100%' minW='359px'>
             <Header />
             <Hide breakpoint='(max-width: 1200px)'>
                 <Flex
-                    data-test-id='nav'
+                    data-test-id={DataTestId.Nav}
                     as='aside'
                     flexDirection='column'
                     justifyContent='space-between'
@@ -98,6 +84,9 @@ export const Layout = ({ children }: LayoutProps) => {
                 ml={{ base: '0', md: '256px' }}
                 mr={{ base: 0, md: '208px' }}
                 pb={{ base: '110px', md: 2 }}
+                display='flex'
+                flexDir='column'
+                flexGrow={1}
             >
                 {children}
             </Box>
@@ -111,9 +100,9 @@ export const Layout = ({ children }: LayoutProps) => {
                 left='0'
                 bottom='0'
                 w='100%'
-                minW='360px'
+                minW='359px'
                 zIndex='2'
-                data-test-id='footer'
+                data-test-id={DataTestId.Footer}
                 sx={{
                     '@media screen and (min-width: 1200px)': {
                         display: 'none',
@@ -122,6 +111,8 @@ export const Layout = ({ children }: LayoutProps) => {
             >
                 <Footer />
             </Box>
+            <LoaderFullsize isOpen={isDataLoading} />
+            <AlertComponent title='Ошибка сервера' desc='Попробуйте поискать снова попозже' />
         </Flex>
     );
 };

@@ -11,24 +11,23 @@ import {
     Tag,
     TagLabel,
     Text,
+    VStack,
 } from '@chakra-ui/react';
 
-type SimpleCard = {
-    title: string;
-    desc: string;
-    tag: {
-        icon: string;
-        name: string;
-    };
-    bookmark?: number;
-    likes?: number;
-};
+import { API_IMG } from '~/consts/consts';
+import { useAppSelector } from '~/store/hooks';
+import { categoriesSelector } from '~/store/slices/categories-slice';
+import { Recipe } from '~/types/recipe';
+import { getUniqueCategories } from '~/utils';
+
 type SimpleCardProps = {
-    item: SimpleCard;
+    item: Recipe;
 };
 
 export const SimpleCard = ({ item }: SimpleCardProps) => {
-    const { title, desc, tag, bookmark, likes } = item;
+    const { title, description, bookmarks, likes, categoriesIds } = item;
+    const categories = useAppSelector(categoriesSelector);
+    const uniqueCategories = getUniqueCategories(categories, categoriesIds);
 
     return (
         <Card
@@ -58,15 +57,25 @@ export const SimpleCard = ({ item }: SimpleCardProps) => {
                         {title}
                     </Heading>
                     <Text noOfLines={3} fontSize={14} lineHeight='20px'>
-                        {desc}
+                        {description}
                     </Text>
                 </Stack>
             </CardBody>
             <CardFooter pt={1} pb={{ base: 3, xl: 6 }} pl={{ base: 3, sm: 6, md: 4 }}>
-                <Tag size='md' variant='subtle' backgroundColor='lime.50' gap={{ base: 1, xl: 3 }}>
-                    <Image boxSize={4} src={tag.icon} />
-                    <TagLabel>{tag.name}</TagLabel>
-                </Tag>
+                <VStack maxW='65%' alignItems='flex-start'>
+                    {uniqueCategories.map((cat, idx) => (
+                        <Tag
+                            key={idx}
+                            size='md'
+                            variant='subtle'
+                            backgroundColor='lime.50'
+                            gap={{ base: 1, xl: 3 }}
+                        >
+                            <Image src={`${API_IMG}${cat.icon}`} boxSize={5} />
+                            <TagLabel>{cat.title}</TagLabel>
+                        </Tag>
+                    ))}
+                </VStack>
                 <Spacer />
                 <HStack
                     gap={3}
@@ -76,14 +85,14 @@ export const SimpleCard = ({ item }: SimpleCardProps) => {
                     lineHeight='140%'
                     pr={{ base: 0, xl: 4 }}
                 >
-                    {bookmark && (
+                    {bookmarks && (
                         <HStack>
                             <Image
                                 src='/svg/BsBookmarkHeart.svg'
                                 boxSize='12px'
                                 alt='bookmarks count'
                             />
-                            <Box as='span'>{bookmark}</Box>
+                            <Box as='span'>{bookmarks}</Box>
                         </HStack>
                     )}
                     {likes && (

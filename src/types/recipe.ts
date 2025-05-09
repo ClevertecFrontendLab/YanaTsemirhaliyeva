@@ -1,8 +1,7 @@
-export type NutritionValue = {
-    calories: number;
-    proteins: number;
-    fats: number;
-    carbohydrates: number;
+export type Step = {
+    stepNumber: number;
+    description: string;
+    image: string;
 };
 
 export type Ingredient = {
@@ -11,27 +10,38 @@ export type Ingredient = {
     measureUnit: string;
 };
 
-export type Step = {
-    stepNumber: number;
-    description: string;
-    image: string;
+export type NutritionValue = {
+    calories: number;
+    proteins?: number;
+    protein?: number;
+    fats: number;
+    carbohydrates: number;
+};
+
+type AuthorData = {
+    login: string;
+    firstName: string;
+    lastName: string;
+    subscribers: string[];
 };
 
 export type Recipe = {
-    id: string;
+    _id: string;
     title: string;
     description: string;
-    category: string[];
-    subcategory: string[];
+    time: number;
     image: string;
-    bookmarks: number;
-    likes: number;
-    date: string; // ISO 8601 format
-    time: string;
-    portions?: number;
+    meat: string;
+    garnish: string;
+    portions: number;
+    authorId: string;
+    categoriesIds: string[];
+    steps: Step[];
     nutritionValue: NutritionValue;
     ingredients: Ingredient[];
-    steps: Step[];
-    meat?: string;
-    side?: string;
+    likes: number;
+    views: number;
+    bookmarks: number;
+    createdAt: string;
+    authorData: AuthorData;
 };

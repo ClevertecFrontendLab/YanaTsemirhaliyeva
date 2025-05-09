@@ -1,23 +1,34 @@
 import { CloseIcon, SearchIcon } from '@chakra-ui/icons';
 import { HStack, IconButton, Input, InputGroup, InputRightElement } from '@chakra-ui/react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
+import { DataTestId } from '~/consts/consts';
 import { useAppDispatch, useAppSelector } from '~/store/hooks';
 import {
+    allergensSelector,
+    applyIntroAllergens,
     clearSearch,
-    recipesSelector,
     serchInputSelector,
+    setIsSearchTriggered,
     setSearchQuery,
 } from '~/store/slices/recipes-slice';
+import { Recipe } from '~/types/recipe';
 
 import { Filters } from '../filters/Filters';
 
-export const Search = () => {
+type SearchProps = {
+    recipesData: Recipe[] | undefined;
+};
+
+export const Search = ({ recipesData }: SearchProps) => {
     const dispatch = useAppDispatch();
     const searchInputCurrent = useSelector(serchInputSelector);
     const [searchInput, setSearchInput] = useState(searchInputCurrent);
-    const filteredRecipes = useAppSelector(recipesSelector);
+    const selectedAllergens = useAppSelector(allergensSelector);
+
+    const filteredRecipes = recipesData || [];
+
     const outlineColorCondition =
         filteredRecipes.length > 0 && searchInputCurrent.length > 0
             ? '#2DB100'
@@ -29,15 +40,22 @@ export const Search = () => {
         setSearchInput(event.target.value);
     };
 
+    useEffect(() => {
+        setSearchInput(searchInputCurrent);
+    }, [searchInputCurrent, selectedAllergens]);
+
     const handleSearch = () => {
-        if (searchInput.trim().length >= 3) {
+        if (searchInput.trim().length >= 2 || selectedAllergens.length > 0) {
             dispatch(setSearchQuery(searchInput.trim()));
+            dispatch(applyIntroAllergens());
+            dispatch(setIsSearchTriggered(true));
         }
     };
 
     const handleClearInput = () => {
         setSearchInput('');
         dispatch(clearSearch());
+        dispatch(setIsSearchTriggered(false));
     };
 
     return (
@@ -45,11 +63,11 @@ export const Search = () => {
             <Filters />
             <InputGroup>
                 <Input
-                    data-test-id='search-input'
+                    data-test-id={DataTestId.SearchInput}
                     value={searchInput}
                     onChange={handleInputChange}
                     onKeyDown={(e) => {
-                        if (e.key === 'Enter' && searchInput.trim().length >= 3) {
+                        if (e.key === 'Enter' && searchInput.trim().length >= 2) {
                             handleSearch();
                         }
                     }}
@@ -89,13 +107,17 @@ export const Search = () => {
                         />
                     )}
                     <IconButton
-                        data-test-id='search-button'
+                        data-test-id={DataTestId.SearchBtn}
                         onClick={handleSearch}
                         icon={<SearchIcon color='black' />}
                         aria-label='найти рецепты по запросу'
                         size={{ base: 'sm', sm: 'lg' }}
                         bgColor='inherit'
-                        pointerEvents={searchInput.trim().length < 3 ? 'none' : 'auto'}
+                        pointerEvents={
+                            searchInput.trim().length >= 3 || selectedAllergens.length > 0
+                                ? 'auto'
+                                : 'none'
+                        }
                         sx={{
                             transition: 'opacity 0.3s ease-in-out, border-color 0.3s ease-in-out',
                             border: 'none',

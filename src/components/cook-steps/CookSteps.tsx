@@ -1,5 +1,6 @@
 import { Box, Heading, Image, ListItem, Text, UnorderedList, VStack } from '@chakra-ui/react';
 
+import { API_IMG } from '~/consts/consts';
 import { Step } from '~/types/recipe';
 
 type CookStepsProps = {
@@ -30,7 +31,7 @@ export const CookSteps = ({ steps }: CookStepsProps) => (
                 >
                     {step.image && (
                         <Image
-                            src={step.image}
+                            src={`${API_IMG}${step.image}`}
                             alt={`Шаг ${step.stepNumber}`}
                             onError={(e) => (e.currentTarget.style.display = 'none')}
                             w={{ base: '48%', '2xs': '52%', md: '60%', xl: '52%' }}
