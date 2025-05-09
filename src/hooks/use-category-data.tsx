@@ -3,7 +3,12 @@ import { useLocation, useNavigate } from 'react-router';
 
 import { AppRoute } from '~/consts/consts';
 import { useAppDispatch } from '~/store/hooks';
-import { setCategory, setRecipeTitle, setSubcategory } from '~/store/slices/recipes-slice';
+import {
+    setCategory,
+    setRecipeTitle,
+    setSubcategory,
+    updateSearchParams,
+} from '~/store/slices/recipes-slice';
 import { getCategoriesFromDB, getCategoryAndSubcategoryFromUrl } from '~/utils';
 
 export const useCategoryData = () => {
@@ -18,7 +23,17 @@ export const useCategoryData = () => {
             );
             const { categories } = await getCategoriesFromDB();
             const excludedRoutes = [AppRoute.Index, AppRoute.Juicy, AppRoute.NotFound].map(String);
-            if (excludedRoutes.includes(location.pathname)) return;
+            if (excludedRoutes.includes(location.pathname)) {
+                dispatch(setCategory(null));
+                dispatch(setSubcategory(null));
+                dispatch(
+                    updateSearchParams({
+                        subcategoriesIds: [],
+                        page: 1,
+                    }),
+                );
+                return;
+            }
 
             if (!isValid) {
                 navigate(AppRoute.NotFound, { replace: true });
@@ -48,10 +63,22 @@ export const useCategoryData = () => {
                 }
 
                 dispatch(setSubcategory(subcategory));
+                dispatch(
+                    updateSearchParams({
+                        subcategoriesIds: [subcategory._id],
+                        page: 1,
+                    }),
+                );
             } else {
                 const firstSubcategory = validCategory.subCategories?.[0];
                 if (category && firstSubcategory) {
                     dispatch(setSubcategory(firstSubcategory));
+                    dispatch(
+                        updateSearchParams({
+                            subcategoriesIds: [firstSubcategory._id],
+                            page: 1,
+                        }),
+                    );
                     navigate(`/${category.category}/${firstSubcategory.category}`, {
                         replace: true,
                     });

@@ -18,6 +18,8 @@ import { Header } from '../header/Header';
 import { LoaderFullsize } from '../loader-fullsize/LoaderFullsize';
 import { UserNav } from '../user-nav/UserNav';
 
+const DEFAULT_SWIPER_SLIDES_COUNT = 10;
+
 type LayoutProps = {
     children: ReactNode;
 };
@@ -27,8 +29,8 @@ export const Layout = ({ children }: LayoutProps) => {
     const recipeId = useAppSelector(currentRecipeIdSelector);
     const isJuiciestFetching = useAppSelector(isFetching);
     const { data: categoriesData, isLoading: isCategoriesDataLoading } = useGetCategoriesQuery();
-    const { isFetching: isRecipesLoading } = useGetRecipesQuery({
-        limit: DEFAULT_CARDS_PER_PAGE,
+    const { data: recipesData, isFetching: isRecipesLoading } = useGetRecipesQuery({
+        limit: DEFAULT_SWIPER_SLIDES_COUNT,
         sortBy: 'createdAt',
     });
     const { isFetching: isJuiciestRecipesLoading } = useGetRecipesQuery({
@@ -42,7 +44,7 @@ export const Layout = ({ children }: LayoutProps) => {
 
     const isDataLoading =
         isCategoriesDataLoading ||
-        isRecipesLoading ||
+        (isRecipesLoading && !recipesData) ||
         isRecipeLoading ||
         isJuiciestRecipesLoading ||
         isJuiciestFetching;

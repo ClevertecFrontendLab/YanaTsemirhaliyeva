@@ -2,17 +2,36 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 import { Category, SubCategory } from '~/types/category';
 import { Recipe } from '~/types/recipe';
+import { formatAllergensForUrl } from '~/utils';
 
 import { ApplicationState } from '../configure-store';
 
+// Типы для фильтров
 export type FilterTypes = 'meatTypes' | 'garnishTypes' | 'allergens' | 'categories' | 'authors';
-const formatAllergensForUrl = (allergens: string[]) =>
-    allergens
-        .map((allergen) =>
-            allergen.includes('(') ? allergen.replace(/\(|\)/g, '').split(' ') : [allergen],
-        )
-        .flat();
 
+// Типизация параметров поиска
+export type SearchQueryParams = {
+    searchString?: string;
+    allergens?: string[];
+    meat?: string[];
+    garnish?: string[];
+    subcategoriesIds?: string[];
+    sortBy?: 'createdAt' | 'likes';
+    sortOrder?: 'asc' | 'desc';
+    page?: number;
+    limit?: number;
+};
+
+// Типизация фильтров
+export type FiltersMap = {
+    meatTypes?: string[];
+    garnishTypes?: string[];
+    allergens?: string[];
+    categories?: string[];
+    authors?: string[];
+};
+
+// Типизация состояния рецептов
 export type RecipeState = {
     recipes: Recipe[];
     filteredRecipes: Recipe[];
@@ -23,38 +42,31 @@ export type RecipeState = {
     currentRecipeId: string | null;
     isFilterAllergenActive: boolean;
     isIntroAllergenActive: boolean;
-    selectedFilters: {
-        meatTypes?: string[];
-        garnishTypes?: string[];
-        allergens?: string[];
-        categories?: string[];
-        authors?: string[];
-    };
-    appliedFilters: {
-        meatTypes?: string[];
-        garnishTypes?: string[];
-        allergens?: string[];
-        categories?: string[];
-        authors?: string[];
-    };
+    selectedFilters: FiltersMap;
+    appliedFilters: FiltersMap;
     searchQuery: string;
     isDrawerOpen: boolean;
-    searchQueryParams: {
-        searchString?: string;
-        allergens?: string[];
-        meat?: string[];
-        garnish?: string[];
-        subcategoriesIds?: string[];
-        sortBy?: 'createdAt' | 'likes';
-        sortOrder?: 'asc' | 'desc';
-        page?: number;
-        limit?: number;
-    };
+    searchQueryParams: SearchQueryParams;
     isError: boolean;
     isSearchTriggered: boolean;
     isFetching: boolean;
 };
 
+// Дефолтные значения для параметров поиска
+const DEFAULT_PAGE = 1;
+const DEFAULT_LIMIT = 8;
+
+const defaultSearchParams: SearchQueryParams = {
+    searchString: '',
+    allergens: [],
+    meat: [],
+    garnish: [],
+    subcategoriesIds: [],
+    page: DEFAULT_PAGE,
+    limit: DEFAULT_LIMIT,
+};
+
+// Начальное состояние
 const initialState: RecipeState = {
     recipes: [],
     filteredRecipes: [],
@@ -69,20 +81,27 @@ const initialState: RecipeState = {
     appliedFilters: {},
     searchQuery: '',
     isDrawerOpen: false,
-    searchQueryParams: {
-        searchString: '',
-        allergens: [],
-        meat: [],
-        garnish: [],
-        subcategoriesIds: [],
-        sortBy: undefined,
-        sortOrder: undefined,
-        page: 1,
-        limit: 8,
-    },
+    searchQueryParams: defaultSearchParams,
     isError: false,
     isSearchTriggered: false,
     isFetching: false,
+};
+
+// Вспомогательные функции
+const getAllergens = (state: RecipeState): string[] => [
+    ...state.allergens,
+    ...(state.appliedFilters.allergens || []),
+];
+
+const resetFilters = (state: RecipeState, keepSearchQuery = true): void => {
+    state.selectedFilters = {};
+    state.appliedFilters = {};
+    state.allergens = [];
+    state.searchQueryParams = {
+        ...defaultSearchParams,
+        searchString: keepSearchQuery ? state.searchQuery : '',
+    };
+    state.isFilterAllergenActive = false;
 };
 
 export const recipeSlice = createSlice({
@@ -135,49 +154,33 @@ export const recipeSlice = createSlice({
         },
         applyFilters(state) {
             state.appliedFilters = JSON.parse(JSON.stringify(state.selectedFilters));
+
+            // Отображение выбранных фильтров на параметры поиска
+            const allergens = formatAllergensForUrl(getAllergens(state));
+
             state.searchQueryParams = {
                 ...state.searchQueryParams,
                 searchString: state.searchQuery || '',
-                allergens: formatAllergensForUrl([
-                    ...state.allergens,
-                    ...(state.appliedFilters.allergens || []),
-                ]),
+                allergens,
                 garnish: state.appliedFilters.garnishTypes || [],
                 meat: state.appliedFilters.meatTypes || [],
                 subcategoriesIds: state.appliedFilters.categories || [],
             };
         },
         clearFilters(state) {
-            state.selectedFilters = {};
-            state.appliedFilters = {};
-            state.allergens = [];
-            state.searchQueryParams = {
-                searchString: state.searchQuery,
-                allergens: [],
-                meat: [],
-                garnish: [],
-                subcategoriesIds: [],
-                sortBy: undefined,
-                sortOrder: undefined,
-                page: 1,
-                limit: 8,
-            };
-            state.isFilterAllergenActive = false;
+            resetFilters(state);
         },
         clearSearch(state) {
             state.searchQuery = '';
             state.searchQueryParams.searchString = '';
         },
-        updateSearchParams(
-            state,
-            action: PayloadAction<Partial<RecipeState['searchQueryParams']>>,
-        ) {
+        updateSearchParams(state, action: PayloadAction<Partial<SearchQueryParams>>) {
+            const allergens = action.payload.allergens || state.searchQueryParams.allergens || [];
+
             state.searchQueryParams = {
                 ...state.searchQueryParams,
                 ...action.payload,
-                allergens: formatAllergensForUrl(
-                    action.payload.allergens || state.searchQueryParams.allergens || [],
-                ),
+                allergens: formatAllergensForUrl(allergens),
             };
         },
         setRecipeTitle(state, action: PayloadAction<string | null>) {
@@ -201,6 +204,7 @@ export const recipeSlice = createSlice({
         setIsFetching: (state, action: PayloadAction<boolean>) => {
             state.isFetching = action.payload;
         },
+        resetState: () => initialState,
     },
 });
 
@@ -228,30 +232,53 @@ export const {
     setIsSearchTriggered,
     setIsFetching,
     applyIntroAllergens,
+    resetState,
 } = recipeSlice.actions;
 
-// Селекторы
-export const recipesSelector = (state: ApplicationState) => state.recipes.filteredRecipes;
-export const allergensSelector = (state: ApplicationState) => state.recipes.allergens;
-export const currentCategorySelector = (state: ApplicationState) => state.recipes.currentCategory;
-export const currentSubcategorySelector = (state: ApplicationState) =>
-    state.recipes.currentSubcategory;
-export const currentRecipeTitleSelector = (state: ApplicationState) =>
-    state.recipes.currentRecipeTitle;
-export const currentRecipeIdSelector = (state: ApplicationState) => state.recipes.currentRecipeId;
-export const isFilterActiveSelector = (state: ApplicationState) =>
-    state.recipes.isFilterAllergenActive;
-export const isIntroActiveSelector = (state: ApplicationState) =>
-    state.recipes.isIntroAllergenActive;
-export const selectedFiltersSelector = (state: ApplicationState) => state.recipes.selectedFilters;
-export const serchInputSelector = (state: ApplicationState) => state.recipes.searchQuery;
-export const drawerStatusSelector = (state: ApplicationState) => state.recipes.isDrawerOpen;
+// Селекторы сгруппированные по типу данных
+export const selectors = {
+    // Данные рецептов
+    recipes: (state: ApplicationState) => state.recipes.filteredRecipes,
 
-export const searchParamsSelector = (state: ApplicationState) => state.recipes.searchQueryParams;
-export const isErrorSelector = (state: ApplicationState) => state.recipes.isError;
-export const isSearchTriggeredSelector = (state: ApplicationState) =>
-    state.recipes.isSearchTriggered;
-export const isFetching = (state: ApplicationState) => state.recipes.isFetching;
+    // Категории и рецепты
+    currentCategory: (state: ApplicationState) => state.recipes.currentCategory,
+    currentSubcategory: (state: ApplicationState) => state.recipes.currentSubcategory,
+    currentRecipeTitle: (state: ApplicationState) => state.recipes.currentRecipeTitle,
+    currentRecipeId: (state: ApplicationState) => state.recipes.currentRecipeId,
+
+    // Фильтры и аллергены
+    allergens: (state: ApplicationState) => state.recipes.allergens,
+    isFilterActive: (state: ApplicationState) => state.recipes.isFilterAllergenActive,
+    isIntroActive: (state: ApplicationState) => state.recipes.isIntroAllergenActive,
+    selectedFilters: (state: ApplicationState) => state.recipes.selectedFilters,
+
+    // Поиск
+    searchQuery: (state: ApplicationState) => state.recipes.searchQuery,
+    searchParams: (state: ApplicationState) => state.recipes.searchQueryParams,
+    isSearchTriggered: (state: ApplicationState) => state.recipes.isSearchTriggered,
+
+    // UI состояние
+    drawerStatus: (state: ApplicationState) => state.recipes.isDrawerOpen,
+    isError: (state: ApplicationState) => state.recipes.isError,
+    isFetching: (state: ApplicationState) => state.recipes.isFetching,
+};
+
+// Для обратной совместимости - индивидуальные селекторы
+export const recipesSelector = selectors.recipes;
+export const allergensSelector = selectors.allergens;
+export const currentCategorySelector = selectors.currentCategory;
+export const currentSubcategorySelector = selectors.currentSubcategory;
+export const currentRecipeTitleSelector = selectors.currentRecipeTitle;
+export const currentRecipeIdSelector = selectors.currentRecipeId;
+export const isFilterActiveSelector = selectors.isFilterActive;
+export const isIntroActiveSelector = selectors.isIntroActive;
+export const selectedFiltersSelector = selectors.selectedFilters;
+export const serchInputSelector = selectors.searchQuery;
+export const drawerStatusSelector = selectors.drawerStatus;
+export const searchParamsSelector = selectors.searchParams;
+export const isErrorSelector = selectors.isError;
+export const isSearchTriggeredSelector = selectors.isSearchTriggered;
+export const isFetching = selectors.isFetching;
 
 // Редьюсер
 export default recipeSlice.reducer;

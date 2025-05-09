@@ -54,3 +54,15 @@ export type GetRecipesWithFiltersAndPaginateParams = {
     subcategoriesIds?: string[];
     limit?: number;
 };
+
+export type QueryParams = Partial<{
+    page: number;
+    limit: number;
+    searchString: string;
+    allergens: string[];
+    meat: string[];
+    garnish: string[];
+    subcategoriesIds: string[];
+    sortBy: 'createdAt' | 'likes';
+    sortOrder: 'asc' | 'desc';
+}>;

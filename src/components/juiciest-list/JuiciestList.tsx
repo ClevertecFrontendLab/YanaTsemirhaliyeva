@@ -8,7 +8,7 @@ import {
     Spacer,
     useBreakpointValue,
 } from '@chakra-ui/react';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import { Link } from 'react-router';
 
 import { HorizontalCard } from '~/components/horizontal-card/HorizontalCard';
@@ -24,19 +24,16 @@ export const JuiciestList = () => {
     const isTabletOrAbove = useBreakpointValue({ base: false, '2xs': true, sm: false });
     const categories = useAppSelector(categoriesSelector);
     const searchParams = useAppSelector(searchParamsSelector);
-    const [params, setParams] = useState({
-        ...searchParams,
-        sortBy: 'likes' as const,
-        sortOrder: 'desc' as const,
-    });
+    const params = useMemo(
+        () => ({
+            ...searchParams,
+            sortBy: 'likes' as const,
+            sortOrder: 'desc' as const,
+        }),
+        [searchParams],
+    );
 
-    useEffect(() => {
-        setParams({ ...searchParams, sortBy: 'likes', sortOrder: 'desc' });
-    }, [searchParams]);
-
-    const { data, isError } = useGetRecipesQuery(params, {
-        refetchOnMountOrArgChange: true,
-    });
+    const { data, isError } = useGetRecipesQuery(params);
 
     useEffect(() => {
         if (isError) {

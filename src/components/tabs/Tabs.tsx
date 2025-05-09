@@ -22,6 +22,7 @@ import {
     currentSubcategorySelector,
     searchParamsSelector,
     setSubcategory,
+    updateSearchParams,
 } from '~/store/slices/recipes-slice';
 
 import { HorizontalCard } from '../horizontal-card/HorizontalCard';
@@ -34,32 +35,48 @@ export const TabsComponent = () => {
     const searchParams = useAppSelector(searchParamsSelector);
     const categories = useAppSelector(categoriesSelector);
     const [page, setPage] = useState(1);
-    const [activeTabIndex, setActiveTabIndex] = useState(0);
+    const subcategoriesIds = useMemo(
+        () => searchParams.subcategoriesIds || [],
+        [searchParams.subcategoriesIds],
+    );
+    const currentSubcategoryId = currentSubcategory?._id || '';
 
     const subcategories = useMemo(() => currentCategory?.subCategories || [], [currentCategory]);
 
-    useEffect(() => {
-        if (!currentSubcategory) return;
-        const foundIndex = subcategories.findIndex((sub) => sub._id === currentSubcategory._id);
-        if (foundIndex !== -1) setActiveTabIndex(foundIndex);
+    const activeTabIndex = useMemo(() => {
+        if (!currentSubcategory) return 0;
+        const index = subcategories.findIndex((sub) => sub._id === currentSubcategory._id);
+        return index !== -1 ? index : 0;
     }, [currentSubcategory, subcategories]);
-
-    const selectedSubCategoryId = subcategories[activeTabIndex]?._id ?? '';
 
     useEffect(() => {
         setPage(1);
-    }, [searchParams]);
+    }, [searchParams, currentSubcategoryId]);
+
+    useEffect(() => {
+        if (
+            currentSubcategoryId &&
+            (!subcategoriesIds.length || subcategoriesIds[0] !== currentSubcategoryId)
+        ) {
+            dispatch(
+                updateSearchParams({
+                    subcategoriesIds: [currentSubcategoryId],
+                    page: 1,
+                }),
+            );
+        }
+    }, [currentSubcategoryId, dispatch, subcategoriesIds]);
 
     const { data, isLoading } = useGetRecipesWithFiltersAndPaginateQuery(
         {
-            subcategoriesIds: [selectedSubCategoryId],
+            subcategoriesIds: [currentSubcategoryId],
             searchString: searchParams.searchString || '',
             allergens: searchParams.allergens || [],
             page,
             limit: DEFAULT_CARDS_PER_PAGE,
         },
         {
-            skip: !selectedSubCategoryId,
+            skip: !currentSubcategoryId,
             refetchOnMountOrArgChange: true,
         },
     );
@@ -67,12 +84,17 @@ export const TabsComponent = () => {
     const recipesForSubcategory = data?.data || [];
 
     const handleTabChange = (index: number) => {
-        setActiveTabIndex(index);
         setPage(1);
-
         const newSubcategory = subcategories[index];
+
         if (newSubcategory && newSubcategory._id !== currentSubcategory?._id) {
             dispatch(setSubcategory(newSubcategory));
+            dispatch(
+                updateSearchParams({
+                    subcategoriesIds: [newSubcategory._id],
+                    page: 1,
+                }),
+            );
             navigate(`/${currentCategory?.category}/${newSubcategory.category}`, { replace: true });
         }
     };

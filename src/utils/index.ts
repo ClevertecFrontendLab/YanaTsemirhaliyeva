@@ -161,7 +161,6 @@ export async function getCategoryAndSubcategoryFromUrl(pathname: string): Promis
     return result;
 }
 
-// utils/categoryUtils.ts
 export const getUniqueCategories = (categories: Category[], categoriesIds: string[]) =>
     categories.filter(
         (category) =>
@@ -230,4 +229,122 @@ export const transformCategoryResponse = (
         },
         { categories: [], subCategories: [] },
     );
+};
+
+export const formatAllergensForUrl = (allergens: string[]): string[] =>
+    allergens
+        .map((allergen) =>
+            allergen.includes('(') ? allergen.replace(/\(|\)/g, '').split(' ') : [allergen],
+        )
+        .flat();
+
+export const getOriginalAllergens = (
+    formattedAllergens: string[] | undefined,
+    originalAllergens: string[] = [],
+): string[] => {
+    if (!formattedAllergens || formattedAllergens.length === 0) return [];
+
+    const uniqueOriginalAllergens = new Set<string>();
+
+    formattedAllergens.forEach((formatted) => {
+        for (const original of originalAllergens) {
+            // Проверяем, содержит ли оригинальный аллерген форматированное значение
+            if (
+                original.includes(formatted) ||
+                formatAllergensForUrl([original]).includes(formatted)
+            ) {
+                uniqueOriginalAllergens.add(original);
+                break;
+            }
+        }
+    });
+
+    // Если мы нашли все оригинальные значения, возвращаем их
+    if (uniqueOriginalAllergens.size > 0) {
+        return Array.from(uniqueOriginalAllergens);
+    }
+
+    // Если оригинальные значения не найдены, возвращаем форматированные значения
+    return formattedAllergens;
+};
+
+type SearchParamsType = {
+    allergens?: string[];
+    meat?: string[];
+    garnish?: string[];
+};
+
+type SelectedFiltersType = {
+    allergens?: string[];
+};
+
+type FilterItem = {
+    key: string;
+    formattedKey: string;
+    item: string;
+};
+
+export const formatFilters = (
+    filterKeysToShow: Array<keyof SearchParamsType>,
+    searchParams: SearchParamsType,
+    selectedFilters: SelectedFiltersType,
+): FilterItem[] => {
+    const result: FilterItem[] = [];
+
+    for (const filterKey of filterKeysToShow) {
+        const values = searchParams[filterKey];
+        if (!values || values.length === 0) continue;
+
+        if (
+            filterKey === 'allergens' &&
+            selectedFilters.allergens &&
+            selectedFilters.allergens.length > 0
+        ) {
+            const formattedToOriginal = new Map<string, string>();
+            // Создаем отображение форматированных значений к оригинальным
+            selectedFilters.allergens.forEach((originalAllergen) => {
+                const formattedValues = formatAllergensForUrl([originalAllergen]);
+                formattedValues.forEach((formatted) => {
+                    formattedToOriginal.set(formatted, originalAllergen);
+                });
+            });
+            const addedOriginals = new Set<string>();
+
+            // Для каждого значения в searchParams.allergens находим оригинальное название
+            values.forEach((formatted, index) => {
+                const original = formattedToOriginal.get(formatted);
+
+                if (original && !addedOriginals.has(original)) {
+                    result.push({
+                        key: `allergens-${index}`,
+                        formattedKey: 'allergens',
+                        item: original,
+                    });
+
+                    addedOriginals.add(original);
+                } else if (!original) {
+                    result.push({
+                        key: `allergens-${index}`,
+                        formattedKey: 'allergens',
+                        item: formatted,
+                    });
+                }
+            });
+        } else {
+            values.forEach((item, index) => {
+                result.push({
+                    key: `${filterKey}-${index}`,
+                    formattedKey:
+                        filterKey === 'meat'
+                            ? 'meatTypes'
+                            : filterKey === 'garnish'
+                              ? 'garnishTypes'
+                              : filterKey,
+                    item: item,
+                });
+            });
+        }
+    }
+
+    return result;
 };

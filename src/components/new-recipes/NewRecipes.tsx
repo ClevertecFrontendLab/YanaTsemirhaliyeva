@@ -1,7 +1,7 @@
 import './NewRecipes.css';
 
 import { Box, Heading, IconButton } from '@chakra-ui/react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { Swiper as SwiperType } from 'swiper';
 import { Navigation } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -20,22 +20,18 @@ export const NewRecipes = () => {
     const dispatch = useAppDispatch();
     const swiperRef = useRef<SwiperType | null>(null);
     const searchParams = useAppSelector(searchParamsSelector);
-    const [params, setParams] = useState({
-        ...searchParams,
-        sortBy: 'createdAt' as const,
-        sortOrder: 'desc' as const,
-    });
-
-    useEffect(() => {
-        setParams({
+    const queryParams = useMemo(
+        () => ({
             ...searchParams,
-            sortBy: 'createdAt',
-            sortOrder: 'desc',
+            sortBy: 'createdAt' as const,
+            sortOrder: 'desc' as const,
             limit: DEFAULT_CARDS_PER_CAROUSEL,
-        });
-    }, [searchParams]);
+            page: 1,
+        }),
+        [searchParams],
+    );
 
-    const { data, isError } = useGetRecipesQuery(params);
+    const { data, isError } = useGetRecipesQuery(queryParams);
 
     useEffect(() => {
         if (isError) {

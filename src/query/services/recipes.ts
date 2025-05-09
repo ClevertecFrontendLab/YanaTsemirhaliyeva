@@ -13,183 +13,161 @@ import {
     RecipeResponse,
 } from '../types/recipeApi.types';
 
+type QueryParamsOptions = {
+    searchString?: string;
+    allergens?: string[];
+    meat?: string[];
+    garnish?: string[];
+    subcategoriesIds?: string[];
+    page?: number;
+    limit?: number;
+    sortBy?: string;
+    sortOrder?: string;
+};
+
+const buildQueryParams = (options: QueryParamsOptions) => {
+    const {
+        searchString,
+        allergens,
+        meat,
+        garnish,
+        subcategoriesIds,
+        page = DEFAULT_PAGE,
+        limit = DEFAULT_CARDS_PER_PAGE,
+        sortBy,
+        sortOrder,
+    } = options;
+
+    return {
+        page,
+        limit,
+        ...(searchString ? { searchString } : {}),
+        ...(allergens?.length ? { allergens: allergens.join(',') } : {}),
+        ...(meat?.length ? { meat: meat.join(',') } : {}),
+        ...(garnish?.length ? { garnish: garnish.join(',') } : {}),
+        ...(subcategoriesIds?.length ? { subcategoriesIds: subcategoriesIds.join(',') } : {}),
+        ...(sortBy ? { sortBy } : {}),
+        ...(sortOrder ? { sortOrder } : {}),
+    };
+};
+
+const handlePaginationMerge = (
+    currentCache: RecipeResponse,
+    newData: RecipeResponse,
+    { arg }: { arg: { page: number } },
+) => {
+    if (arg.page === DEFAULT_PAGE || arg.page === 1) {
+        return newData;
+    }
+    currentCache.data.push(...newData.data);
+    currentCache.meta = newData.meta;
+    return currentCache;
+};
+
+type ArgValue = string | number | boolean | string[] | number[] | undefined;
+
+type ForceRefetchArg = {
+    currentArg: Record<string, ArgValue> | undefined;
+    previousArg: Record<string, ArgValue> | undefined;
+};
+
+const createForceRefetchHandler =
+    (fields: string[]) =>
+    ({ currentArg, previousArg }: ForceRefetchArg): boolean => {
+        if (!currentArg || !previousArg) return true;
+
+        return fields.some((field) => {
+            if (field === 'page') {
+                return currentArg.page !== previousArg.page;
+            }
+            if (field === 'subCategoryId') {
+                return currentArg.subCategoryId !== previousArg.subCategoryId;
+            }
+            if (field === 'searchString') {
+                return currentArg.searchString !== previousArg.searchString;
+            }
+            return JSON.stringify(currentArg[field]) !== JSON.stringify(previousArg[field]);
+        });
+    };
+
 export const recipeApiSlice = baseApiSlice
     .enhanceEndpoints({ addTagTypes: [Tags.RECIPES] })
     .injectEndpoints({
         endpoints: (builder) => ({
             getRecipesByCategory: builder.query<RecipeResponse, GetRecipesByCategoryParams>({
-                query: ({
-                    subCategoryId,
-                    searchString,
-                    allergens,
-                    page = DEFAULT_PAGE,
-                    limit = DEFAULT_CARDS_PER_PAGE,
-                }) => ({
+                query: ({ subCategoryId, ...rest }) => ({
                     url: `${ApiEndpoints.RECIPES}/category/${subCategoryId}`,
-                    params: {
-                        page,
-                        limit,
-                        ...(searchString ? { searchString } : {}),
-                        ...(allergens?.length ? { allergens: allergens.join(',') } : {}),
-                    },
+                    params: buildQueryParams(rest),
                 }),
-                forceRefetch({ currentArg, previousArg }) {
-                    return (
-                        currentArg?.searchString !== previousArg?.searchString ||
-                        JSON.stringify(currentArg?.allergens) !==
-                            JSON.stringify(previousArg?.allergens)
-                    );
-                },
+                forceRefetch: createForceRefetchHandler(['searchString', 'allergens']),
             }),
+
             getRecipes: builder.query<RecipeResponse, GetRecipesParams>({
-                query: ({
-                    searchString,
-                    allergens,
-                    meat,
-                    garnish,
-                    subcategoriesIds,
-                    sortBy = 'createdAt',
-                    sortOrder = 'desc',
-                    page = DEFAULT_PAGE,
-                    limit = DEFAULT_CARDS_PER_PAGE,
-                }) => ({
-                    url: `${ApiEndpoints.RECIPES}`,
-                    params: {
-                        page,
-                        limit,
-                        ...(searchString ? { searchString } : {}),
-                        ...(allergens?.length ? { allergens: allergens.join(',') } : {}),
-                        ...(meat?.length ? { meat: meat.join(',') } : {}),
-                        ...(garnish?.length ? { garnish: garnish.join(',') } : {}),
-                        ...(subcategoriesIds?.length
-                            ? { subcategoriesIds: subcategoriesIds.join(',') }
-                            : {}),
-                        sortBy,
-                        sortOrder,
-                    },
+                query: (params) => ({
+                    url: ApiEndpoints.RECIPES,
+                    params: buildQueryParams({
+                        ...params,
+                        sortBy: params.sortBy || 'createdAt',
+                        sortOrder: params.sortOrder || 'desc',
+                    }),
                 }),
-                forceRefetch({ currentArg, previousArg }) {
-                    return (
-                        currentArg?.searchString !== previousArg?.searchString ||
-                        JSON.stringify(currentArg?.subcategoriesIds) !==
-                            JSON.stringify(previousArg?.subcategoriesIds)
-                    );
-                },
+                forceRefetch: createForceRefetchHandler(['searchString', 'subcategoriesIds']),
             }),
+
             getRecipeById: builder.query<Recipe, string>({
                 query: (recipeId) => ({
                     url: `${ApiEndpoints.RECIPES}/${recipeId}`,
                 }),
             }),
+
             getPaginatedRecipes: builder.query<RecipeResponse, GetPaginatedRecipesParams>({
-                query: ({
-                    searchString,
-                    allergens,
-                    meat,
-                    garnish,
-                    subcategoriesIds,
-                    sortBy = 'createdAt',
-                    sortOrder = 'desc',
-                    page,
-                    limit = DEFAULT_CARDS_PER_PAGE,
-                }) => ({
+                query: (params) => ({
                     url: ApiEndpoints.RECIPES,
-                    params: {
-                        page,
-                        limit,
-                        ...(searchString ? { searchString } : {}),
-                        ...(allergens?.length ? { allergens: allergens.join(',') } : {}),
-                        ...(meat?.length ? { meat: meat.join(',') } : {}),
-                        ...(garnish?.length ? { garnish: garnish.join(',') } : {}),
-                        ...(subcategoriesIds?.length
-                            ? { subcategoriesIds: subcategoriesIds.join(',') }
-                            : {}),
-                        sortBy,
-                        sortOrder,
-                    },
+                    params: buildQueryParams({
+                        ...params,
+                        sortBy: params.sortBy || 'createdAt',
+                        sortOrder: params.sortOrder || 'desc',
+                    }),
                 }),
                 serializeQueryArgs: ({ endpointName }) => endpointName,
-                merge: (currentCache, newData, { arg }) => {
-                    if (arg.page === 1) {
-                        return newData;
-                    }
-                    currentCache.data.push(...newData.data);
-                    currentCache.meta = newData.meta;
-                    return currentCache;
-                },
-                forceRefetch({ currentArg, previousArg }) {
-                    return (
-                        currentArg?.page !== previousArg?.page ||
-                        JSON.stringify(currentArg?.searchString) !==
-                            JSON.stringify(previousArg?.searchString) ||
-                        JSON.stringify(currentArg?.allergens) !==
-                            JSON.stringify(previousArg?.allergens) ||
-                        JSON.stringify(currentArg?.meat) !== JSON.stringify(previousArg?.meat) ||
-                        JSON.stringify(currentArg?.garnish) !==
-                            JSON.stringify(previousArg?.garnish) ||
-                        JSON.stringify(currentArg?.subcategoriesIds) !==
-                            JSON.stringify(previousArg?.subcategoriesIds)
-                    );
-                },
+                merge: handlePaginationMerge,
+                forceRefetch: createForceRefetchHandler([
+                    'page',
+                    'searchString',
+                    'allergens',
+                    'meat',
+                    'garnish',
+                    'subcategoriesIds',
+                ]),
             }),
+
             getRecipesByCategoryWithPaginate: builder.query<
                 RecipeResponse,
                 GetRecipesByCategoryWithPaginateParams
             >({
-                query: ({ subCategoryId, searchString, allergens, page, limit = 8 }) => ({
+                query: ({ subCategoryId, ...rest }) => ({
                     url: `${ApiEndpoints.RECIPES}/category/${subCategoryId}`,
-                    params: {
-                        page,
-                        limit,
-                        ...(searchString ? { searchString } : {}),
-                        ...(allergens?.length ? { allergens: allergens.join(',') } : {}),
-                    },
+                    params: buildQueryParams({ ...rest, limit: rest.limit || 8 }),
                 }),
                 serializeQueryArgs: ({ endpointName }) => endpointName,
-                merge: (currentCache, newData, { arg }) => {
-                    if (arg.page === DEFAULT_PAGE) {
-                        return newData; // Очищаем кеш при смене категории
-                    }
-                    currentCache.data.push(...newData.data); // Добавляем новые рецепты при загрузке
-                    currentCache.meta = newData.meta;
-                    return currentCache;
-                },
-                forceRefetch({ currentArg, previousArg }) {
-                    return (
-                        currentArg?.subCategoryId !== previousArg?.subCategoryId ||
-                        currentArg?.searchString !== previousArg?.searchString ||
-                        JSON.stringify(currentArg?.allergens) !==
-                            JSON.stringify(previousArg?.allergens)
-                    );
-                },
+                merge: handlePaginationMerge,
+                forceRefetch: createForceRefetchHandler([
+                    'subCategoryId',
+                    'searchString',
+                    'allergens',
+                ]),
             }),
+
             getRecipesWithFiltersAndPaginate: builder.query<
                 RecipeResponse,
                 GetRecipesWithFiltersAndPaginateParams
             >({
-                query: ({
-                    searchString,
-                    allergens,
-                    meat,
-                    garnish,
-                    subcategoriesIds,
-                    page,
-                    limit = DEFAULT_CARDS_PER_PAGE,
-                }) => ({
+                query: (params) => ({
                     url: ApiEndpoints.RECIPES,
-                    params: {
-                        page,
-                        limit,
-                        ...(searchString ? { searchString } : {}),
-                        ...(allergens?.length ? { allergens: allergens.join('') } : {}),
-                        ...(meat?.length ? { meat: meat.join('') } : {}),
-                        ...(garnish?.length ? { garnish: garnish.join('') } : {}),
-                        ...(subcategoriesIds?.length
-                            ? { subcategoriesIds: subcategoriesIds.join(',') }
-                            : {}),
-                    },
+                    params: buildQueryParams(params),
                 }),
-                serializeQueryArgs: ({ endpointName }) => endpointName,
+                serializeQueryArgs: ({ queryArgs }) =>
+                    `${queryArgs.subcategoriesIds?.[0] || 'all'}-${queryArgs.searchString || ''}`,
                 merge: (currentCache, newData, { arg }) => {
                     if (arg.page === 1) {
                         return newData;
@@ -198,18 +176,13 @@ export const recipeApiSlice = baseApiSlice
                     currentCache.meta = newData.meta;
                     return currentCache;
                 },
-                forceRefetch({ currentArg, previousArg }) {
-                    return (
-                        currentArg?.searchString !== previousArg?.searchString ||
-                        JSON.stringify(currentArg?.allergens) !==
-                            JSON.stringify(previousArg?.allergens) ||
-                        JSON.stringify(currentArg?.meat) !== JSON.stringify(previousArg?.meat) ||
-                        JSON.stringify(currentArg?.garnish) !==
-                            JSON.stringify(previousArg?.garnish) ||
-                        JSON.stringify(currentArg?.subcategoriesIds) !==
-                            JSON.stringify(previousArg?.subcategoriesIds)
-                    );
-                },
+                forceRefetch: createForceRefetchHandler([
+                    'searchString',
+                    'allergens',
+                    'meat',
+                    'garnish',
+                    'subcategoriesIds',
+                ]),
             }),
         }),
     });

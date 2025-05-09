@@ -10,7 +10,7 @@ import {
     useOutsideClick,
     VStack,
 } from '@chakra-ui/react';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 import { DataTestId, DEFAULT_CARDS_PER_PAGE } from '~/consts/consts';
@@ -31,6 +31,7 @@ import {
     updateSearchParams,
     updateSelectedFilters,
 } from '~/store/slices/recipes-slice';
+import { formatFilters } from '~/utils';
 
 import { AllergenSelect } from '../allergens/Allergens';
 import { Loader } from '../loader/Loader';
@@ -54,6 +55,7 @@ export const Intro = ({ title, desc }: IntroProps) => {
     const filterKeysToShow: Array<
         keyof Pick<typeof searchParams, 'allergens' | 'meat' | 'garnish'>
     > = ['allergens', 'meat', 'garnish'];
+    const formattedFilters = formatFilters(filterKeysToShow, searchParams, selectedFilters);
 
     const recipesQueryParams = {
         searchString: searchInputCurrent,
@@ -65,36 +67,67 @@ export const Intro = ({ title, desc }: IntroProps) => {
         skip: !isSearchTriggered,
     });
 
+    useEffect(() => {
+        dispatch(setIsSearchTriggered(false));
+    }, [dispatch, recipesData]);
+
     const handleAddCustomAllergen = (customAllergen: string) => {
         if (customAllergen.trim() && !selectedAllergens.includes(customAllergen)) {
             dispatch(addAllergen(customAllergen));
+            const updatedAllergens = [...(selectedFilters.allergens || []), customAllergen];
+            dispatch(updateSelectedFilters({ type: 'allergens', value: updatedAllergens }));
         }
     };
 
     const handleCheckboxChange = (allergen: string) => {
-        dispatch(
-            selectedAllergens.includes(allergen) ? removeAllergen(allergen) : addAllergen(allergen),
-        );
+        const isAllergenSelected = selectedAllergens.includes(allergen);
+        dispatch(isAllergenSelected ? removeAllergen(allergen) : addAllergen(allergen));
+        const currentAllergens = selectedFilters.allergens || [];
+        let updatedAllergens: string[];
+
+        if (isAllergenSelected) {
+            updatedAllergens = currentAllergens.filter((item) => item !== allergen);
+        } else {
+            updatedAllergens = [...currentAllergens, allergen];
+        }
+
+        dispatch(updateSelectedFilters({ type: 'allergens', value: updatedAllergens }));
     };
 
     const handleToggleFilter = () => {
         if (isToggleActive) {
             dispatch(clearAllergens());
             dispatch(setIsSearchTriggered(false));
+            dispatch(updateSelectedFilters({ type: 'allergens', value: [] }));
         }
         dispatch(toggleIntroAllergen());
     };
 
-    const handleRemoveFilter = (type: keyof typeof selectedFilters, value: string) => {
-        const updatedFilter = selectedFilters[type]?.filter((item) => item !== value);
-        dispatch(updateSelectedFilters({ type, value: updatedFilter || [] }));
+    const handleRemoveFilter = (type: string, value: string) => {
+        let filterType: keyof typeof selectedFilters;
 
-        const updatedSearchParams = {
-            ...searchParams,
-            allergens: type === 'allergens' ? updatedFilter || [] : searchParams.allergens,
-            meat: type === 'meatTypes' ? updatedFilter || [] : searchParams.meat,
-            garnish: type === 'garnishTypes' ? updatedFilter || [] : searchParams.garnish,
-        };
+        if (type === 'allergens') filterType = 'allergens';
+        else if (type === 'meat') filterType = 'meatTypes';
+        else if (type === 'garnish') filterType = 'garnishTypes';
+        else filterType = type as keyof typeof selectedFilters;
+
+        const currentValues = selectedFilters[filterType] || [];
+        const updatedValues = currentValues.filter((item) => item !== value);
+        dispatch(updateSelectedFilters({ type: filterType, value: updatedValues }));
+
+        if (type === 'allergens') {
+            dispatch(removeAllergen(value));
+        }
+        const updatedSearchParams: Partial<typeof searchParams> = { ...searchParams };
+
+        if (type === 'allergens') {
+            updatedSearchParams.allergens = updatedValues;
+        } else if (type === 'meat') {
+            updatedSearchParams.meat = updatedValues;
+        } else if (type === 'garnish') {
+            updatedSearchParams.garnish = updatedValues;
+        }
+
         dispatch(updateSearchParams(updatedSearchParams));
     };
 
@@ -176,49 +209,32 @@ export const Intro = ({ title, desc }: IntroProps) => {
                     </>
                 )}
             </VStack>
-            {filterKeysToShow.some(
-                (key) => Array.isArray(searchParams[key]) && searchParams[key]?.length,
-            ) && (
-                <HStack spacing={3} mb={4} flexWrap='wrap'>
-                    {filterKeysToShow.flatMap((filterType) => {
-                        const filterKey = filterType as keyof typeof searchParams;
-
-                        const formattedKey =
-                            filterKey === 'meat'
-                                ? 'meatTypes'
-                                : filterKey === 'garnish'
-                                  ? 'garnishTypes'
-                                  : filterKey;
-
-                        return Array.isArray(searchParams[filterKey])
-                            ? searchParams[filterKey]?.map((item, index) => (
-                                  <Tag
-                                      data-test-id={DataTestId.FilterTag}
-                                      size='sm'
-                                      key={`${filterKey}-${index}`}
-                                      borderRadius='md'
-                                      border='1px solid'
-                                      borderColor='lime.400'
-                                      variant='solid'
-                                      bgColor='lime.100'
-                                      color='lime.700'
-                                  >
-                                      <TagLabel>{item}</TagLabel>
-                                      <TagCloseButton
-                                          onClick={() =>
-                                              handleRemoveFilter(
-                                                  formattedKey as keyof typeof selectedFilters,
-                                                  item,
-                                              )
-                                          }
-                                          _focus={{ outline: 'none' }}
-                                      />
-                                  </Tag>
-                              ))
-                            : [];
-                    })}
-                </HStack>
-            )}
+            <HStack spacing={3} mb={4} flexWrap='wrap'>
+                {formattedFilters.map(({ key, formattedKey, item }) => (
+                    <Tag
+                        data-test-id={DataTestId.FilterTag}
+                        size='sm'
+                        key={`${key}`}
+                        borderRadius='md'
+                        border='1px solid'
+                        borderColor='lime.400'
+                        variant='solid'
+                        bgColor='lime.100'
+                        color='lime.700'
+                    >
+                        <TagLabel>{item}</TagLabel>
+                        <TagCloseButton
+                            onClick={() =>
+                                handleRemoveFilter(
+                                    formattedKey as keyof typeof selectedFilters,
+                                    item,
+                                )
+                            }
+                            _focus={{ outline: 'none' }}
+                        />
+                    </Tag>
+                ))}
+            </HStack>
         </VStack>
     );
 };
