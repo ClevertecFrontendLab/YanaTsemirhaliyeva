@@ -152,6 +152,8 @@ export const ResetPasswordModal = ({ isOpen, onClose, email }: ResetPasswordProp
                                         size='md'
                                         minH={12}
                                         borderColor='lime.150'
+                                        color='lime.800'
+                                        fontSize={18}
                                         {...register('login', { onBlur: handleTrimBlur })}
                                     />
                                     <Text fontSize={14} color='blackAlpha.700'>
@@ -173,6 +175,8 @@ export const ResetPasswordModal = ({ isOpen, onClose, email }: ResetPasswordProp
                                             mb={2}
                                             minH={12}
                                             borderColor='lime.150'
+                                            color='lime.800'
+                                            fontSize={18}
                                             {...register('password')}
                                         />
                                         <InputRightElement h={12}>
@@ -219,6 +223,8 @@ export const ResetPasswordModal = ({ isOpen, onClose, email }: ResetPasswordProp
                                             mb={2}
                                             minH={12}
                                             borderColor='lime.150'
+                                            color='lime.800'
+                                            fontSize={18}
                                             {...register('passwordConfirm')}
                                         />
                                         <InputRightElement h={12}>

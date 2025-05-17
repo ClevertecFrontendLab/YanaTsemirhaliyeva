@@ -61,10 +61,10 @@ export const Header = () => {
                     onClick={handleReset}
                 >
                     <Show above='2xs'>
-                        <Image src='/logo-full.svg' alt='logo' />
+                        <Image src='logo-full.svg' alt='logo' />
                     </Show>
                     <Show below='2xs'>
-                        <Image src='/logo.svg' alt='logo' />
+                        <Image src='logo.svg' alt='logo' />
                     </Show>
                 </Link>
                 {isMdOrAbove && <Breadcrumbs />}

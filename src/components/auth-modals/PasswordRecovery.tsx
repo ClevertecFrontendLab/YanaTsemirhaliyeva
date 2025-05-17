@@ -112,6 +112,8 @@ export const PasswordRecoveryModal = ({ isOpen, onClose, onSubmit }: PasswordRec
                                 mb={2}
                                 minH={12}
                                 borderColor='lime.150'
+                                color='lime.800'
+                                fontSize={18}
                                 {...register('email')}
                             />
                             <FormErrorMessage>{errors.email?.message}</FormErrorMessage>

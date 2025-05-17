@@ -184,6 +184,8 @@ export const RegisterForm = () => {
                                     borderColor='lime.150'
                                     mb={2}
                                     minH={12}
+                                    color='lime.800'
+                                    fontSize={18}
                                     {...register('firstName', { onBlur: handleTrimBlur })}
                                 />
                                 <FormErrorMessage>{errors.firstName?.message}</FormErrorMessage>
@@ -199,6 +201,8 @@ export const RegisterForm = () => {
                                     mb={2}
                                     minH={12}
                                     borderColor='lime.150'
+                                    color='lime.800'
+                                    fontSize={18}
                                     {...register('lastName', { onBlur: handleTrimBlur })}
                                 />
                                 <FormErrorMessage>{errors.lastName?.message}</FormErrorMessage>
@@ -215,6 +219,8 @@ export const RegisterForm = () => {
                                     mb={2}
                                     minH={12}
                                     borderColor='lime.150'
+                                    color='lime.800'
+                                    fontSize={18}
                                     {...register('email', { onBlur: handleTrimBlur })}
                                 />
                                 <FormErrorMessage>{errors.email?.message}</FormErrorMessage>
@@ -244,6 +250,8 @@ export const RegisterForm = () => {
                                     size='md'
                                     minH={12}
                                     borderColor='lime.150'
+                                    color='lime.800'
+                                    fontSize={18}
                                     {...register('login', { onBlur: handleTrimBlur })}
                                 />
                                 <Text fontSize={14} color='blackAlpha.700'>
@@ -263,6 +271,8 @@ export const RegisterForm = () => {
                                         mb={2}
                                         minH={12}
                                         borderColor='lime.150'
+                                        color='lime.800'
+                                        fontSize={18}
                                         {...register('password')}
                                     />
                                     <InputRightElement h={12}>
@@ -309,6 +319,8 @@ export const RegisterForm = () => {
                                         mb={2}
                                         minH={12}
                                         borderColor='lime.150'
+                                        color='lime.800'
+                                        fontSize={18}
                                         {...register('confirmPassword')}
                                     />
                                     <InputRightElement h={12}>

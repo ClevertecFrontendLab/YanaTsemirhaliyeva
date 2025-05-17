@@ -5,8 +5,6 @@ import { AuthTabs } from '~/components/auth-tabs/AuthTabs';
 import { useAppSelector } from '~/store/hooks';
 import { alertStatusSelector } from '~/store/slices/auth-slice';
 
-import AuthImg from '../../../public/img/auth/1.jpg';
-
 export const AuthPage = () => {
     const alertProps = useAppSelector(alertStatusSelector);
 
@@ -49,7 +47,7 @@ export const AuthPage = () => {
             >
                 <Box pos='absolute' top={0} right={0} bottom={0} left={0}>
                     <Image
-                        src={AuthImg}
+                        src='img/auth/1.jpg'
                         height='100%'
                         width='100%'
                         objectFit='cover'

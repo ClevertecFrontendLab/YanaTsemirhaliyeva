@@ -151,6 +151,8 @@ export const LoginForm = () => {
                             size='md'
                             minH={12}
                             borderColor={borderColor}
+                            color='lime.800'
+                            fontSize={18}
                             {...register('login', { onBlur: handleTrimBlur })}
                         />
                         {errors.login && (
@@ -174,6 +176,8 @@ export const LoginForm = () => {
                                 size='md'
                                 minH={12}
                                 borderColor={borderColor}
+                                color='lime.800'
+                                fontSize={18}
                                 {...register('password')}
                             />
                             <InputRightElement h={12}>
