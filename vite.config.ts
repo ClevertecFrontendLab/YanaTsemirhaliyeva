@@ -3,7 +3,7 @@ import { resolve } from 'path';
 import { defineConfig } from 'vite';
 
 export default defineConfig(({ command }) => ({
-    base: command === 'build' ? '/YanaTsemirhaliyeva/' : '',
+    base: command === 'build' ? '/YanaTsemirhaliyeva/' : '/',
     plugins: [react()],
     server: {
         host: true,
