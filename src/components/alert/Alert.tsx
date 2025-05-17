@@ -11,46 +11,59 @@ import { useEffect } from 'react';
 
 import { DataTestId } from '~/consts/consts';
 import { useAppDispatch, useAppSelector } from '~/store/hooks';
+import { alertStatusSelector, setAlertStatus } from '~/store/slices/auth-slice';
 import { clearError, isErrorSelector } from '~/store/slices/recipes-slice';
 
-const TIME = 5000;
+const TIME = 15000;
 
 type AlertComponentProps = {
+    status: 'error' | 'success';
     title: string;
-    desc: string;
+    desc?: string;
+    hasFooter?: boolean;
 };
 
-export const AlertComponent = ({ title, desc }: AlertComponentProps) => {
+export const AlertComponent = ({ status, title, desc, hasFooter = false }: AlertComponentProps) => {
     const dispatch = useAppDispatch();
     const isError = useAppSelector(isErrorSelector);
+    const isAuthError = useAppSelector(alertStatusSelector);
 
     useEffect(() => {
-        const timer = setTimeout(() => dispatch(clearError()), TIME);
+        const timer = setTimeout(() => {
+            dispatch(clearError());
+            dispatch(setAlertStatus({ status: 'error', isError: false, title: '', desc: '' }));
+        }, TIME);
         return () => {
             clearTimeout(timer);
         };
-    }, [dispatch, isError]);
+    }, [dispatch, isError, isAuthError]);
+
+    const handleAlertClose = () => {
+        dispatch(clearError());
+        dispatch(setAlertStatus({ status: 'error', isError: false, title: '', desc: '' }));
+    };
 
     return (
-        isError && (
+        isError ||
+        (isAuthError.isError && (
             <Center
-                zIndex={10}
+                zIndex={1500}
                 position='absolute'
-                bottom={{ base: '100px', lg: '30px' }}
+                bottom={hasFooter ? { base: '100px', lg: '30px' } : '30px'}
                 left='50%'
                 transform='translateX(-50%)'
                 width={{ base: '328px', md: '400px' }}
             >
                 <Alert
                     data-test-id={DataTestId.ErrorNotification}
-                    status='error'
+                    status={status}
                     variant='solid'
-                    bgColor='red.500'
+                    bgColor={status === 'error' ? 'red.500' : 'green.500'}
                 >
                     <AlertIcon />
                     <Box width='100%'>
                         <AlertTitle>{title}</AlertTitle>
-                        <AlertDescription>{desc}</AlertDescription>
+                        {desc && <AlertDescription>{desc}</AlertDescription>}
                     </Box>
                     <CloseButton
                         data-test-id={DataTestId.CloseAlertBtn}
@@ -58,10 +71,10 @@ export const AlertComponent = ({ title, desc }: AlertComponentProps) => {
                         position='relative'
                         right={-1}
                         top={-1}
-                        onClick={() => dispatch(clearError())}
+                        onClick={handleAlertClose}
                     />
                 </Alert>
             </Center>
-        )
+        ))
     );
 };

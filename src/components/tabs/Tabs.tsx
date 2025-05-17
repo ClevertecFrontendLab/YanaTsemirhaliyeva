@@ -1,15 +1,4 @@
-import {
-    Box,
-    Button,
-    Center,
-    Grid,
-    Spinner,
-    Tab,
-    TabList,
-    TabPanel,
-    TabPanels,
-    Tabs,
-} from '@chakra-ui/react';
+import { Box, Button, Grid, Tab, TabList, TabPanel, TabPanels, Tabs } from '@chakra-ui/react';
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
 
@@ -26,6 +15,7 @@ import {
 } from '~/store/slices/recipes-slice';
 
 import { HorizontalCard } from '../horizontal-card/HorizontalCard';
+import { LoaderFullsize } from '../loader-fullsize/LoaderFullsize';
 
 export const TabsComponent = () => {
     const dispatch = useAppDispatch();
@@ -67,7 +57,7 @@ export const TabsComponent = () => {
         }
     }, [currentSubcategoryId, dispatch, subcategoriesIds]);
 
-    const { data, isLoading } = useGetRecipesWithFiltersAndPaginateQuery(
+    const { data, isLoading, isFetching } = useGetRecipesWithFiltersAndPaginateQuery(
         {
             subcategoriesIds: [currentSubcategoryId],
             searchString: searchParams.searchString || '',
@@ -162,10 +152,8 @@ export const TabsComponent = () => {
                         pb={1}
                     >
                         {idx === activeTabIndex ? (
-                            isLoading ? (
-                                <Center p={1}>
-                                    <Spinner color='lime.500' />
-                                </Center>
+                            isLoading || isFetching ? (
+                                <LoaderFullsize isOpen={isLoading || isFetching} />
                             ) : recipesForSubcategory.length > 0 ? (
                                 <Grid
                                     templateColumns={{

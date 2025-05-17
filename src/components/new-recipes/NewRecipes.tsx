@@ -41,10 +41,7 @@ export const NewRecipes = () => {
 
     const newestRecipes = data?.data || [];
 
-    const sortedRecipes = [...newestRecipes].sort(
-        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-    );
-    if (sortedRecipes.length === 0) return;
+    if (newestRecipes.length === 0) return;
 
     return (
         <Box as='section' w='100%' boxSizing='border-box'>
@@ -58,7 +55,7 @@ export const NewRecipes = () => {
                 Новые рецепты
             </Heading>
             <Box pos='relative' data-test-id={DataTestId.Carousel}>
-                {sortedRecipes.length > 0 ? (
+                {newestRecipes.length > 0 ? (
                     <>
                         <Swiper
                             modules={[Navigation]}
@@ -78,7 +75,7 @@ export const NewRecipes = () => {
                                 1536: { slidesPerView: 4, spaceBetween: 18 },
                             }}
                         >
-                            {sortedRecipes.map((recipe, i) => (
+                            {newestRecipes.map((recipe, i) => (
                                 <SwiperSlide
                                     key={recipe._id}
                                     style={{ minHeight: '100%' }}
@@ -91,7 +88,7 @@ export const NewRecipes = () => {
                             ))}
                         </Swiper>
 
-                        {sortedRecipes.length > 3 && (
+                        {newestRecipes.length > 3 && (
                             <Box className='swiper-btns'>
                                 <IconButton
                                     data-test-id={DataTestId.CarouselCardBtnBack}
