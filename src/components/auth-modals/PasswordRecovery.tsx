@@ -24,6 +24,8 @@ import { PasswordRecoveryFormValues, passwordRecoverySchema } from '~/schemas/au
 import { useAppDispatch } from '~/store/hooks';
 import { setAlertStatus } from '~/store/slices/auth-slice';
 
+import { BUTTON_STYLES, MODAL_CLOSE_BUTTON_STYLES } from './consts';
+
 type PasswordRecoveryProps = {
     isOpen: boolean;
     onClose: (arg: boolean) => void;
@@ -36,7 +38,6 @@ export const PasswordRecoveryModal = ({ isOpen, onClose, onSubmit }: PasswordRec
     const {
         register,
         handleSubmit,
-        setError,
         formState: { errors },
         setValue,
         reset,
@@ -62,11 +63,9 @@ export const PasswordRecoveryModal = ({ isOpen, onClose, onSubmit }: PasswordRec
             const apiError = error as FetchBaseQueryError;
 
             if (apiError.status === 403) {
-                setError('email', { message: 'E-mail не найден' });
                 setValue('email', '');
                 dispatch(setAlertStatus(ALERT_MESSAGES.EMAIL_NOT_FOUND));
             } else {
-                setError('email', { message: 'Ошибка сервера, попробуйте позже' });
                 reset();
                 dispatch(setAlertStatus(ALERT_MESSAGES.SERVER_ERROR));
             }
@@ -83,6 +82,7 @@ export const PasswordRecoveryModal = ({ isOpen, onClose, onSubmit }: PasswordRec
         <Modal onClose={handleCloseClick} isOpen={isOpen} isCentered>
             <ModalOverlay onClick={handleCloseClick} />
             <ModalContent
+                sx={{ fontFamily: 'Inter' }}
                 p={8}
                 alignItems='center'
                 w={{ base: 316, md: 396 }}
@@ -93,18 +93,7 @@ export const PasswordRecoveryModal = ({ isOpen, onClose, onSubmit }: PasswordRec
                 <Image src='img/modals/meal.jpg' boxSize={{ base: 108, md: 206 }} />
                 <ModalCloseButton
                     data-test-id={DataTestId.CloseBtn}
-                    borderRadius='50%'
-                    border='1px solid black'
-                    top={6}
-                    right={6}
-                    sx={{
-                        '&:hover': {
-                            borderColor: 'black',
-                        },
-                        '&:focus': {
-                            outline: 'none',
-                        },
-                    }}
+                    {...MODAL_CLOSE_BUTTON_STYLES}
                 />
                 <ModalBody p={0}>
                     <Text textAlign='center' color='blackAlpha.900' px={5} mb={4}>
@@ -129,21 +118,8 @@ export const PasswordRecoveryModal = ({ isOpen, onClose, onSubmit }: PasswordRec
                         </FormControl>
                         <Button
                             data-test-id={DataTestId.SubmitBtn}
-                            type='submit'
-                            variant='solid'
-                            bgColor='black'
-                            color='white'
-                            width='full'
-                            mt={6}
-                            size='md'
-                            py={6}
-                            transition='border-color 0.3s ease-in-out'
-                            sx={{
-                                '&:hover': {
-                                    bgColor: 'black',
-                                    borderColor: 'white',
-                                },
-                            }}
+                            {...BUTTON_STYLES}
+                            sx={{ ...BUTTON_STYLES.sx, mt: 6 }}
                         >
                             Получить код
                         </Button>

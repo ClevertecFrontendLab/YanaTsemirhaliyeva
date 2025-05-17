@@ -21,7 +21,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
-import { ALERT_MESSAGES, DataTestId } from '~/consts/consts';
+import { ALERT_MESSAGES, DataTestId, InputAriaLabel, InputType } from '~/consts/consts';
 import { useResetPasswordMutation } from '~/query/services/auth';
 import { ResetPasswordParams } from '~/query/types/authApi.types';
 import { resetPasswordSchema } from '~/schemas/auth.schema';
@@ -29,6 +29,7 @@ import { useAppDispatch } from '~/store/hooks';
 import { setAlertStatus } from '~/store/slices/auth-slice';
 
 import { LoaderFullsize } from '../loader-fullsize/LoaderFullsize';
+import { BUTTON_STYLES, MODAL_CLOSE_BUTTON_STYLES } from './consts';
 
 type ResetPasswordProps = {
     isOpen: boolean;
@@ -118,22 +119,12 @@ export const ResetPasswordModal = ({ isOpen, onClose, email }: ResetPasswordProp
                     w={{ base: 316, md: 396 }}
                     borderRadius={16}
                     gap={6}
+                    sx={{ fontFamily: 'Inter' }}
                     data-test-id={DataTestId.ResetCredentialsModal}
                 >
                     <ModalCloseButton
                         data-test-id={DataTestId.CloseBtn}
-                        borderRadius='50%'
-                        border='1px solid black'
-                        top={6}
-                        right={6}
-                        sx={{
-                            '&:hover': {
-                                borderColor: 'black',
-                            },
-                            '&:focus': {
-                                outline: 'none',
-                            },
-                        }}
+                        {...MODAL_CLOSE_BUTTON_STYLES}
                     />
                     <ModalBody p={0}>
                         <Heading
@@ -174,7 +165,9 @@ export const ResetPasswordModal = ({ isOpen, onClose, email }: ResetPasswordProp
                                         <Input
                                             data-test-id={DataTestId.PasswordInput}
                                             id='registerPassword'
-                                            type={showPassword ? 'text' : 'password'}
+                                            type={
+                                                showPassword ? InputType.Text : InputType.Password
+                                            }
                                             placeholder='Введите пароль'
                                             bgColor='white'
                                             mb={2}
@@ -186,8 +179,8 @@ export const ResetPasswordModal = ({ isOpen, onClose, email }: ResetPasswordProp
                                             <IconButton
                                                 aria-label={
                                                     showPassword
-                                                        ? 'Скрыть пароль'
-                                                        : 'Показать пароль'
+                                                        ? InputAriaLabel.Hide
+                                                        : InputAriaLabel.Show
                                                 }
                                                 icon={showPassword ? <ViewIcon /> : <ViewOffIcon />}
                                                 variant='ghost'
@@ -216,7 +209,11 @@ export const ResetPasswordModal = ({ isOpen, onClose, email }: ResetPasswordProp
                                         <Input
                                             data-test-id={DataTestId.ConfirmPasswordInput}
                                             id='confirmPassword'
-                                            type={showConfirmPassword ? 'text' : 'password'}
+                                            type={
+                                                showConfirmPassword
+                                                    ? InputType.Text
+                                                    : InputType.Password
+                                            }
                                             placeholder='Повторите пароль'
                                             bgColor='white'
                                             mb={2}
@@ -228,8 +225,8 @@ export const ResetPasswordModal = ({ isOpen, onClose, email }: ResetPasswordProp
                                             <IconButton
                                                 aria-label={
                                                     showConfirmPassword
-                                                        ? 'Скрыть пароль'
-                                                        : 'Показать пароль'
+                                                        ? InputAriaLabel.Hide
+                                                        : InputAriaLabel.Show
                                                 }
                                                 icon={
                                                     showConfirmPassword ? (
@@ -256,23 +253,7 @@ export const ResetPasswordModal = ({ isOpen, onClose, email }: ResetPasswordProp
                                         {errors.passwordConfirm?.message}
                                     </FormErrorMessage>
                                 </FormControl>
-                                <Button
-                                    data-test-id={DataTestId.SubmitBtn}
-                                    type='submit'
-                                    variant='solid'
-                                    bgColor='black'
-                                    color='white'
-                                    width='full'
-                                    size='md'
-                                    py={6}
-                                    transition='border-color 0.3s ease-in-out'
-                                    sx={{
-                                        '&:hover': {
-                                            bgColor: 'black',
-                                            borderColor: 'lime.150',
-                                        },
-                                    }}
-                                >
+                                <Button data-test-id={DataTestId.SubmitBtn} {...BUTTON_STYLES}>
                                     Зарегистрироваться
                                 </Button>
                             </VStack>

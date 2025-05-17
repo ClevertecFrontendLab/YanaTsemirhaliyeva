@@ -1,10 +1,13 @@
+export type BaseAuthParams = {
+    email: string;
+};
+
 export type AuthResponse = {
     statusText: string;
     message: string;
 };
 
-export type SignupParams = {
-    email: string;
+export type SignupParams = BaseAuthParams & {
     login: string;
     password: string;
     firstName?: string;
@@ -16,17 +19,13 @@ export type LoginParams = {
     password: string;
 };
 
-export type ForgotPasswordParams = {
-    email: string;
-};
+export type ForgotPasswordParams = BaseAuthParams;
 
-export type VerifyOtpParams = {
-    email: string;
+export type VerifyOtpParams = BaseAuthParams & {
     otpToken: string;
 };
 
-export type ResetPasswordParams = {
-    email: string;
+export type ResetPasswordParams = BaseAuthParams & {
     login: string;
     password: string;
     passwordConfirm: string;

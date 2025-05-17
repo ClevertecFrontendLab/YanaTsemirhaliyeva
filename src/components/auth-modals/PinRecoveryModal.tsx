@@ -17,6 +17,8 @@ import { useEffect, useRef, useState } from 'react';
 import { DataTestId } from '~/consts/consts';
 import { generateTestId } from '~/utils';
 
+import { MODAL_CLOSE_BUTTON_STYLES } from './consts';
+
 const PIN = [1, 2, 3, 4, 5, 6];
 
 type PinRecoveryProps = {
@@ -73,23 +75,13 @@ export const PinRecoveryModal = ({
                 w={{ base: 316, md: 396 }}
                 borderRadius={16}
                 gap={6}
+                sx={{ fontFamily: 'Inter' }}
                 data-test-id={DataTestId.VerificationCodeModal}
             >
                 <Image src='img/modals/otp-recovery.jpg' boxSize={{ base: 108, md: 206 }} />
                 <ModalCloseButton
                     data-test-id={DataTestId.CloseBtn}
-                    borderRadius='50%'
-                    border='1px solid black'
-                    top={6}
-                    right={6}
-                    sx={{
-                        '&:hover': {
-                            borderColor: 'black',
-                        },
-                        '&:focus': {
-                            outline: 'none',
-                        },
-                    }}
+                    {...MODAL_CLOSE_BUTTON_STYLES}
                 />
                 <ModalBody p={0}>
                     {isError && errorStatus === 403 && (

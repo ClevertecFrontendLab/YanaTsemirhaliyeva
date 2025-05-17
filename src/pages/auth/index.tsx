@@ -1,32 +1,20 @@
-import { Box, Flex, Image, Show, Text, VStack } from '@chakra-ui/react';
-import { useState } from 'react';
+import { Box, Flex, Image, Text, VStack } from '@chakra-ui/react';
 
 import { AlertComponent } from '~/components/alert/Alert';
-import { VerificationExpiredModal } from '~/components/auth-modals/VerificationExpired';
 import { AuthTabs } from '~/components/auth-tabs/AuthTabs';
-import { useAppDispatch, useAppSelector } from '~/store/hooks';
-import {
-    alertStatusSelector,
-    isVerificationExpiredSelector,
-    setIsVerificationExpired,
-} from '~/store/slices/auth-slice';
+import { useAppSelector } from '~/store/hooks';
+import { alertStatusSelector } from '~/store/slices/auth-slice';
+
+import AuthImg from '../../../public/img/auth/1.jpg';
 
 export const AuthPage = () => {
-    const dispatch = useAppDispatch();
     const alertProps = useAppSelector(alertStatusSelector);
-    const isError = useAppSelector(isVerificationExpiredSelector);
-    const [isErrorModalOpen, setIsErrorModalOpen] = useState(isError);
-
-    const handleModalClose = () => {
-        setIsErrorModalOpen(false);
-        dispatch(setIsVerificationExpired(false));
-    };
 
     return (
         <Flex minH='100vh' width='full' pos='relative' overflow='auto'>
             <VStack
                 w={{ base: '100%', md: '50%' }}
-                bgGradient='linear(222deg, #EAFFC7 0%, #EAFFC7 60%, #29813F 100%)'
+                bgGradient='linear-gradient(228deg, #EAFFC7 0%, #29813F 100%)'
                 p='60px 20px 28px'
                 minH='100vh'
                 h='100%'
@@ -52,29 +40,34 @@ export const AuthPage = () => {
                     Все права защищены, ученический файл, ©Клевер Технолоджи, 2025
                 </Box>
             </VStack>
-            <Show above='md'>
-                <Box w='50%' h='auto' minH='100vh' position='relative' bgColor='lime.700'>
-                    <Box position='absolute' top={0} left={0} right={0} bottom={0}>
-                        <Image
-                            src='/img/auth/1.jpg'
-                            height='100%'
-                            width='100%'
-                            objectFit='cover'
-                            objectPosition='center'
-                        />
-                        <Text
-                            fontSize={12}
-                            fontWeight={600}
-                            pos='absolute'
-                            bottom={7}
-                            right={7}
-                            zIndex={1}
-                        >
-                            &mdash;&nbsp;Лучший сервис для ваших кулинарных побед
-                        </Text>
-                    </Box>
+            <Box
+                w='50%'
+                minH='100vh'
+                position='relative'
+                bgColor='lime.700'
+                display={{ base: 'none', md: 'block' }}
+            >
+                <Box pos='absolute' top={0} right={0} bottom={0} left={0}>
+                    <Image
+                        src={AuthImg}
+                        height='100%'
+                        width='100%'
+                        objectFit='cover'
+                        objectPosition='center'
+                        loading='eager'
+                    />
+                    <Text
+                        fontSize={12}
+                        fontWeight={600}
+                        pos='absolute'
+                        bottom={7}
+                        right={7}
+                        zIndex={1}
+                    >
+                        &mdash;&nbsp;Лучший сервис для ваших кулинарных побед
+                    </Text>
                 </Box>
-            </Show>
+            </Box>
 
             {alertProps.isError && (
                 <AlertComponent
@@ -83,7 +76,6 @@ export const AuthPage = () => {
                     desc={alertProps.desc}
                 />
             )}
-            <VerificationExpiredModal isOpen={isErrorModalOpen} onClose={handleModalClose} />
         </Flex>
     );
 };

@@ -14,6 +14,8 @@ import { Link as RouterLink } from 'react-router';
 
 import { DataTestId } from '~/consts/consts';
 
+import { MODAL_CLOSE_BUTTON_STYLES } from './consts';
+
 type VerificationExpiredProps = {
     isOpen: boolean;
     onClose: (arg: boolean) => void;
@@ -33,23 +35,13 @@ export const VerificationExpiredModal = ({ isOpen, onClose }: VerificationExpire
                 w={{ base: 316, md: 396 }}
                 borderRadius={16}
                 gap={6}
+                sx={{ fontFamily: 'Inter' }}
                 data-test-id={DataTestId.EmailVerificationFailedModal}
             >
                 <Image src='img/modals/verification-expired.jpg' boxSize={{ base: 108, md: 206 }} />
                 <ModalCloseButton
                     data-test-id={DataTestId.CloseBtn}
-                    borderRadius='50%'
-                    border='1px solid black'
-                    top={6}
-                    right={6}
-                    sx={{
-                        '&:hover': {
-                            borderColor: 'black',
-                        },
-                        '&:focus': {
-                            outline: 'none',
-                        },
-                    }}
+                    {...MODAL_CLOSE_BUTTON_STYLES}
                 />
                 <ModalBody p={0}>
                     <Heading as='h1' textAlign='center' color='black' fontSize={24} mb={8}>

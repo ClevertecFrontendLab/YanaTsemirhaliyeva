@@ -12,6 +12,8 @@ import {
 
 import { DataTestId } from '~/consts/consts';
 
+import { BUTTON_STYLES, MODAL_CLOSE_BUTTON_STYLES } from './consts';
+
 type ServerErrorProps = {
     isOpen: boolean;
     onClose: (arg: boolean) => void;
@@ -40,29 +42,19 @@ export const ServerErrorModal = ({ isOpen, onClose, onRetry }: ServerErrorProps)
                 w={{ base: 316, md: 396 }}
                 borderRadius={16}
                 gap={6}
+                sx={{ fontFamily: 'Inter' }}
                 data-test-id={DataTestId.SignInErrorModal}
             >
                 <Image src='img/modals/meal.jpg' boxSize={{ base: 108, md: 206 }} />
                 <ModalCloseButton
                     data-test-id={DataTestId.CloseBtn}
-                    borderRadius='50%'
-                    border='1px solid black'
-                    top={6}
-                    right={6}
-                    sx={{
-                        '&:hover': {
-                            borderColor: 'black',
-                        },
-                        '&:focus': {
-                            outline: 'none',
-                        },
-                    }}
+                    {...MODAL_CLOSE_BUTTON_STYLES}
                 />
                 <ModalBody p={0}>
                     <Heading as='h1' textAlign='center' color='black' fontSize={24} mb={8}>
                         Вход не выполнен
                     </Heading>
-                    <Text textAlign='center' color='blackAlpha.900'>
+                    <Text textAlign='center' color='blackAlpha.700'>
                         Что-то пошло не так.
                         <br />
                         Попробуйте еще раз
@@ -70,21 +62,8 @@ export const ServerErrorModal = ({ isOpen, onClose, onRetry }: ServerErrorProps)
                     <form>
                         <Button
                             data-test-id={DataTestId.RepeatBtn}
-                            type='submit'
-                            variant='solid'
-                            bgColor='black'
-                            color='white'
-                            width='full'
-                            mt={6}
-                            size='md'
-                            py={6}
-                            transition='border-color 0.3s ease-in-out'
-                            sx={{
-                                '&:hover': {
-                                    bgColor: 'black',
-                                    borderColor: 'white',
-                                },
-                            }}
+                            {...BUTTON_STYLES}
+                            sx={{ ...BUTTON_STYLES.sx, mt: 6 }}
                             onClick={handleRetryClick}
                         >
                             Повторить

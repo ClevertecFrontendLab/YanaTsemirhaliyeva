@@ -14,6 +14,8 @@ import { Link as RouterLink, useNavigate } from 'react-router';
 
 import { AppRoute, DataTestId } from '~/consts/consts';
 
+import { MODAL_CLOSE_BUTTON_STYLES } from './consts';
+
 type RegisterSuccessProps = {
     isOpen: boolean;
     onClose: (arg: boolean) => void;
@@ -36,30 +38,24 @@ export const RegisterSuccessModal = ({ isOpen, onClose, email }: RegisterSuccess
                 w={{ base: 316, md: 396 }}
                 borderRadius={16}
                 gap={6}
+                sx={{ fontFamily: 'Inter' }}
                 data-test-id={DataTestId.SignUpSeccessModal}
             >
                 <Image src='img/modals/registration-success.jpg' boxSize={{ base: 108, md: 206 }} />
                 <ModalCloseButton
                     data-test-id={DataTestId.CloseBtn}
-                    borderRadius='50%'
-                    border='1px solid black'
-                    top={6}
-                    right={6}
-                    sx={{
-                        '&:hover': {
-                            borderColor: 'black',
-                        },
-                        '&:focus': {
-                            outline: 'none',
-                        },
-                    }}
+                    {...MODAL_CLOSE_BUTTON_STYLES}
                 />
                 <ModalBody p={0}>
                     <Heading as='h1' textAlign='center' color='black' fontSize={24} mb={8}>
                         Остался последний шаг. Нужно верифицировать ваш e-mail
                     </Heading>
                     <Text textAlign='center' color='blackAlpha.900'>
-                        Мы отправили вам на почту {email} ссылку для верификации.
+                        Мы отправили вам на почту
+                        <Text fontWeight={600} as='span' display='block'>
+                            {email}
+                        </Text>
+                        ссылку для верификации.
                     </Text>
                 </ModalBody>
                 <ModalFooter p={0}>

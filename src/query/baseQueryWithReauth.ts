@@ -37,7 +37,6 @@ export const baseQueryWithReauth: BaseQueryFn<
         if (!mutex.isLocked()) {
             const release = await mutex.acquire();
             try {
-                // Запрос обновления токенов
                 const refreshResult = await baseQuery(
                     {
                         url: '/auth/refresh',
@@ -48,7 +47,6 @@ export const baseQueryWithReauth: BaseQueryFn<
                 );
 
                 if (refreshResult.data) {
-                    // Проверяем наличие данных в ответе (успешное обновление)
                     const responseHeaders = (refreshResult.meta as { response?: Response })
                         ?.response?.headers;
                     const newToken = responseHeaders?.get('Authentication-Access');
@@ -56,25 +54,19 @@ export const baseQueryWithReauth: BaseQueryFn<
                     if (newToken) {
                         localStorage.setItem('accessToken', newToken);
                         api.dispatch(login());
-
-                        // Повторяем запрос с новым токеном
                         result = await baseQuery(args, api, extraOptions);
                     } else {
-                        // Если в ответе нет токена, но запрос был успешным - проверяем другие способы получения токена
                         const data = refreshResult.data as TokenRefreshResponse;
                         if (data.accessToken) {
                             localStorage.setItem('accessToken', data.accessToken);
                             api.dispatch(login());
 
-                            // Повторяем запрос с новым токеном
                             result = await baseQuery(args, api, extraOptions);
                         } else {
-                            // Если никак не получается найти токен - логаут
                             api.dispatch(logout());
                         }
                     }
                 } else if (refreshResult.error) {
-                    // Если запрос на обновление токена вернул ошибку
                     api.dispatch(logout());
                 }
             } finally {

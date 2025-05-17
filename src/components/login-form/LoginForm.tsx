@@ -19,12 +19,13 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router';
 
-import { ALERT_MESSAGES, DataTestId } from '~/consts/consts';
+import { ALERT_MESSAGES, DataTestId, InputAriaLabel, InputType } from '~/consts/consts';
 import { useLoginMutation, useVerifyOtpMutation } from '~/query/services/auth';
 import { LoginFormValues, loginSchema } from '~/schemas/auth.schema';
 import { useAppDispatch } from '~/store/hooks';
 import { login as authLogin, setAlertStatus, setIsSubmitingform } from '~/store/slices/auth-slice';
 
+import { BUTTON_STYLES } from '../auth-modals/consts';
 import { PasswordRecoveryModal } from '../auth-modals/PasswordRecovery';
 import { PinRecoveryModal } from '../auth-modals/PinRecoveryModal';
 import { ResetPasswordModal } from '../auth-modals/ResetPassword';
@@ -49,7 +50,6 @@ export const LoginForm = () => {
     const {
         register,
         handleSubmit,
-        setError,
         formState: { errors },
         reset,
         setValue,
@@ -71,14 +71,11 @@ export const LoginForm = () => {
 
             if (status === 403) {
                 dispatch(setAlertStatus(ALERT_MESSAGES.EMAIL_NOT_VERIFIED));
-                setError('login', { message: 'E-mail не верифицирован' });
             } else if (typeof status === 'number' && status >= 500 && status < 600) {
                 setServerErrorOpen(true);
                 reset();
             } else {
                 dispatch(setAlertStatus(ALERT_MESSAGES.INVALID_DATA));
-                setError('login', { message: 'Неверный логин или пароль' });
-                setError('password', { message: 'Неверный логин или пароль' });
                 reset();
             }
         } finally {
@@ -87,7 +84,7 @@ export const LoginForm = () => {
     };
 
     const handleTrimBlur = (event: React.FocusEvent<HTMLInputElement>) => {
-        if (event.target.type !== 'password') {
+        if (event.target.type !== InputType.Password) {
             setValue('login', event.target.value.trim());
         }
     };
@@ -136,6 +133,8 @@ export const LoginForm = () => {
         setIsResetPasswordOpen(false);
     };
 
+    const borderColor = error ? 'red.500' : 'lime.150';
+
     return (
         <Box>
             <form onSubmit={handleSubmit(onSubmit)} data-test-id={DataTestId.SignInForm}>
@@ -151,7 +150,7 @@ export const LoginForm = () => {
                             mb={2}
                             size='md'
                             minH={12}
-                            borderColor={error ? 'red.500' : 'blackAlpha.500'}
+                            borderColor={borderColor}
                             {...register('login', { onBlur: handleTrimBlur })}
                         />
                         {errors.login && (
@@ -168,19 +167,21 @@ export const LoginForm = () => {
                             <Input
                                 data-test-id={DataTestId.PasswordInput}
                                 id='password'
-                                type={showPassword ? 'text' : 'password'}
+                                type={showPassword ? InputType.Text : InputType.Password}
                                 placeholder='**********'
                                 bgColor='white'
                                 mb={2}
                                 size='md'
                                 minH={12}
-                                borderColor={error ? 'red.500' : 'blackAlpha.500'}
+                                borderColor={borderColor}
                                 {...register('password')}
                             />
                             <InputRightElement h={12}>
                                 <IconButton
                                     data-test-id={DataTestId.PasswordVisibilityBtn}
-                                    aria-label={showPassword ? 'Скрыть пароль' : 'Показать пароль'}
+                                    aria-label={
+                                        showPassword ? InputAriaLabel.Hide : InputAriaLabel.Show
+                                    }
                                     icon={showPassword ? <ViewIcon /> : <ViewOffIcon />}
                                     variant='ghost'
                                     size='md'
@@ -205,21 +206,8 @@ export const LoginForm = () => {
 
                     <Button
                         data-test-id={DataTestId.SubmitBtn}
-                        type='submit'
-                        variant='solid'
-                        bgColor='black'
-                        color='white'
-                        width='full'
-                        mt={20}
-                        size='md'
-                        py={6}
-                        transition='border-color 0.3s ease-in-out'
-                        sx={{
-                            '&:hover': {
-                                bgColor: 'black',
-                                borderColor: 'lime.150',
-                            },
-                        }}
+                        {...BUTTON_STYLES}
+                        sx={{ ...BUTTON_STYLES.sx, mt: 20 }}
                     >
                         Войти
                     </Button>

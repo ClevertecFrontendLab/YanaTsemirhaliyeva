@@ -17,13 +17,20 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
-import { ALERT_MESSAGES, DataTestId } from '~/consts/consts';
+import { ALERT_MESSAGES, DataTestId, InputAriaLabel, InputType } from '~/consts/consts';
 import { useSignupMutation } from '~/query/services/auth';
 import { RegisterFormValues, registerSchema } from '~/schemas/auth.schema';
-import { useAppDispatch } from '~/store/hooks';
-import { setAlertStatus, setIsSubmitingform } from '~/store/slices/auth-slice';
+import { useAppDispatch, useAppSelector } from '~/store/hooks';
+import {
+    isVerificationExpiredSelector,
+    setAlertStatus,
+    setIsSubmitingform,
+    setIsVerificationExpired,
+} from '~/store/slices/auth-slice';
 
+import { BUTTON_STYLES } from '../auth-modals/consts';
 import { RegisterSuccessModal } from '../auth-modals/RegisterSuccess';
+import { VerificationExpiredModal } from '../auth-modals/VerificationExpired';
 
 export const RegisterForm = () => {
     const dispatch = useAppDispatch();
@@ -32,6 +39,13 @@ export const RegisterForm = () => {
     const [step, setStep] = useState(1);
     const [progressValue, setProgressValue] = useState(0);
     const [isRegistrationSuccess, setIsRegistrationSuccess] = useState(false);
+    const isError = useAppSelector(isVerificationExpiredSelector);
+    const [isErrorModalOpen, setIsErrorModalOpen] = useState(isError);
+
+    const handleModalClose = () => {
+        setIsErrorModalOpen(false);
+        dispatch(setIsVerificationExpired(false));
+    };
 
     const {
         register,
@@ -167,6 +181,7 @@ export const RegisterForm = () => {
                                     id='firstName'
                                     placeholder='Имя'
                                     bgColor='white'
+                                    borderColor='lime.150'
                                     mb={2}
                                     minH={12}
                                     {...register('firstName', { onBlur: handleTrimBlur })}
@@ -183,6 +198,7 @@ export const RegisterForm = () => {
                                     bgColor='white'
                                     mb={2}
                                     minH={12}
+                                    borderColor='lime.150'
                                     {...register('lastName', { onBlur: handleTrimBlur })}
                                 />
                                 <FormErrorMessage>{errors.lastName?.message}</FormErrorMessage>
@@ -198,25 +214,15 @@ export const RegisterForm = () => {
                                     bgColor='white'
                                     mb={2}
                                     minH={12}
+                                    borderColor='lime.150'
                                     {...register('email', { onBlur: handleTrimBlur })}
                                 />
                                 <FormErrorMessage>{errors.email?.message}</FormErrorMessage>
                             </FormControl>
                             <Button
-                                variant='solid'
-                                bgColor='black'
-                                color='white'
-                                width='full'
-                                mt={20}
-                                size='md'
-                                py={6}
-                                transition='border-color 0.3s ease-in-out'
-                                sx={{
-                                    '&:hover': {
-                                        bgColor: 'black',
-                                        borderColor: 'lime.150',
-                                    },
-                                }}
+                                {...BUTTON_STYLES}
+                                type='button'
+                                sx={{ ...BUTTON_STYLES.sx, mt: 20 }}
                                 onClick={handleStepNext}
                                 data-test-id={DataTestId.SubmitBtn}
                             >
@@ -237,6 +243,7 @@ export const RegisterForm = () => {
                                     mb={2}
                                     size='md'
                                     minH={12}
+                                    borderColor='lime.150'
                                     {...register('login', { onBlur: handleTrimBlur })}
                                 />
                                 <Text fontSize={14} color='blackAlpha.700'>
@@ -250,17 +257,20 @@ export const RegisterForm = () => {
                                     <Input
                                         data-test-id={DataTestId.PasswordInput}
                                         id='registerPassword'
-                                        type={showPassword ? 'text' : 'password'}
+                                        type={showPassword ? InputType.Text : InputType.Password}
                                         placeholder='Введите пароль'
                                         bgColor='white'
                                         mb={2}
                                         minH={12}
+                                        borderColor='lime.150'
                                         {...register('password')}
                                     />
                                     <InputRightElement h={12}>
                                         <IconButton
                                             aria-label={
-                                                showPassword ? 'Скрыть пароль' : 'Показать пароль'
+                                                showPassword
+                                                    ? InputAriaLabel.Hide
+                                                    : InputAriaLabel.Show
                                             }
                                             icon={showPassword ? <ViewIcon /> : <ViewOffIcon />}
                                             variant='ghost'
@@ -289,19 +299,24 @@ export const RegisterForm = () => {
                                     <Input
                                         data-test-id={DataTestId.ConfirmPasswordInput}
                                         id='confirmPassword'
-                                        type={showConfirmPassword ? 'text' : 'password'}
+                                        type={
+                                            showConfirmPassword
+                                                ? InputType.Text
+                                                : InputType.Password
+                                        }
                                         placeholder='Повторите пароль'
                                         bgColor='white'
                                         mb={2}
                                         minH={12}
+                                        borderColor='lime.150'
                                         {...register('confirmPassword')}
                                     />
                                     <InputRightElement h={12}>
                                         <IconButton
                                             aria-label={
                                                 showConfirmPassword
-                                                    ? 'Скрыть пароль'
-                                                    : 'Показать пароль'
+                                                    ? InputAriaLabel.Hide
+                                                    : InputAriaLabel.Show
                                             }
                                             icon={
                                                 showConfirmPassword ? <ViewIcon /> : <ViewOffIcon />
@@ -326,21 +341,8 @@ export const RegisterForm = () => {
                             </FormControl>
                             <Button
                                 data-test-id={DataTestId.SubmitBtn}
-                                type='submit'
-                                variant='solid'
-                                bgColor='black'
-                                color='white'
-                                width='full'
-                                size='md'
-                                mt={10}
-                                py={6}
-                                transition='border-color 0.3s ease-in-out'
-                                sx={{
-                                    '&:hover': {
-                                        bgColor: 'black',
-                                        borderColor: 'lime.150',
-                                    },
-                                }}
+                                {...BUTTON_STYLES}
+                                sx={{ ...BUTTON_STYLES.sx, mt: 10 }}
                             >
                                 Зарегистрироваться
                             </Button>
@@ -353,6 +355,8 @@ export const RegisterForm = () => {
                 onClose={setIsRegistrationSuccess}
                 email={formValues.email}
             />
+
+            <VerificationExpiredModal isOpen={isErrorModalOpen} onClose={handleModalClose} />
         </>
     );
 };

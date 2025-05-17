@@ -132,6 +132,16 @@ export const ALERT_MESSAGES = {
     },
 };
 
+export const InputType = {
+    Text: 'text',
+    Password: 'password',
+};
+
+export const InputAriaLabel = {
+    Show: 'Показать пароль',
+    Hide: 'Скрыть пароль',
+};
+
 export const meatTypes = ['Курица', 'Свинина', 'Говядина', 'Индейка', 'Утка'];
 
 export const garnishTypes = [

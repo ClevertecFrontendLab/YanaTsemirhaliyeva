@@ -7,7 +7,7 @@ import { Navigation } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 
 import { VerticalCard } from '~/components/vertical-card/VerticalCard';
-import { DataTestId } from '~/consts/consts';
+import { DataTestId, DEFAULT_PAGE } from '~/consts/consts';
 import { useGetRecipesQuery } from '~/query/services/recipes';
 import { ArrowRightIcon } from '~/shared/custom-icons';
 import { useAppDispatch, useAppSelector } from '~/store/hooks';
@@ -15,6 +15,7 @@ import { searchParamsSelector, setError } from '~/store/slices/recipes-slice';
 import { generateTestId } from '~/utils';
 
 const DEFAULT_CARDS_PER_CAROUSEL = 10;
+const MIN_SLIDES_COUNT_FOR_NAV = 4;
 
 export const NewRecipes = () => {
     const dispatch = useAppDispatch();
@@ -26,7 +27,7 @@ export const NewRecipes = () => {
             sortBy: 'createdAt' as const,
             sortOrder: 'desc' as const,
             limit: DEFAULT_CARDS_PER_CAROUSEL,
-            page: 1,
+            page: DEFAULT_PAGE,
         }),
         [searchParams],
     );
@@ -88,7 +89,7 @@ export const NewRecipes = () => {
                             ))}
                         </Swiper>
 
-                        {newestRecipes.length > 3 && (
+                        {newestRecipes.length >= MIN_SLIDES_COUNT_FOR_NAV && (
                             <Box className='swiper-btns'>
                                 <IconButton
                                     data-test-id={DataTestId.CarouselCardBtnBack}
