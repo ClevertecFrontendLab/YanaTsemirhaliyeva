@@ -1,13 +1,4 @@
-import {
-    Box,
-    Button,
-    Grid,
-    Heading,
-    HStack,
-    Show,
-    Spacer,
-    useBreakpointValue,
-} from '@chakra-ui/react';
+import { Box, Button, Grid, Heading, HStack, Spacer, useBreakpointValue } from '@chakra-ui/react';
 import { useEffect, useMemo } from 'react';
 import { Link } from 'react-router';
 
@@ -21,7 +12,7 @@ import { searchParamsSelector, setError } from '~/store/slices/recipes-slice';
 
 export const JuiciestList = () => {
     const dispatch = useAppDispatch();
-    const isTabletOrAbove = useBreakpointValue({ base: false, '2xs': true, sm: false });
+    const isTabletOrAbove = useBreakpointValue({ base: false, sm: true, md: false });
     const categories = useAppSelector(categoriesSelector);
     const searchParams = useAppSelector(searchParamsSelector);
     const params = useMemo(
@@ -56,7 +47,7 @@ export const JuiciestList = () => {
                     Самое сочное
                 </Heading>
                 <Spacer />
-                <Show above='md'>
+                <Box display={{ base: 'none', md: 'block' }}>
                     <Button
                         as={Link}
                         to={AppRoute.Juicy}
@@ -80,7 +71,7 @@ export const JuiciestList = () => {
                     >
                         Вся подборка
                     </Button>
-                </Show>
+                </Box>
             </HStack>
             {mostPopularRecipes.length > 0 ? (
                 <Grid

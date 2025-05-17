@@ -24,7 +24,7 @@ export const FooterAside = ({ as = 'footer' }: { as?: React.ElementType }) => (
                     },
                 }}
             >
-                <Image src='/svg/left-icon.svg' alt='выйти из аккаунта' boxSize={3} />
+                <Image src='svg/left-icon.svg' alt='выйти из аккаунта' boxSize={3} />
                 <Box as='span'>Выйти</Box>
             </Box>
         </Flex>

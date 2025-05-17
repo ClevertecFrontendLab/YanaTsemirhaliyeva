@@ -147,7 +147,7 @@ export const VerticalCard = ({ item }: VerticalCardProps) => {
                     {bookmarks && (
                         <HStack>
                             <Image
-                                src='/svg/BsBookmarkHeart.svg'
+                                src='svg/BsBookmarkHeart.svg'
                                 boxSize={3}
                                 alt='bookmarks count'
                             />
@@ -156,7 +156,7 @@ export const VerticalCard = ({ item }: VerticalCardProps) => {
                     )}
                     {likes && (
                         <HStack>
-                            <Image src='/svg/BsEmojiHeartEyes.svg' boxSize={3} alt='likes count' />
+                            <Image src='svg/BsEmojiHeartEyes.svg' boxSize={3} alt='likes count' />
                             <Box as='span'>{likes}</Box>
                         </HStack>
                     )}

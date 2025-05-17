@@ -1,3 +1,5 @@
+import { FetchBaseQueryError } from '@reduxjs/toolkit/query';
+
 import { DataTestId } from '~/consts/consts';
 import { Category, SubCategory } from '~/types/category';
 
@@ -347,4 +349,40 @@ export const formatFilters = (
     }
 
     return result;
+};
+
+// Вспомогательная функция для извлечения сообщения об ошибке
+export const getErrorMessage = (error: unknown): string => {
+    if (typeof error === 'object' && error !== null) {
+        // Проверяем, является ли ошибка FetchBaseQueryError
+        if ('status' in error && 'data' in error) {
+            const fetchError = error as FetchBaseQueryError;
+
+            // Если в data есть сообщение об ошибке
+            if (
+                typeof fetchError.data === 'object' &&
+                fetchError.data !== null &&
+                'message' in fetchError.data
+            ) {
+                return String(fetchError.data.message);
+            }
+
+            // Если есть стандартное сообщение об ошибке
+            if ('error' in fetchError) {
+                return String(fetchError.error);
+            }
+
+            // Если есть статус ошибки
+            if (fetchError.status) {
+                return `Ошибка ${fetchError.status}`;
+            }
+        }
+
+        // Если есть свойство message
+        if ('message' in error) {
+            return String(error.message);
+        }
+    }
+
+    return 'Произошла ошибка';
 };

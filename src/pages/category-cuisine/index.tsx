@@ -33,12 +33,7 @@ export const CategoryCuisine = () => {
                 pl={{ base: '18px', xs: '20px', sm: '28px' }}
                 pr={{ base: '20px', sm: '54px', md: '70px' }}
             >
-                <Box
-                    pl={{ base: '18px', xs: '20px', sm: '28px' }}
-                    pr={{ base: '20px', sm: '54px', md: '70px' }}
-                >
-                    <CategoryHighlight isDivider />
-                </Box>
+                <CategoryHighlight isDivider />
             </Box>
         </Box>
     );

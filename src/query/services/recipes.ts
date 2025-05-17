@@ -23,15 +23,13 @@ const buildQueryParams = (options: QueryParamsOptions) => {
         meat,
         garnish,
         subcategoriesIds,
-        page = DEFAULT_PAGE,
-        limit = DEFAULT_CARDS_PER_PAGE,
         sortBy,
         sortOrder,
+        page,
+        limit,
     } = options;
 
     return {
-        page,
-        limit,
         ...(searchString ? { searchString } : {}),
         ...(allergens?.length ? { allergens: allergens.join(',') } : {}),
         ...(meat?.length ? { meat: meat.join(',') } : {}),
@@ -39,6 +37,8 @@ const buildQueryParams = (options: QueryParamsOptions) => {
         ...(subcategoriesIds?.length ? { subcategoriesIds: subcategoriesIds.join(',') } : {}),
         ...(sortBy ? { sortBy } : {}),
         ...(sortOrder ? { sortOrder } : {}),
+        ...(page !== undefined ? { page } : {}),
+        ...(limit !== undefined ? { limit } : {}),
     };
 };
 
@@ -139,14 +139,26 @@ export const recipeApiSlice = baseApiSlice
             >({
                 query: ({ subCategoryId, ...rest }) => ({
                     url: `${ApiEndpoints.RECIPES}/category/${subCategoryId}`,
-                    params: buildQueryParams({ ...rest, limit: rest.limit || 8 }),
+                    params: buildQueryParams({
+                        ...rest,
+                        limit: rest.limit || DEFAULT_CARDS_PER_PAGE,
+                    }),
                 }),
-                serializeQueryArgs: ({ endpointName }) => endpointName,
-                merge: handlePaginationMerge,
+                serializeQueryArgs: ({ queryArgs }) =>
+                    `category-${queryArgs.subCategoryId}-${queryArgs.searchString || ''}-${queryArgs.allergens?.join(',') || ''}`,
+                merge: (currentCache, newData, { arg }) => {
+                    if (arg.page === 1) {
+                        return newData;
+                    }
+                    currentCache.data.push(...newData.data);
+                    currentCache.meta = newData.meta;
+                    return currentCache;
+                },
                 forceRefetch: createForceRefetchHandler([
                     'subCategoryId',
                     'searchString',
                     'allergens',
+                    'page',
                 ]),
             }),
 

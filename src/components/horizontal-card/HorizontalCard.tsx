@@ -131,7 +131,7 @@ export const HorizontalCard = ({ item, index, categories }: HorizontalCardProps)
                         {bookmarks && (
                             <HStack gap={1}>
                                 <Image
-                                    src='/svg/BsBookmarkHeart.svg'
+                                    src='svg/BsBookmarkHeart.svg'
                                     boxSize={3}
                                     alt='bookmarks count'
                                 />
@@ -141,7 +141,7 @@ export const HorizontalCard = ({ item, index, categories }: HorizontalCardProps)
                         {likes && (
                             <HStack alignItems='center' gap={1}>
                                 <Image
-                                    src='/svg/BsEmojiHeartEyes.svg'
+                                    src='svg/BsEmojiHeartEyes.svg'
                                     boxSize={3}
                                     alt='bookmarks count'
                                 />

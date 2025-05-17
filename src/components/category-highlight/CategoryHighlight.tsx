@@ -1,10 +1,12 @@
 import { Box, Divider, Flex, Grid, Heading, Text } from '@chakra-ui/react';
 import { useEffect, useRef, useState } from 'react';
 
+import { ALERT_MESSAGES } from '~/consts/consts';
 import { useGetRecipesByCategoryQuery } from '~/query/services/recipes';
 import { useAppDispatch, useAppSelector } from '~/store/hooks';
+import { setAlertStatus } from '~/store/slices/auth-slice';
 import { categoriesSelector } from '~/store/slices/categories-slice';
-import { currentCategorySelector, setError } from '~/store/slices/recipes-slice';
+import { currentCategorySelector } from '~/store/slices/recipes-slice';
 import { Category } from '~/types/category';
 
 import { NarrowCard } from '../narrow-card/NarrowCard';
@@ -36,7 +38,7 @@ export const CategoryHighlight = ({ isDivider = false }: CategoryHighlightProps)
         setRandomCategory(newRandomCategory);
     }, [currentCategory?.category, categories]);
 
-    const { data, isError } = useGetRecipesByCategoryQuery(
+    const { data, isError, error } = useGetRecipesByCategoryQuery(
         {
             subCategoryId: randomCategory?.subCategories[0]?._id ?? '',
             limit: LIMIT_CARDS_VALUE,
@@ -47,10 +49,10 @@ export const CategoryHighlight = ({ isDivider = false }: CategoryHighlightProps)
     );
 
     useEffect(() => {
-        if (isError) {
-            dispatch(setError(true));
+        if (isError || error) {
+            dispatch(setAlertStatus(ALERT_MESSAGES.SERVER_ERROR));
         }
-    }, [dispatch, isError]);
+    }, [dispatch, error, isError]);
 
     if (!randomCategory || !data?.data) return null;
     const recipesLeft = [...data.data].slice(0, 2);

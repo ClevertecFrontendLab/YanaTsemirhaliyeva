@@ -13,7 +13,7 @@ export const ErrorPage = () => (
         flexGrow={1}
     >
         <VisuallyHidden as='h1'>Страница не найдена</VisuallyHidden>
-        <Image src='/img/not-found/not-found.jpg' boxSize={{ base: '108px', md: '208px' }} mb={8} />
+        <Image src='img/not-found/not-found.jpg' boxSize={{ base: '108px', md: '208px' }} mb={8} />
         <VStack gap={4}>
             <Text color='black' fontSize={24} fontWeight={700} textAlign='center' as='h1'>
                 Упс! Такой страницы нет

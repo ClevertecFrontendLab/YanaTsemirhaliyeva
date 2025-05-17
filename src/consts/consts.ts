@@ -5,22 +5,12 @@ export enum AppRoute {
     Index = '/',
     Juicy = '/the-juiciest',
     NotFound = '/not-found',
-}
-
-export enum CategoryRoute {
-    VeganDishes = '/vegan',
-    Salads = '/salads',
-    Snacks = '/snacks',
-    First = '/first-dish',
-    Second = '/second-dish',
-    Desserts = '/desserts',
-    Grilled = '/grilled-dishes',
-    Child = '/children-dishes',
-    Nutrition = '/therapeutic-nutrition',
-    National = '/national',
-    Sauce = '/sauces',
-    Drinks = '/drinks',
-    Preparations = '/preparations',
+    Login = '/login',
+    Register = '/register',
+    ForgotPassword = 'forgot-password',
+    VerifyOTP = '/verify-otp',
+    ResetPassword = '/reset-password',
+    Verification = '/verification',
 }
 
 // Шаблоны динамических маршрутов
@@ -76,188 +66,81 @@ export enum DataTestId {
     AppLoader = 'app-loader',
     LinkErrorPage = 'error-page-go-home',
     BtnLoadMore = 'load-more-button',
+    SignInForm = 'sign-in-form',
+    LoginInput = 'login-input',
+    PasswordInput = 'password-input',
+    PasswordVisibilityBtn = 'password-visibility-button',
+    SubmitBtn = 'submit-button',
+    ForgotPasswordLink = 'forgot-password',
+    SignInErrorModal = 'sign-in-error-modal',
+    CloseBtn = 'close-button',
+    RepeatBtn = 'repeat-button',
+    SignUpProgress = 'sign-up-progress',
+    SignUpForm = 'sign-up-form',
+    FirstNameInput = 'first-name-input',
+    LastNameInput = 'last-name-input',
+    EmailInput = 'email-input',
+    ConfirmPasswordInput = 'confirm-password-input',
+    SignUpSeccessModal = 'sign-up-success-modal',
+    EmailVerificationFailedModal = 'email-verification-failed-modal',
+    VerificationCodeModal = 'verification-code-modal',
+    VerificationCodeInput = 'verification-code-input-',
+    ResetCredentialsModal = 'reset-credentials-modal',
+    SendEmailModal = 'send-email-modal',
 }
 
-// Enum для подкатегорий салатов
-export enum SaladsSubcategory {
-    Meat = 'meat-salads',
-    Fish = 'fish-salads',
-    Vegetable = 'vegetable-salads',
-    Warm = 'warm-salads',
-}
-
-// Enum для подкатегорий закусок
-export enum SnacksSubcategory {
-    Meat = 'meat-snacks',
-    Fish = 'fish-snacks',
-    Vegetable = 'vegetable-snacks',
-    Warm = 'warm-snacks',
-    Sandwiches = 'sandwiches',
-    FastFood = 'fast-food',
-}
-
-// Enum для подкатегорий первых блюд
-export enum FirstSubcategory {
-    MeatSoups = 'meat-soups',
-    VegetableSoups = 'vegetable-soups',
-    Broths = 'broths',
-    ColdSoups = 'cold-soups',
-    DietSoups = 'diet-soups',
-}
-
-// Enum для подкатегорий вторых блюд
-export enum SecondSubcategory {
-    Meat = 'meat-dish',
-    Fish = 'fish-dish',
-    Vegetable = 'vegetable-dish',
-    Poultry = 'poultry-dish',
-    Mushroom = 'mushroom-dish',
-    Offal = 'offal-dish',
-    Steamed = 'steamed-dish',
-    Dumplings = 'dumplings',
-    FlourGarnishes = 'flour-garnish',
-    VegetableGarnishes = 'vegetable-garnish',
-    Pizza = 'pizza',
-    Sushi = 'sushi',
-}
-
-// Enum для подкатегорий десертов и выпечки
-export enum DessertsSubcategory {
-    Pancakes = 'pancakes',
-    Pies = 'pies',
-    Cakes = 'cakes',
-    Rolls = 'rolls',
-    Muffins = 'muffins',
-    CheeseCakes = 'cheese-cakes',
-    PuffPastry = 'puff-pastry',
-    Choux = 'choux-pastry',
-    YeastDough = 'yeast-dough',
-    Buns = 'buns',
-    Bread = 'bread',
-    PizzaDough = 'pizza-dough',
-    Creams = 'creams',
-}
-
-// Enum для подкатегорий блюд на гриле
-export enum GrilledSubcategory {
-    Beef = 'beef',
-    Pork = 'pork',
-    Poultry = 'poultry-dish',
-    Fish = 'fish',
-    Mushrooms = 'mushrooms',
-    Vegetables = 'vegetables',
-}
-
-// Enum для подкатегорий веганской кухни
-export enum VeganSubcategory {
-    Snacks = 'snacks',
-    FirstDish = 'first-dish',
-    SecondDish = 'second-dish',
-    SideDish = 'side-dish',
-    Desserts = 'desserts',
-    Bakery = 'bakery',
-    RawFood = 'raw-food',
-    Drinks = 'drinks',
-}
-
-// Enum для подкатегорий детских блюд
-export enum ChildSubcategory {
-    FirstDish = 'first-dish',
-    SecondDish = 'second-dish',
-    SideDish = 'side-dish',
-    Bakery = 'bakery',
-    GlutenFree = 'gluten-free',
-    SugarFree = 'sugar-free',
-    AllergenFree = 'allergen-free',
-    Complementary = 'complementary',
-}
-
-// Enum для подкатегорий лечебного питания
-export enum NutritionSubcategory {
-    ChildDiet = 'child-diet',
-    Diet1 = 'diet-1',
-    Diet2 = 'diet-2',
-    Diet3 = 'diet-3',
-    Diet5 = 'diet-5',
-    Diet6 = 'diet-6',
-    Diet7 = 'diet-7',
-    Diet8 = 'diet-8',
-    Diet9 = 'diet-9',
-    Diet10 = 'diet-10',
-    Diet11 = 'diet-11',
-    Diet12 = 'diet-12',
-    Diet13 = 'diet-13',
-    Diet14 = 'diet-14',
-    GlutenFree = 'gluten-free',
-    AllergenFree = 'allergen-free',
-}
-
-// Enum для подкатегорий национальных блюд
-export enum NationalSubcategory {
-    American = 'american',
-    Armenian = 'armenian',
-    Greek = 'greek',
-    Georgian = 'georgian',
-    Italian = 'italian',
-    Spanish = 'spanish',
-    Chinese = 'chinese',
-    Mexican = 'mexican',
-    PanAsian = 'pan-asian',
-    Russian = 'russian',
-    Turkish = 'turkish',
-    French = 'french',
-    Swedish = 'swedish',
-    Japanese = 'japanese',
-    Other = 'other',
-}
-
-// Enum для подкатегорий соусов
-export enum SauceSubcategory {
-    MeatSauces = 'meat-sauce',
-    CheeseSauces = 'cheese-sauce',
-    Marinades = 'marinades',
-}
-
-// Enum для подкатегорий напитков
-export enum DrinksSubcategory {
-    Juices = 'juices',
-    Smoothies = 'smoothies',
-    Compotes = 'compotes',
-    Kissel = 'kissel',
-    Coffee = 'coffee',
-    MedicinalTea = 'medicinal-tea',
-    Kvass = 'kvass',
-    Cocktails = 'cocktails',
-    Alcoholic = 'alcoholic',
-}
-
-// Enum для подкатегорий заготовок
-export enum PreparationsSubcategory {
-    MeatPreparations = 'meat-preparations',
-    FishPreparations = 'fish-preparations',
-    Cucumber = 'cucumber',
-    Tomato = 'tomato',
-    Mushroom = 'mushroom',
-    VegetablePreparations = 'vegetable-preparations',
-    SaladsCaviar = 'salads-caviar',
-    FruitsBerries = 'fruits-berries',
-}
-
-// Обратная карта для быстрого поиска категории по пути
-export const PathToCategoryMap: Record<string, string> = Object.entries(CategoryRoute).reduce(
-    (acc, [key, path]) => {
-        const cleanPath = path.replace('/', '');
-        acc[cleanPath] = key;
-        return acc;
+export const ALERT_MESSAGES = {
+    SERVER_ERROR: {
+        status: 'error' as const,
+        isError: true,
+        title: 'Ошибка сервера',
+        desc: 'Попробуйте немного позже.',
     },
-    {} as Record<string, string>,
-);
+    VERIFICATION_SUCCESS: {
+        status: 'success' as const,
+        isError: true,
+        title: 'Верификация прошла успешно',
+    },
+    RECOVERY_SUCCESS: {
+        status: 'success' as const,
+        isError: true,
+        title: 'Восстановление данных успешно',
+    },
+    SERVER_ERROR_LAYOUT: {
+        status: 'error' as const,
+        title: 'Ошибка сервера',
+        desc: 'Попробуйте поискать снова попозже',
+        hasFooter: true,
+    },
+    EMAIL_NOT_VERIFIED: {
+        status: 'error' as const,
+        isError: true,
+        title: 'E-mail не верифицирован',
+        desc: 'Проверьте почту и перейдите по ссылке',
+    },
+    INVALID_DATA: {
+        status: 'error' as const,
+        isError: true,
+        title: 'Неверный логин или пароль.',
+        desc: 'Попробуйте снова',
+    },
+    EMAIL_NOT_FOUND: {
+        status: 'error' as const,
+        isError: true,
+        title: 'Такого e-mail нет!',
+        desc: 'Попробуйте другой e-mail или проверьте правильность его написания',
+    },
+};
 
-// Вспомогательная функция для получения ключа категории по пути URL
-export function getCategoryKeyByPath(path: string): string | null {
-    const cleanPath = path.replace('/', '');
-    return PathToCategoryMap[cleanPath] || null;
-}
+export const InputType = {
+    Text: 'text',
+    Password: 'password',
+};
+
+export const InputAriaLabel = {
+    Show: 'Показать пароль',
+    Hide: 'Скрыть пароль',
+};
 
 export const meatTypes = ['Курица', 'Свинина', 'Говядина', 'Индейка', 'Утка'];
 
@@ -271,17 +154,6 @@ export const garnishTypes = [
     'Фасоль',
     'Другие овощи',
 ];
-
-export const garnishMapping: Record<string, string> = {
-    Картошка: 'potatoes',
-    Гречка: 'buckwheat',
-    Паста: 'pasta',
-    Спагетти: 'spaghetti',
-    Рис: 'rice',
-    Капуста: 'cabbage',
-    Фасоль: 'beans',
-    'Другие овощи': 'other-vegetables',
-};
 
 export const authors = [
     'Segun Adebayo',

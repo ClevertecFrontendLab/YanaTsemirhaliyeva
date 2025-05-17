@@ -4,6 +4,7 @@ import { baseApiSlice } from '~/query/base-api';
 import { apiSlice } from '~/query/create-api';
 
 import appReducer, { appSlice } from './app-slice';
+import authReducer, { authSlice } from './slices/auth-slice';
 import categoryReducer, { categorySlice } from './slices/categories-slice';
 import recipeReducer, { recipeSlice } from './slices/recipes-slice';
 
@@ -13,6 +14,7 @@ const rootReducer = combineReducers({
     [apiSlice.reducerPath]: apiSlice.reducer,
     [recipeSlice.name]: recipeReducer,
     [categorySlice.name]: categoryReducer,
+    [authSlice.name]: authReducer,
     [baseApiSlice.reducerPath]: baseApiSlice.reducer,
 });
 
