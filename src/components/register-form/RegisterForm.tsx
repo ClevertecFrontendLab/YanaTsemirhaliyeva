@@ -18,6 +18,7 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { ALERT_MESSAGES, DataTestId, InputAriaLabel, InputType } from '~/consts/consts';
+import { INPUT_STYLES } from '~/consts/styles';
 import { useSignupMutation } from '~/query/services/auth';
 import { RegisterFormValues, registerSchema } from '~/schemas/auth.schema';
 import { useAppDispatch, useAppSelector } from '~/store/hooks';
@@ -180,12 +181,8 @@ export const RegisterForm = () => {
                                     data-test-id={DataTestId.FirstNameInput}
                                     id='firstName'
                                     placeholder='Имя'
-                                    bgColor='white'
-                                    borderColor='lime.150'
                                     mb={2}
-                                    minH={12}
-                                    color='lime.800'
-                                    fontSize={18}
+                                    {...INPUT_STYLES}
                                     {...register('firstName', { onBlur: handleTrimBlur })}
                                 />
                                 <FormErrorMessage>{errors.firstName?.message}</FormErrorMessage>
@@ -197,12 +194,8 @@ export const RegisterForm = () => {
                                     data-test-id={DataTestId.LastNameInput}
                                     id='lastName'
                                     placeholder='Фамилия'
-                                    bgColor='white'
                                     mb={2}
-                                    minH={12}
-                                    borderColor='lime.150'
-                                    color='lime.800'
-                                    fontSize={18}
+                                    {...INPUT_STYLES}
                                     {...register('lastName', { onBlur: handleTrimBlur })}
                                 />
                                 <FormErrorMessage>{errors.lastName?.message}</FormErrorMessage>
@@ -215,12 +208,8 @@ export const RegisterForm = () => {
                                     id='registerEmail'
                                     type='email'
                                     placeholder='example@email.com'
-                                    bgColor='white'
                                     mb={2}
-                                    minH={12}
-                                    borderColor='lime.150'
-                                    color='lime.800'
-                                    fontSize={18}
+                                    {...INPUT_STYLES}
                                     {...register('email', { onBlur: handleTrimBlur })}
                                 />
                                 <FormErrorMessage>{errors.email?.message}</FormErrorMessage>
@@ -228,7 +217,7 @@ export const RegisterForm = () => {
                             <Button
                                 {...BUTTON_STYLES}
                                 type='button'
-                                sx={{ ...BUTTON_STYLES.sx, mt: 20 }}
+                                sx={{ ...BUTTON_STYLES.sx, mt: 9 }}
                                 onClick={handleStepNext}
                                 data-test-id={DataTestId.SubmitBtn}
                             >
@@ -245,13 +234,8 @@ export const RegisterForm = () => {
                                     id='login'
                                     type='text'
                                     placeholder='bake_and_pie'
-                                    bgColor='white'
                                     mb={2}
-                                    size='md'
-                                    minH={12}
-                                    borderColor='lime.150'
-                                    color='lime.800'
-                                    fontSize={18}
+                                    {...INPUT_STYLES}
                                     {...register('login', { onBlur: handleTrimBlur })}
                                 />
                                 <Text fontSize={14} color='blackAlpha.700'>
@@ -267,12 +251,8 @@ export const RegisterForm = () => {
                                         id='registerPassword'
                                         type={showPassword ? InputType.Text : InputType.Password}
                                         placeholder='Введите пароль'
-                                        bgColor='white'
                                         mb={2}
-                                        minH={12}
-                                        borderColor='lime.150'
-                                        color='lime.800'
-                                        fontSize={18}
+                                        {...INPUT_STYLES}
                                         {...register('password')}
                                     />
                                     <InputRightElement h={12}>
@@ -315,12 +295,8 @@ export const RegisterForm = () => {
                                                 : InputType.Password
                                         }
                                         placeholder='Повторите пароль'
-                                        bgColor='white'
                                         mb={2}
-                                        minH={12}
-                                        borderColor='lime.150'
-                                        color='lime.800'
-                                        fontSize={18}
+                                        {...INPUT_STYLES}
                                         {...register('confirmPassword')}
                                     />
                                     <InputRightElement h={12}>
@@ -354,7 +330,7 @@ export const RegisterForm = () => {
                             <Button
                                 data-test-id={DataTestId.SubmitBtn}
                                 {...BUTTON_STYLES}
-                                sx={{ ...BUTTON_STYLES.sx, mt: 10 }}
+                                sx={{ ...BUTTON_STYLES.sx, mt: 9 }}
                             >
                                 Зарегистрироваться
                             </Button>

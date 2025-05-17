@@ -21,7 +21,7 @@ export const AuthPage = () => {
                 <Box
                     as='header'
                     m='0 auto'
-                    mt={{ base: 4, sm: '80px', md: '110px' }}
+                    mt={{ base: 4, sm: '70px', md: '100px' }}
                     mb={{ base: 10, sm: 14, md: '80px' }}
                 >
                     <Image

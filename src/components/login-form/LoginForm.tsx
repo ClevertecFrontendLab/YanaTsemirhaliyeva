@@ -20,6 +20,7 @@ import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router';
 
 import { ALERT_MESSAGES, DataTestId, InputAriaLabel, InputType } from '~/consts/consts';
+import { INPUT_STYLES } from '~/consts/styles';
 import { useLoginMutation, useVerifyOtpMutation } from '~/query/services/auth';
 import { LoginFormValues, loginSchema } from '~/schemas/auth.schema';
 import { useAppDispatch } from '~/store/hooks';
@@ -146,13 +147,8 @@ export const LoginForm = () => {
                             id='login'
                             type='text'
                             placeholder='bake_and_pie'
-                            bgColor='white'
-                            mb={2}
-                            size='md'
-                            minH={12}
                             borderColor={borderColor}
-                            color='lime.800'
-                            fontSize={18}
+                            {...INPUT_STYLES}
                             {...register('login', { onBlur: handleTrimBlur })}
                         />
                         {errors.login && (
@@ -171,13 +167,8 @@ export const LoginForm = () => {
                                 id='password'
                                 type={showPassword ? InputType.Text : InputType.Password}
                                 placeholder='**********'
-                                bgColor='white'
-                                mb={2}
-                                size='md'
-                                minH={12}
                                 borderColor={borderColor}
-                                color='lime.800'
-                                fontSize={18}
+                                {...INPUT_STYLES}
                                 {...register('password')}
                             />
                             <InputRightElement h={12}>

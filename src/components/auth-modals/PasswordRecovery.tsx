@@ -19,6 +19,7 @@ import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { ALERT_MESSAGES, DataTestId } from '~/consts/consts';
+import { INPUT_STYLES } from '~/consts/styles';
 import { useForgotPasswordMutation } from '~/query/services/auth';
 import { PasswordRecoveryFormValues, passwordRecoverySchema } from '~/schemas/auth.schema';
 import { useAppDispatch } from '~/store/hooks';
@@ -108,12 +109,8 @@ export const PasswordRecoveryModal = ({ isOpen, onClose, onSubmit }: PasswordRec
                                 id='modalPasswordRecovery'
                                 type='email'
                                 placeholder='e-mail'
-                                bgColor='white'
                                 mb={2}
-                                minH={12}
-                                borderColor='lime.150'
-                                color='lime.800'
-                                fontSize={18}
+                                {...INPUT_STYLES}
                                 {...register('email')}
                             />
                             <FormErrorMessage>{errors.email?.message}</FormErrorMessage>

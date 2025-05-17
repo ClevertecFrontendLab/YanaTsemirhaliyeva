@@ -22,6 +22,7 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { ALERT_MESSAGES, DataTestId, InputAriaLabel, InputType } from '~/consts/consts';
+import { INPUT_STYLES } from '~/consts/styles';
 import { useResetPasswordMutation } from '~/query/services/auth';
 import { ResetPasswordParams } from '~/query/types/authApi.types';
 import { resetPasswordSchema } from '~/schemas/auth.schema';
@@ -147,13 +148,8 @@ export const ResetPasswordModal = ({ isOpen, onClose, email }: ResetPasswordProp
                                         id='login'
                                         type='text'
                                         placeholder='bake_and_pie'
-                                        bgColor='white'
                                         mb={2}
-                                        size='md'
-                                        minH={12}
-                                        borderColor='lime.150'
-                                        color='lime.800'
-                                        fontSize={18}
+                                        {...INPUT_STYLES}
                                         {...register('login', { onBlur: handleTrimBlur })}
                                     />
                                     <Text fontSize={14} color='blackAlpha.700'>
@@ -171,12 +167,8 @@ export const ResetPasswordModal = ({ isOpen, onClose, email }: ResetPasswordProp
                                                 showPassword ? InputType.Text : InputType.Password
                                             }
                                             placeholder='Введите пароль'
-                                            bgColor='white'
                                             mb={2}
-                                            minH={12}
-                                            borderColor='lime.150'
-                                            color='lime.800'
-                                            fontSize={18}
+                                            {...INPUT_STYLES}
                                             {...register('password')}
                                         />
                                         <InputRightElement h={12}>
@@ -219,12 +211,8 @@ export const ResetPasswordModal = ({ isOpen, onClose, email }: ResetPasswordProp
                                                     : InputType.Password
                                             }
                                             placeholder='Повторите пароль'
-                                            bgColor='white'
                                             mb={2}
-                                            minH={12}
-                                            borderColor='lime.150'
-                                            color='lime.800'
-                                            fontSize={18}
+                                            {...INPUT_STYLES}
                                             {...register('passwordConfirm')}
                                         />
                                         <InputRightElement h={12}>
