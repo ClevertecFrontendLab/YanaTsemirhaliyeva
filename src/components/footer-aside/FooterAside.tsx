@@ -1,4 +1,6 @@
-import { Box, Flex, Image, Text } from '@chakra-ui/react';
+import { Box, Flex, Text } from '@chakra-ui/react';
+
+import { LogoutIcon } from '~/shared/custom-icons';
 
 export const FooterAside = ({ as = 'footer' }: { as?: React.ElementType }) => (
     <Box as={as}>
@@ -24,7 +26,7 @@ export const FooterAside = ({ as = 'footer' }: { as?: React.ElementType }) => (
                     },
                 }}
             >
-                <Image src='svg/left-icon.svg' alt='выйти из аккаунта' boxSize={3} />
+                <LogoutIcon boxSize={3} />
                 <Box as='span'>Выйти</Box>
             </Box>
         </Flex>

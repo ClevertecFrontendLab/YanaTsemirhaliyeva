@@ -15,7 +15,7 @@ import {
 } from '@chakra-ui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { FetchBaseQueryError } from '@reduxjs/toolkit/query';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { ALERT_MESSAGES, DataTestId } from '~/consts/consts';
@@ -35,6 +35,7 @@ type PasswordRecoveryProps = {
 
 export const PasswordRecoveryModal = ({ isOpen, onClose, onSubmit }: PasswordRecoveryProps) => {
     const dispatch = useAppDispatch();
+    const [isServerError, setIsServerError] = useState(false);
     const [forgotPassword] = useForgotPasswordMutation();
     const {
         register,
@@ -57,10 +58,12 @@ export const PasswordRecoveryModal = ({ isOpen, onClose, onSubmit }: PasswordRec
 
     const handleRecoverySubmit = async (data: PasswordRecoveryFormValues) => {
         try {
+            setIsServerError(false);
             await forgotPassword(data).unwrap();
             onSubmit(data.email);
             onClose(false);
         } catch (error) {
+            setIsServerError(true);
             const apiError = error as FetchBaseQueryError;
 
             if (apiError.status === 403) {
@@ -77,6 +80,10 @@ export const PasswordRecoveryModal = ({ isOpen, onClose, onSubmit }: PasswordRec
         setValue('email', '');
         reset({ email: '' });
         onClose(false);
+    };
+
+    const handleInputChange = () => {
+        isServerError && setIsServerError(false);
     };
 
     return (
@@ -111,6 +118,13 @@ export const PasswordRecoveryModal = ({ isOpen, onClose, onSubmit }: PasswordRec
                                 placeholder='e-mail'
                                 mb={2}
                                 {...INPUT_STYLES}
+                                sx={{
+                                    borderColor: isServerError ? 'red.500' : 'lime.150',
+                                    _hover: {
+                                        borderColor: isServerError ? 'red.500' : 'lime.150',
+                                    },
+                                }}
+                                onInput={handleInputChange}
                                 {...register('email')}
                             />
                             <FormErrorMessage>{errors.email?.message}</FormErrorMessage>

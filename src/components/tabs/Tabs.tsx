@@ -3,7 +3,10 @@ import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
 
 import { DEFAULT_CARDS_PER_PAGE } from '~/consts/consts';
-import { useGetRecipesWithFiltersAndPaginateQuery } from '~/query/services/recipes';
+import {
+    useGetRecipesByCategoryWithPaginateQuery,
+    useGetRecipesWithFiltersAndPaginateQuery,
+} from '~/query/services/recipes';
 import { useAppDispatch, useAppSelector } from '~/store/hooks';
 import { categoriesSelector } from '~/store/slices/categories-slice';
 import {
@@ -57,19 +60,53 @@ export const TabsComponent = () => {
         }
     }, [currentSubcategoryId, dispatch, subcategoriesIds]);
 
-    const { data, isLoading, isFetching } = useGetRecipesWithFiltersAndPaginateQuery(
+    const hasAdditionalFilters = useMemo(
+        () =>
+            !!(
+                searchParams.meat?.length ||
+                searchParams.garnish?.length ||
+                searchParams.allergens?.length ||
+                searchParams.searchString?.length ||
+                false
+            ),
+        [searchParams],
+    );
+
+    const recipesWithFilters = useGetRecipesWithFiltersAndPaginateQuery(
         {
             subcategoriesIds: [currentSubcategoryId],
+            searchString: searchParams.searchString || '',
+            allergens: searchParams.allergens || [],
+            meat: searchParams.meat || [],
+            garnish: searchParams.garnish || [],
+            page,
+            limit: DEFAULT_CARDS_PER_PAGE,
+        },
+        {
+            skip: !currentSubcategoryId || !hasAdditionalFilters,
+            refetchOnMountOrArgChange: true,
+        },
+    );
+
+    // Запрос без фильтров через /recipe/category/{id}
+    const recipesByCategory = useGetRecipesByCategoryWithPaginateQuery(
+        {
+            subCategoryId: currentSubcategoryId,
             searchString: searchParams.searchString || '',
             allergens: searchParams.allergens || [],
             page,
             limit: DEFAULT_CARDS_PER_PAGE,
         },
         {
-            skip: !currentSubcategoryId,
+            skip: !currentSubcategoryId || hasAdditionalFilters,
             refetchOnMountOrArgChange: true,
         },
     );
+
+    // Выбираем результаты из нужного запроса в зависимости от наличия фильтров
+    const { data, isLoading, isFetching } = hasAdditionalFilters
+        ? recipesWithFilters
+        : recipesByCategory;
 
     const recipesForSubcategory = data?.data || [];
 

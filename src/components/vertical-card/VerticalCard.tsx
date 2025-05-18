@@ -18,6 +18,7 @@ import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
 
 import { API_IMG } from '~/consts/consts';
+import { BookmarkIcon, HappyFaceIcon } from '~/shared/custom-icons';
 import { useAppSelector } from '~/store/hooks';
 import { categoriesSelector } from '~/store/slices/categories-slice';
 import { serchInputSelector } from '~/store/slices/recipes-slice';
@@ -146,17 +147,13 @@ export const VerticalCard = ({ item }: VerticalCardProps) => {
                 >
                     {bookmarks && (
                         <HStack>
-                            <Image
-                                src='svg/BsBookmarkHeart.svg'
-                                boxSize={3}
-                                alt='bookmarks count'
-                            />
+                            <BookmarkIcon color='black' />
                             <Box as='span'>{bookmarks}</Box>
                         </HStack>
                     )}
                     {likes && (
                         <HStack>
-                            <Image src='svg/BsEmojiHeartEyes.svg' boxSize={3} alt='likes count' />
+                            <HappyFaceIcon color='black' />
                             <Box as='span'>{likes}</Box>
                         </HStack>
                     )}

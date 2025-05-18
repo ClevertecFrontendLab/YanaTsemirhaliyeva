@@ -141,11 +141,6 @@ export const RegisterForm = () => {
                             title: errorMessage,
                         }),
                     );
-                    if (errorMessage.toLowerCase().includes('login')) {
-                        setError('login', { message: errorMessage });
-                    } else if (errorMessage.toLowerCase().includes('email')) {
-                        setError('email', { message: errorMessage });
-                    }
 
                     return;
                 }

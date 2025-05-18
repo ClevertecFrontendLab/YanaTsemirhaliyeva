@@ -11,6 +11,7 @@ import {
     Text,
 } from '@chakra-ui/react';
 
+import AvatarImg from '~/assets/img/avatar-2.jpg';
 import { SubscribeIcon, SubscribersIcon } from '~/shared/custom-icons';
 
 export const RecipeAuthor = () => (
@@ -23,7 +24,7 @@ export const RecipeAuthor = () => (
         px={{ base: 3 }}
         gap={{ base: 2 }}
     >
-        <Avatar name='Segun Adebayo' src='/img/avatar-2.jpg' size='xl' />
+        <Avatar name='Segun Adebayo' src={AvatarImg} size='xl' />
         <Box width='100%'>
             <CardHeader
                 display='flex'

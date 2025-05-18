@@ -26,7 +26,7 @@ export const Footer = () => (
                 <ShadowIcon
                     route='#'
                     title='Мой профиль'
-                    icon={<Avatar size='md' src='/img/avatar.jpg' />}
+                    icon={<Avatar size='md' src='img/avatar.jpg' />}
                 />
             </ListItem>
         </UnorderedList>
