@@ -25,7 +25,7 @@ import { PasswordRecoveryFormValues, passwordRecoverySchema } from '~/schemas/au
 import { useAppDispatch } from '~/store/hooks';
 import { setAlertStatus } from '~/store/slices/auth-slice';
 
-import { BUTTON_STYLES, MODAL_CLOSE_BUTTON_STYLES } from './consts';
+import { BORDER_COLOR_STYLES, BUTTON_STYLES, MODAL_CLOSE_BUTTON_STYLES } from './consts';
 
 type PasswordRecoveryProps = {
     isOpen: boolean;
@@ -118,12 +118,8 @@ export const PasswordRecoveryModal = ({ isOpen, onClose, onSubmit }: PasswordRec
                                 placeholder='e-mail'
                                 mb={2}
                                 {...INPUT_STYLES}
-                                sx={{
-                                    borderColor: isServerError ? 'red.500' : 'lime.150',
-                                    _hover: {
-                                        borderColor: isServerError ? 'red.500' : 'lime.150',
-                                    },
-                                }}
+                                borderColor='lime.150'
+                                sx={BORDER_COLOR_STYLES(isServerError)}
                                 onInput={handleInputChange}
                                 {...register('email')}
                             />

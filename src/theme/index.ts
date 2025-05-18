@@ -24,6 +24,20 @@ const theme = extendTheme({
     config,
     colors,
     breakpoints,
+    styles: {
+        global: {
+            'input:focus-visible': {
+                borderColor: 'inherit',
+                boxShadow: 'none !important',
+                outline: 'none !important',
+            },
+            '[data-focus-visible]': {
+                borderColor: 'inherit',
+                boxShadow: 'none !important',
+                outline: 'none !important',
+            },
+        },
+    },
     components: {
         Switch: {
             baseStyle: {

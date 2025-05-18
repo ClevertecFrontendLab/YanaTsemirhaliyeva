@@ -28,3 +28,16 @@ export const BUTTON_STYLES = {
         },
     },
 };
+
+export const BORDER_COLOR_STYLES = (isError: boolean) => ({
+    borderColor: isError ? 'red.500' : 'lime.150',
+    _hover: {
+        borderColor: isError ? 'red.500' : 'lime.150',
+    },
+});
+
+export const HOVER_EFFECT = {
+    '&:hover': {
+        bgColor: 'white',
+    },
+};

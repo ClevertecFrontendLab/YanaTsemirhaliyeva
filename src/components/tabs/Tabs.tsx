@@ -88,7 +88,6 @@ export const TabsComponent = () => {
         },
     );
 
-    // Запрос без фильтров через /recipe/category/{id}
     const recipesByCategory = useGetRecipesByCategoryWithPaginateQuery(
         {
             subCategoryId: currentSubcategoryId,
@@ -103,7 +102,6 @@ export const TabsComponent = () => {
         },
     );
 
-    // Выбираем результаты из нужного запроса в зависимости от наличия фильтров
     const { data, isLoading, isFetching } = hasAdditionalFilters
         ? recipesWithFilters
         : recipesByCategory;

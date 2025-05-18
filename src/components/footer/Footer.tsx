@@ -1,5 +1,6 @@
 import { Avatar, Box, ListItem, UnorderedList } from '@chakra-ui/react';
 
+import AvatarImg from '~/assets/img/avatar.jpg';
 import { HomeIcon, SearchIcon, WriteIcon } from '~/shared/custom-icons';
 
 import { ShadowIcon } from '../shadow-icon/ShadowIcon';
@@ -26,7 +27,7 @@ export const Footer = () => (
                 <ShadowIcon
                     route='#'
                     title='Мой профиль'
-                    icon={<Avatar size='md' src='img/avatar.jpg' />}
+                    icon={<Avatar size='md' src={AvatarImg} />}
                 />
             </ListItem>
         </UnorderedList>

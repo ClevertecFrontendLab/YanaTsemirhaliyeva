@@ -14,6 +14,13 @@ import { useAppDispatch, useAppSelector } from '~/store/hooks';
 import { alertStatusSelector, setAlertStatus } from '~/store/slices/auth-slice';
 import { clearError, isErrorSelector } from '~/store/slices/recipes-slice';
 
+const DEFAULT_ALERT_STATUS = {
+    status: 'error' as const,
+    isError: false,
+    title: '',
+    desc: '',
+};
+
 const TIME = 15000;
 
 type AlertComponentProps = {
@@ -31,7 +38,7 @@ export const AlertComponent = ({ status, title, desc, hasFooter = false }: Alert
     useEffect(() => {
         const timer = setTimeout(() => {
             dispatch(clearError());
-            dispatch(setAlertStatus({ status: 'error', isError: false, title: '', desc: '' }));
+            dispatch(setAlertStatus(DEFAULT_ALERT_STATUS));
         }, TIME);
         return () => {
             clearTimeout(timer);
@@ -40,7 +47,7 @@ export const AlertComponent = ({ status, title, desc, hasFooter = false }: Alert
 
     const handleAlertClose = () => {
         dispatch(clearError());
-        dispatch(setAlertStatus({ status: 'error', isError: false, title: '', desc: '' }));
+        dispatch(setAlertStatus(DEFAULT_ALERT_STATUS));
     };
 
     return (

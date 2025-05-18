@@ -1,4 +1,3 @@
-import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
 import {
     Button,
     FormControl,
@@ -21,7 +20,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
-import { ALERT_MESSAGES, DataTestId, InputAriaLabel, InputType } from '~/consts/consts';
+import { ALERT_MESSAGES, DataTestId } from '~/consts/consts';
 import { INPUT_STYLES } from '~/consts/styles';
 import { useResetPasswordMutation } from '~/query/services/auth';
 import { ResetPasswordParams } from '~/query/types/authApi.types';
@@ -30,7 +29,8 @@ import { useAppDispatch } from '~/store/hooks';
 import { setAlertStatus } from '~/store/slices/auth-slice';
 
 import { LoaderFullsize } from '../loader-fullsize/LoaderFullsize';
-import { BUTTON_STYLES, MODAL_CLOSE_BUTTON_STYLES } from './consts';
+import { BUTTON_STYLES, HOVER_EFFECT, MODAL_CLOSE_BUTTON_STYLES } from './consts';
+import { PASSWORD_ICON_PROPS, PASSWORD_INPUT_TYPE } from './utils';
 
 type ResetPasswordProps = {
     isOpen: boolean;
@@ -149,6 +149,7 @@ export const ResetPasswordModal = ({ isOpen, onClose, email }: ResetPasswordProp
                                         type='text'
                                         placeholder='bake_and_pie'
                                         mb={2}
+                                        borderColor='lime.150'
                                         {...INPUT_STYLES}
                                         {...register('login', { onBlur: handleTrimBlur })}
                                     />
@@ -163,30 +164,20 @@ export const ResetPasswordModal = ({ isOpen, onClose, email }: ResetPasswordProp
                                         <Input
                                             data-test-id={DataTestId.PasswordInput}
                                             id='registerPassword'
-                                            type={
-                                                showPassword ? InputType.Text : InputType.Password
-                                            }
+                                            type={PASSWORD_INPUT_TYPE(showConfirmPassword)}
                                             placeholder='Введите пароль'
                                             mb={2}
                                             {...INPUT_STYLES}
+                                            borderColor='lime.150'
                                             {...register('password')}
                                         />
                                         <InputRightElement h={12}>
                                             <IconButton
-                                                aria-label={
-                                                    showPassword
-                                                        ? InputAriaLabel.Hide
-                                                        : InputAriaLabel.Show
-                                                }
-                                                icon={showPassword ? <ViewIcon /> : <ViewOffIcon />}
+                                                {...PASSWORD_ICON_PROPS(showPassword)}
                                                 variant='ghost'
                                                 size='sm'
                                                 border='none'
-                                                sx={{
-                                                    '&:hover': {
-                                                        bgColor: 'white',
-                                                    },
-                                                }}
+                                                sx={HOVER_EFFECT}
                                                 onClick={() => setShowPassword(!showPassword)}
                                             />
                                         </InputRightElement>
@@ -205,38 +196,20 @@ export const ResetPasswordModal = ({ isOpen, onClose, email }: ResetPasswordProp
                                         <Input
                                             data-test-id={DataTestId.ConfirmPasswordInput}
                                             id='confirmPassword'
-                                            type={
-                                                showConfirmPassword
-                                                    ? InputType.Text
-                                                    : InputType.Password
-                                            }
+                                            type={PASSWORD_INPUT_TYPE(showConfirmPassword)}
                                             placeholder='Повторите пароль'
                                             mb={2}
+                                            borderColor='lime.150'
                                             {...INPUT_STYLES}
                                             {...register('passwordConfirm')}
                                         />
                                         <InputRightElement h={12}>
                                             <IconButton
-                                                aria-label={
-                                                    showConfirmPassword
-                                                        ? InputAriaLabel.Hide
-                                                        : InputAriaLabel.Show
-                                                }
-                                                icon={
-                                                    showConfirmPassword ? (
-                                                        <ViewIcon />
-                                                    ) : (
-                                                        <ViewOffIcon />
-                                                    )
-                                                }
+                                                {...PASSWORD_ICON_PROPS(showPassword)}
                                                 variant='ghost'
                                                 size='sm'
                                                 border='none'
-                                                sx={{
-                                                    '&:hover': {
-                                                        bgColor: 'white',
-                                                    },
-                                                }}
+                                                sx={HOVER_EFFECT}
                                                 onClick={() =>
                                                     setShowConfirmPassword(!showConfirmPassword)
                                                 }

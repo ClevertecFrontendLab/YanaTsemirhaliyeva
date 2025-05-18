@@ -177,6 +177,7 @@ export const RegisterForm = () => {
                                     id='firstName'
                                     placeholder='Имя'
                                     mb={2}
+                                    borderColor='lime.150'
                                     {...INPUT_STYLES}
                                     {...register('firstName', { onBlur: handleTrimBlur })}
                                 />
@@ -190,6 +191,7 @@ export const RegisterForm = () => {
                                     id='lastName'
                                     placeholder='Фамилия'
                                     mb={2}
+                                    borderColor='lime.150'
                                     {...INPUT_STYLES}
                                     {...register('lastName', { onBlur: handleTrimBlur })}
                                 />
@@ -204,6 +206,7 @@ export const RegisterForm = () => {
                                     type='email'
                                     placeholder='example@email.com'
                                     mb={2}
+                                    borderColor='lime.150'
                                     {...INPUT_STYLES}
                                     {...register('email', { onBlur: handleTrimBlur })}
                                 />
@@ -230,6 +233,7 @@ export const RegisterForm = () => {
                                     type='text'
                                     placeholder='bake_and_pie'
                                     mb={2}
+                                    borderColor='lime.150'
                                     {...INPUT_STYLES}
                                     {...register('login', { onBlur: handleTrimBlur })}
                                 />
@@ -247,6 +251,7 @@ export const RegisterForm = () => {
                                         type={showPassword ? InputType.Text : InputType.Password}
                                         placeholder='Введите пароль'
                                         mb={2}
+                                        borderColor='lime.150'
                                         {...INPUT_STYLES}
                                         {...register('password')}
                                     />
@@ -292,6 +297,7 @@ export const RegisterForm = () => {
                                         placeholder='Повторите пароль'
                                         mb={2}
                                         {...INPUT_STYLES}
+                                        borderColor='lime.150'
                                         {...register('confirmPassword')}
                                     />
                                     <InputRightElement h={12}>
