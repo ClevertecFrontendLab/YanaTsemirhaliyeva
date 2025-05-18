@@ -3,7 +3,12 @@
   <head>
     <meta charset="utf-8">
     <title>Single Page Apps for GitHub Pages</title>
-    <script type="text/javascript" src="./404-redirect.js"></script>
+    <script type="text/javascript" src="/404-redirect.js"></script>
+    <script type="text/javascript">
+      var pathSegmentsToKeep = 1;
+      var l = window.location;
+      l.replace(redirectToSPA(l, pathSegmentsToKeep));
+    </script>
   </head>
   <body>
   </body>
