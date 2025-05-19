@@ -74,7 +74,7 @@ export const PinRecoveryModal = ({
                 alignItems='center'
                 w={{ base: 316, md: 396 }}
                 borderRadius={16}
-                gap={6}
+                gap='26px'
                 sx={{ fontFamily: 'Inter' }}
                 data-test-id={DataTestId.VerificationCodeModal}
             >
@@ -89,7 +89,7 @@ export const PinRecoveryModal = ({
                             Неверный код
                         </Heading>
                     )}
-                    <Text textAlign='center' color='blackAlpha.900' px={5} mb={4}>
+                    <Text textAlign='center' color='blackAlpha.900' px={5} mb={4} pt={1}>
                         Мы отправили вам на e-mail
                         <Text fontWeight={600} as='span' display='inline-block'>
                             &nbsp;{email}&nbsp;
@@ -97,7 +97,7 @@ export const PinRecoveryModal = ({
                         шестизначный код. Введите его ниже.
                     </Text>
                     <form>
-                        <HStack justifyContent='center'>
+                        <HStack justifyContent='center' gap='6px'>
                             <PinInput
                                 otp
                                 value={pinValue}
@@ -112,10 +112,12 @@ export const PinRecoveryModal = ({
                                     );
                                     return (
                                         <PinInputField
+                                            color='lime.800'
+                                            _placeholder={{ color: 'lime.800', fontSize: 14 }}
                                             key={i}
                                             ref={i === 0 ? firstPinFieldRef : undefined}
                                             data-test-id={id}
-                                            borderColor={isError ? 'red.500' : 'blackAlpha.500'}
+                                            borderColor={isError ? 'red.500' : 'blackAlpha.100'}
                                         />
                                     );
                                 })}
@@ -125,7 +127,9 @@ export const PinRecoveryModal = ({
                 </ModalBody>
                 <ModalFooter p={0}>
                     <Text textAlign='center' color='blackAlpha.600' fontSize={12}>
-                        Не пришло письмо? Проверьте папку Спам.
+                        Не пришло письмо?
+                        <br style={{ display: window.innerWidth >= 1200 ? 'none' : 'block' }} />
+                        Проверьте папку Спам.
                     </Text>
                 </ModalFooter>
             </ModalContent>

@@ -25,6 +25,7 @@ import { useAppDispatch, useAppSelector } from '~/store/hooks';
 import {
     isVerificationExpiredSelector,
     setAlertStatus,
+    setIsAuthModalOpen,
     setIsSubmitingform,
     setIsVerificationExpired,
 } from '~/store/slices/auth-slice';
@@ -42,11 +43,6 @@ export const RegisterForm = () => {
     const [isRegistrationSuccess, setIsRegistrationSuccess] = useState(false);
     const isError = useAppSelector(isVerificationExpiredSelector);
     const [isErrorModalOpen, setIsErrorModalOpen] = useState(isError);
-
-    const handleModalClose = () => {
-        setIsErrorModalOpen(false);
-        dispatch(setIsVerificationExpired(false));
-    };
 
     const {
         register,
@@ -117,6 +113,7 @@ export const RegisterForm = () => {
         try {
             await signup(data).unwrap();
             setIsRegistrationSuccess(true);
+            dispatch(setIsAuthModalOpen(true));
         } catch (err) {
             if (err && typeof err === 'object') {
                 let errorMessage = '';
@@ -151,6 +148,12 @@ export const RegisterForm = () => {
         }
     };
 
+    const handleModalClose = () => {
+        setIsErrorModalOpen(false);
+        dispatch(setIsVerificationExpired(false));
+        dispatch(setIsAuthModalOpen(false));
+    };
+
     return (
         <>
             <form onSubmit={handleSubmit(onSubmit)} data-test-id={DataTestId.SignUpForm}>
@@ -161,9 +164,8 @@ export const RegisterForm = () => {
                         </Text>
                         <Progress
                             data-test-id={DataTestId.SignUpProgress}
-                            hasStripe
+                            variant='limeWhiteStripe'
                             value={progressValue}
-                            colorScheme='lime'
                             size='sm'
                         />
                     </Box>
@@ -204,7 +206,7 @@ export const RegisterForm = () => {
                                     data-test-id={DataTestId.EmailInput}
                                     id='registerEmail'
                                     type='email'
-                                    placeholder='example@email.com'
+                                    placeholder='email'
                                     mb={2}
                                     borderColor='lime.150'
                                     {...INPUT_STYLES}
@@ -231,7 +233,7 @@ export const RegisterForm = () => {
                                     data-test-id={DataTestId.LoginInput}
                                     id='login'
                                     type='text'
-                                    placeholder='bake_and_pie'
+                                    placeholder='Логин'
                                     mb={2}
                                     borderColor='lime.150'
                                     {...INPUT_STYLES}

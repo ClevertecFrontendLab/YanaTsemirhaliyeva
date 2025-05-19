@@ -44,15 +44,22 @@ export const VerificationExpiredModal = ({ isOpen, onClose }: VerificationExpire
                     {...MODAL_CLOSE_BUTTON_STYLES}
                 />
                 <ModalBody p={0}>
-                    <Heading as='h1' textAlign='center' color='black' fontSize={24} mb={8}>
+                    <Heading
+                        as='h1'
+                        textAlign='center'
+                        color='black'
+                        fontSize={24}
+                        mb={4}
+                        fontFamily='inherit'
+                    >
                         Упс! Что-то пошло не так
                     </Heading>
-                    <Text textAlign='center' color='blackAlpha.900'>
+                    <Text textAlign='center' color='blackAlpha.700'>
                         Ваша ссылка для верификации недействительна. Попробуйте зарегистрироваться
                         снова.
                     </Text>
                 </ModalBody>
-                <ModalFooter p={0}>
+                <ModalFooter p={0} pt={2}>
                     <Text textAlign='center' color='blackAlpha.600' fontSize={12}>
                         Остались вопросы? Свяжитесь&nbsp;
                         <Link as={RouterLink} to='#'>

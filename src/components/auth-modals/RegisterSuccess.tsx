@@ -47,8 +47,18 @@ export const RegisterSuccessModal = ({ isOpen, onClose, email }: RegisterSuccess
                     {...MODAL_CLOSE_BUTTON_STYLES}
                 />
                 <ModalBody p={0}>
-                    <Heading as='h1' textAlign='center' color='black' fontSize={24} mb={8}>
-                        Остался последний шаг. Нужно верифицировать ваш e-mail
+                    <Heading
+                        as='h1'
+                        textAlign='center'
+                        color='black'
+                        fontSize={24}
+                        mb={4}
+                        lineHeight='1.3'
+                        pt='10px'
+                    >
+                        Остался последний шаг.
+                        <br style={{ display: window.innerWidth >= 1200 ? 'none' : 'block' }} />
+                        Нужно верифицировать ваш e-mail
                     </Heading>
                     <Text textAlign='center' color='blackAlpha.900'>
                         Мы отправили вам на почту
@@ -58,11 +68,15 @@ export const RegisterSuccessModal = ({ isOpen, onClose, email }: RegisterSuccess
                         ссылку для верификации.
                     </Text>
                 </ModalBody>
-                <ModalFooter p={0}>
+                <ModalFooter p={0} pt={2}>
                     <Text textAlign='center' color='blackAlpha.600' fontSize={12}>
-                        Не пришло письмо? Проверьте папку Спам. По другим вопросам свяжитесь&nbsp;
+                        Не пришло письмо?
+                        <br style={{ display: window.innerWidth >= 1200 ? 'none' : 'block' }} />
+                        Проверьте папку Спам.
+                        <br /> По другим вопросам свяжитесь&nbsp;
+                        <br style={{ display: window.innerWidth >= 1200 ? 'none' : 'block' }} />
                         <Link as={RouterLink} to='#'>
-                            с поддержкой
+                            с &nbsp;поддержкой
                         </Link>
                     </Text>
                 </ModalFooter>

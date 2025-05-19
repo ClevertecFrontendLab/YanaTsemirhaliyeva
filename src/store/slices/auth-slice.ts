@@ -14,6 +14,7 @@ export type AuthState = {
     alertStatus: Alert;
     isVerificationExpired: boolean;
     isSubmitingForm: boolean;
+    isAuthModalOpen: boolean;
 };
 
 const initialState: AuthState = {
@@ -21,6 +22,7 @@ const initialState: AuthState = {
     alertStatus: { status: 'error', title: '', isError: false, desc: '' },
     isVerificationExpired: false,
     isSubmitingForm: false,
+    isAuthModalOpen: false,
 };
 
 export const authSlice = createSlice({
@@ -43,12 +45,21 @@ export const authSlice = createSlice({
         setIsSubmitingform: (state, action: PayloadAction<boolean>) => {
             state.isSubmitingForm = action.payload;
         },
+        setIsAuthModalOpen: (state, action: PayloadAction<boolean>) => {
+            state.isAuthModalOpen = action.payload;
+        },
     },
 });
 
 // Экшены
-export const { login, logout, setAlertStatus, setIsVerificationExpired, setIsSubmitingform } =
-    authSlice.actions;
+export const {
+    login,
+    logout,
+    setAlertStatus,
+    setIsVerificationExpired,
+    setIsSubmitingform,
+    setIsAuthModalOpen,
+} = authSlice.actions;
 
 // Селекторы
 export const isAuthorizedSelector = (state: ApplicationState) => state.auth.isAuthorized;
@@ -56,6 +67,7 @@ export const isVerificationExpiredSelector = (state: ApplicationState) =>
     state.auth.isVerificationExpired;
 export const alertStatusSelector = (state: ApplicationState) => state.auth.alertStatus;
 export const isSubmitingFormSelector = (state: ApplicationState) => state.auth.isSubmitingForm;
+export const isAuthModalOpenSelector = (state: ApplicationState) => state.auth.isAuthModalOpen;
 
 // Редьюсер
 export default authSlice.reducer;

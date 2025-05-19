@@ -12,6 +12,9 @@ export const MODAL_CLOSE_BUTTON_STYLES = {
             outline: 'none',
         },
     },
+    _focusVisible: {
+        outline: 'none',
+    },
 };
 
 export const BUTTON_STYLES = {
@@ -27,11 +30,16 @@ export const BUTTON_STYLES = {
             bgColor: 'black',
         },
     },
+    fontSize: '18px',
 };
 
 export const BORDER_COLOR_STYLES = (isError: boolean) => ({
     borderColor: isError ? 'red.500' : 'lime.150',
+    borderWidth: isError ? '2px' : '1px',
     _hover: {
+        borderColor: isError ? 'red.500' : 'lime.150',
+    },
+    _focusVisible: {
         borderColor: isError ? 'red.500' : 'lime.150',
     },
 });

@@ -3,10 +3,11 @@ import { Box, Flex, Image, Text, VStack } from '@chakra-ui/react';
 import { AlertComponent } from '~/components/alert/Alert';
 import { AuthTabs } from '~/components/auth-tabs/AuthTabs';
 import { useAppSelector } from '~/store/hooks';
-import { alertStatusSelector } from '~/store/slices/auth-slice';
+import { alertStatusSelector, isAuthModalOpenSelector } from '~/store/slices/auth-slice';
 
 export const AuthPage = () => {
     const alertProps = useAppSelector(alertStatusSelector);
+    const isModalOpen = useAppSelector(isAuthModalOpenSelector);
 
     return (
         <Flex minH='100vh' width='full' pos='relative' overflow='auto'>
@@ -18,25 +19,40 @@ export const AuthPage = () => {
                 h='100%'
                 position='relative'
             >
-                <Box
-                    as='header'
-                    m='0 auto'
-                    mt={{ base: 4, sm: '70px', md: '100px' }}
-                    mb={{ base: 10, sm: 14, md: '80px' }}
-                >
-                    <Image
-                        src='logo-full.svg'
-                        w={{ base: '158px', md: '271px' }}
-                        h={{ base: '38px', md: '64px' }}
-                    />
-                </Box>
-                <Flex flexGrow={1}>
-                    <AuthTabs />
-                </Flex>
+                <VStack flexGrow={1} justifyContent='center'>
+                    <Box
+                        as='header'
+                        m='0 auto'
+                        mt={{ base: 4, sm: '70px', md: '100px' }}
+                        mb={{ base: 10, sm: 14, md: '80px' }}
+                    >
+                        <Image
+                            src='logo-full.svg'
+                            w={{ base: '158px', md: '271px' }}
+                            h={{ base: '38px', md: '64px' }}
+                        />
+                    </Box>
+                    <Flex>
+                        <AuthTabs />
+                    </Flex>
+                </VStack>
 
-                <Box as='footer' fontSize={12} color='black' alignSelf='flex-start'>
+                <Box
+                    as='footer'
+                    fontSize={12}
+                    color='black'
+                    alignSelf='flex-start'
+                    fontWeight={600}
+                >
                     Все права защищены, ученический файл, ©Клевер Технолоджи, 2025
                 </Box>
+                {alertProps.isError && !isModalOpen && (
+                    <AlertComponent
+                        title={alertProps.title}
+                        status={alertProps.status}
+                        desc={alertProps.desc}
+                    />
+                )}
             </VStack>
             <Box
                 w='50%'
@@ -57,6 +73,7 @@ export const AuthPage = () => {
                     <Text
                         fontSize={12}
                         fontWeight={600}
+                        color='black'
                         pos='absolute'
                         bottom={7}
                         right={7}
@@ -67,7 +84,7 @@ export const AuthPage = () => {
                 </Box>
             </Box>
 
-            {alertProps.isError && (
+            {alertProps.isError && isModalOpen && (
                 <AlertComponent
                     title={alertProps.title}
                     status={alertProps.status}

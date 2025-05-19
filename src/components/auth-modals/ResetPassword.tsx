@@ -29,7 +29,12 @@ import { useAppDispatch } from '~/store/hooks';
 import { setAlertStatus } from '~/store/slices/auth-slice';
 
 import { LoaderFullsize } from '../loader-fullsize/LoaderFullsize';
-import { BUTTON_STYLES, HOVER_EFFECT, MODAL_CLOSE_BUTTON_STYLES } from './consts';
+import {
+    BORDER_COLOR_STYLES,
+    BUTTON_STYLES,
+    HOVER_EFFECT,
+    MODAL_CLOSE_BUTTON_STYLES,
+} from './consts';
 import { PASSWORD_ICON_PROPS, PASSWORD_INPUT_TYPE } from './utils';
 
 type ResetPasswordProps = {
@@ -133,14 +138,16 @@ export const ResetPasswordModal = ({ isOpen, onClose, email }: ResetPasswordProp
                             textAlign='center'
                             color='black'
                             fontSize={24}
-                            mb={8}
+                            mb={6}
                             px={10}
-                            pt={1}
+                            pt='2px'
+                            lineHeight='1.3'
+                            fontFamily='inherit'
                         >
                             Восстановление аккаунта
                         </Heading>
                         <form onSubmit={onFormSubmit}>
-                            <VStack justifyContent='center'>
+                            <VStack justifyContent='center' gap='18px'>
                                 <FormControl isInvalid={!!errors.login}>
                                     <FormLabel htmlFor='login'>Логин для входа на сайт</FormLabel>
                                     <Input
@@ -148,15 +155,17 @@ export const ResetPasswordModal = ({ isOpen, onClose, email }: ResetPasswordProp
                                         id='login'
                                         type='text'
                                         placeholder='bake_and_pie'
-                                        mb={2}
-                                        borderColor='lime.150'
+                                        mb='5px'
                                         {...INPUT_STYLES}
+                                        sx={BORDER_COLOR_STYLES(Boolean(errors.login))}
                                         {...register('login', { onBlur: handleTrimBlur })}
                                     />
                                     <Text fontSize={14} color='blackAlpha.700'>
                                         Логин не менее 5 символов, только латиница и !@#$&_+-.
                                     </Text>
-                                    <FormErrorMessage>{errors.login?.message}</FormErrorMessage>
+                                    <FormErrorMessage fontSize={12}>
+                                        {errors.login?.message}
+                                    </FormErrorMessage>
                                 </FormControl>
                                 <FormControl isInvalid={!!errors.password}>
                                     <FormLabel htmlFor='registerPassword'>Пароль</FormLabel>
@@ -166,9 +175,9 @@ export const ResetPasswordModal = ({ isOpen, onClose, email }: ResetPasswordProp
                                             id='registerPassword'
                                             type={PASSWORD_INPUT_TYPE(showConfirmPassword)}
                                             placeholder='Введите пароль'
-                                            mb={2}
+                                            mb='5px'
                                             {...INPUT_STYLES}
-                                            borderColor='lime.150'
+                                            sx={BORDER_COLOR_STYLES(Boolean(errors.password))}
                                             {...register('password')}
                                         />
                                         <InputRightElement h={12}>
@@ -185,12 +194,14 @@ export const ResetPasswordModal = ({ isOpen, onClose, email }: ResetPasswordProp
                                     <Text fontSize={14} color='blackAlpha.700'>
                                         Пароль не менее 8 символов, с заглавной буквой и цифрой
                                     </Text>
-                                    <FormErrorMessage>{errors.password?.message}</FormErrorMessage>
+                                    <FormErrorMessage fontSize={12}>
+                                        {errors.password?.message}
+                                    </FormErrorMessage>
                                 </FormControl>
 
                                 <FormControl isInvalid={!!errors.passwordConfirm}>
                                     <FormLabel htmlFor='confirmPassword'>
-                                        Подтверждение пароля
+                                        Повторите пароль
                                     </FormLabel>
                                     <InputGroup>
                                         <Input
@@ -199,7 +210,9 @@ export const ResetPasswordModal = ({ isOpen, onClose, email }: ResetPasswordProp
                                             type={PASSWORD_INPUT_TYPE(showConfirmPassword)}
                                             placeholder='Повторите пароль'
                                             mb={2}
-                                            borderColor='lime.150'
+                                            sx={BORDER_COLOR_STYLES(
+                                                Boolean(errors.passwordConfirm),
+                                            )}
                                             {...INPUT_STYLES}
                                             {...register('passwordConfirm')}
                                         />
@@ -216,7 +229,7 @@ export const ResetPasswordModal = ({ isOpen, onClose, email }: ResetPasswordProp
                                             />
                                         </InputRightElement>
                                     </InputGroup>
-                                    <FormErrorMessage>
+                                    <FormErrorMessage fontSize={12}>
                                         {errors.passwordConfirm?.message}
                                     </FormErrorMessage>
                                 </FormControl>

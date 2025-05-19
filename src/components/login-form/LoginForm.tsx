@@ -24,7 +24,12 @@ import { INPUT_STYLES } from '~/consts/styles';
 import { useLoginMutation, useVerifyOtpMutation } from '~/query/services/auth';
 import { LoginFormValues, loginSchema } from '~/schemas/auth.schema';
 import { useAppDispatch } from '~/store/hooks';
-import { login as authLogin, setAlertStatus, setIsSubmitingform } from '~/store/slices/auth-slice';
+import {
+    login as authLogin,
+    setAlertStatus,
+    setIsAuthModalOpen,
+    setIsSubmitingform,
+} from '~/store/slices/auth-slice';
 
 import { BUTTON_STYLES } from '../auth-modals/consts';
 import { PasswordRecoveryModal } from '../auth-modals/PasswordRecovery';
@@ -74,6 +79,7 @@ export const LoginForm = () => {
                 dispatch(setAlertStatus(ALERT_MESSAGES.EMAIL_NOT_VERIFIED));
             } else if (typeof status === 'number' && status >= 500 && status < 600) {
                 setServerErrorOpen(true);
+                dispatch(setIsAuthModalOpen(true));
                 reset();
             } else {
                 dispatch(setAlertStatus(ALERT_MESSAGES.INVALID_DATA));
@@ -98,6 +104,7 @@ export const LoginForm = () => {
     const handlePasswordRecovery = (email: string) => {
         setEmailValue(email);
         setIsPinRecoveryOpen(true);
+        dispatch(setIsAuthModalOpen(true));
         setIsPasswordRecoveryOpen(false);
     };
 
@@ -108,30 +115,36 @@ export const LoginForm = () => {
             setEmail(emailValue);
             setIsPinRecoveryOpen(false);
             setIsResetPasswordOpen(true);
+            dispatch(setIsAuthModalOpen(true));
         } catch (err) {
             setPinError(true);
             const status = (err as FetchBaseQueryError)?.status;
             setErrorStatus(status as number | undefined);
             dispatch(setAlertStatus(ALERT_MESSAGES.SERVER_ERROR));
+            dispatch(setIsAuthModalOpen(true));
         } finally {
             dispatch(setIsSubmitingform(false));
         }
     };
 
     const hanleRecoveryPasswordOpen = () => {
+        dispatch(setIsAuthModalOpen(true));
         setIsPasswordRecoveryOpen(true);
     };
 
     const hanleRecoveryPasswordClose = () => {
+        dispatch(setIsAuthModalOpen(false));
         setIsPasswordRecoveryOpen(false);
     };
 
     const hanlePinOtpModalClose = () => {
         setIsPinRecoveryOpen(false);
+        dispatch(setIsAuthModalOpen(false));
     };
 
     const hanleResetPasswordModalClose = () => {
         setIsResetPasswordOpen(false);
+        dispatch(setIsAuthModalOpen(false));
     };
 
     const borderColor = error ? 'red.500' : 'lime.150';

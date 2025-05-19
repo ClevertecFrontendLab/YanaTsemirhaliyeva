@@ -40,6 +40,7 @@ export const AuthTabs = () => {
                     >
                         {TABS.map((tab, i) => (
                             <Tab
+                                width='50%'
                                 key={i}
                                 border='none'
                                 px={6}
@@ -66,8 +67,14 @@ export const AuthTabs = () => {
                                     '&:focus': {
                                         outline: 'none',
                                     },
+                                    '&:focus-visible': {
+                                        outline: 'none',
+                                    },
                                     _hover: {
                                         color: 'lime.600',
+                                    },
+                                    _active: {
+                                        backgroundColor: 'transparent',
                                     },
                                 }}
                             >

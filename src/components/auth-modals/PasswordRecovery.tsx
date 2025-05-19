@@ -104,7 +104,7 @@ export const PasswordRecoveryModal = ({ isOpen, onClose, onSubmit }: PasswordRec
                     {...MODAL_CLOSE_BUTTON_STYLES}
                 />
                 <ModalBody p={0}>
-                    <Text textAlign='center' color='blackAlpha.900' px={5} mb={4}>
+                    <Text textAlign='center' color='blackAlpha.900' px={5} mb={4} pt='10px'>
                         Для восстановления входа введите ваш e-mail, куда можно отправить уникальный
                         код
                     </Text>
@@ -123,12 +123,14 @@ export const PasswordRecoveryModal = ({ isOpen, onClose, onSubmit }: PasswordRec
                                 onInput={handleInputChange}
                                 {...register('email')}
                             />
-                            <FormErrorMessage>{errors.email?.message}</FormErrorMessage>
+                            <FormErrorMessage fontSize={12}>
+                                {errors.email?.message}
+                            </FormErrorMessage>
                         </FormControl>
                         <Button
                             data-test-id={DataTestId.SubmitBtn}
                             {...BUTTON_STYLES}
-                            sx={{ ...BUTTON_STYLES.sx, mt: 6 }}
+                            sx={{ ...BUTTON_STYLES.sx, mt: 3 }}
                         >
                             Получить код
                         </Button>

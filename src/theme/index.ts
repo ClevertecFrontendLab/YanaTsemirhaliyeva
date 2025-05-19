@@ -27,12 +27,10 @@ const theme = extendTheme({
     styles: {
         global: {
             'input:focus-visible': {
-                borderColor: 'inherit',
                 boxShadow: 'none !important',
                 outline: 'none !important',
             },
             '[data-focus-visible]': {
-                borderColor: 'inherit',
                 boxShadow: 'none !important',
                 outline: 'none !important',
             },
@@ -47,6 +45,33 @@ const theme = extendTheme({
                     },
                 },
             },
+        },
+        Progress: {
+            variants: {
+                limeWhiteStripe: {
+                    filledTrack: {
+                        bg: 'lime.300',
+                        backgroundImage: `linear-gradient(
+              45deg,
+              rgba(255, 255, 255, 0.5) 25%,
+              transparent 25%,
+              transparent 50%,
+              rgba(255, 255, 255, 0.5) 50%,
+              rgba(255, 255, 255, 0.5) 75%,
+              transparent 75%,
+              transparent
+            )`,
+                        backgroundSize: '1rem 1rem',
+                        animation: 'progress-bar-stripes 1s linear infinite',
+                    },
+                },
+            },
+        },
+    },
+    keyframes: {
+        'progress-bar-stripes': {
+            '0%': { backgroundPosition: '0 0' },
+            '100%': { backgroundPosition: '1rem 0' },
         },
     },
 });

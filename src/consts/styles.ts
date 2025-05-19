@@ -4,13 +4,11 @@ export const INPUT_STYLES = {
     minH: 12,
     fontSize: 18,
     color: 'lime.800',
-    sx: {
-        '::placeholder': {
-            color: 'lime.800',
-            fontSize: 18,
-        },
-        '&:hover': {
-            borderColor: 'lime.150',
-        },
+    _placeholder: {
+        color: 'lime.800',
+        fontSize: 18,
+    },
+    _hover: {
+        borderColor: 'lime.150',
     },
 };
