@@ -22,7 +22,14 @@ export const useCategoryData = () => {
                 location.pathname,
             );
             const { categories } = await getCategoriesFromDB();
-            const excludedRoutes = [AppRoute.Index, AppRoute.Juicy, AppRoute.NotFound].map(String);
+            const excludedRoutes = [
+                AppRoute.Index,
+                AppRoute.Juicy,
+                AppRoute.NotFound,
+                AppRoute.Login,
+                AppRoute.Register,
+                AppRoute.Verification,
+            ].map(String);
             if (excludedRoutes.includes(location.pathname)) {
                 dispatch(setCategory(null));
                 dispatch(setSubcategory(null));

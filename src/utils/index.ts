@@ -1,3 +1,5 @@
+import { FetchBaseQueryError } from '@reduxjs/toolkit/query';
+
 import { DataTestId } from '~/consts/consts';
 import { Category, SubCategory } from '~/types/category';
 
@@ -131,18 +133,16 @@ export async function getCategoryAndSubcategoryFromUrl(pathname: string): Promis
     };
 
     const pathParts = pathname.split('/').filter(Boolean);
-    if (pathParts.length === 0) return { ...result, isValid: false }; // Пустой URL → невалидный
+    if (pathParts.length === 0) return { ...result, isValid: false };
 
     const categorySlug = pathParts[0];
     const subcategorySlug = pathParts.length > 1 ? pathParts[1] : null;
     const id = pathParts.length > 2 ? pathParts[2] : null;
 
-    // Загружаем данные из IndexedDB
     const { categories } = await getCategoriesFromDB();
 
-    // Ищем категорию
     const categoryData = categories.find((cat) => cat.category === categorySlug);
-    if (!categoryData) return { ...result, isValid: false }; // Категории нет → невалидно
+    if (!categoryData) return { ...result, isValid: false };
 
     result.category = categoryData;
 
@@ -153,7 +153,7 @@ export async function getCategoryAndSubcategoryFromUrl(pathname: string): Promis
         if (subcategoryData) {
             result.subcategory = subcategoryData;
         } else {
-            return { ...result, isValid: false }; // Подкатегории нет → невалидно
+            return { ...result, isValid: false };
         }
     }
 
@@ -222,7 +222,7 @@ export const transformCategoryResponse = (
                     });
                 }
             } else {
-                console.warn(`⚠️ Неизвестный формат объекта:`, item);
+                console.warn(`Неизвестный формат объекта:`, item);
             }
 
             return acc;
@@ -248,7 +248,6 @@ export const getOriginalAllergens = (
 
     formattedAllergens.forEach((formatted) => {
         for (const original of originalAllergens) {
-            // Проверяем, содержит ли оригинальный аллерген форматированное значение
             if (
                 original.includes(formatted) ||
                 formatAllergensForUrl([original]).includes(formatted)
@@ -259,12 +258,10 @@ export const getOriginalAllergens = (
         }
     });
 
-    // Если мы нашли все оригинальные значения, возвращаем их
     if (uniqueOriginalAllergens.size > 0) {
         return Array.from(uniqueOriginalAllergens);
     }
 
-    // Если оригинальные значения не найдены, возвращаем форматированные значения
     return formattedAllergens;
 };
 
@@ -301,7 +298,6 @@ export const formatFilters = (
             selectedFilters.allergens.length > 0
         ) {
             const formattedToOriginal = new Map<string, string>();
-            // Создаем отображение форматированных значений к оригинальным
             selectedFilters.allergens.forEach((originalAllergen) => {
                 const formattedValues = formatAllergensForUrl([originalAllergen]);
                 formattedValues.forEach((formatted) => {
@@ -309,8 +305,6 @@ export const formatFilters = (
                 });
             });
             const addedOriginals = new Set<string>();
-
-            // Для каждого значения в searchParams.allergens находим оригинальное название
             values.forEach((formatted, index) => {
                 const original = formattedToOriginal.get(formatted);
 
@@ -347,4 +341,32 @@ export const formatFilters = (
     }
 
     return result;
+};
+
+// Вспомогательная функция для извлечения сообщения об ошибке
+export const getErrorMessage = (error: unknown): string => {
+    if (typeof error === 'object' && error !== null) {
+        if ('status' in error && 'data' in error) {
+            const fetchError = error as FetchBaseQueryError;
+            if (
+                typeof fetchError.data === 'object' &&
+                fetchError.data !== null &&
+                'message' in fetchError.data
+            ) {
+                return String(fetchError.data.message);
+            }
+            if ('error' in fetchError) {
+                return String(fetchError.error);
+            }
+            if (fetchError.status) {
+                return `Ошибка ${fetchError.status}`;
+            }
+        }
+
+        if ('message' in error) {
+            return String(error.message);
+        }
+    }
+
+    return 'Произошла ошибка';
 };

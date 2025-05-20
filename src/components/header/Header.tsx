@@ -13,9 +13,11 @@ import {
 import { useRef } from 'react';
 import { Link as RouterLink } from 'react-router';
 
+import LogoImg from '~/assets/img/logo.svg';
+import LogoFullImg from '~/assets/img/logo-full.svg';
 import { DataTestId } from '~/consts/consts';
 import { useAppDispatch } from '~/store/hooks';
-import { setCategory, setSubcategory } from '~/store/slices/recipes-slice';
+import { setCategory, setRecipeTitle, setSubcategory } from '~/store/slices/recipes-slice';
 
 import { Breadcrumbs } from '../breadcrumbs/Breadcrumbs';
 import { BurgerMenu } from '../burger-menu/BurgerMenu';
@@ -31,6 +33,7 @@ export const Header = () => {
     const handleReset = () => {
         dispatch(setCategory(null));
         dispatch(setSubcategory(null));
+        dispatch(setRecipeTitle(null));
         onClose();
     };
 
@@ -61,10 +64,10 @@ export const Header = () => {
                     onClick={handleReset}
                 >
                     <Show above='2xs'>
-                        <Image src='/logo-full.svg' alt='logo' />
+                        <Image src={LogoFullImg} alt='logo' />
                     </Show>
                     <Show below='2xs'>
-                        <Image src='/logo.svg' alt='logo' />
+                        <Image src={LogoImg} alt='logo' />
                     </Show>
                 </Link>
                 {isMdOrAbove && <Breadcrumbs />}

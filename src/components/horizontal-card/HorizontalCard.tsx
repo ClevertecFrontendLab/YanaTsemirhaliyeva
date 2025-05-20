@@ -21,7 +21,7 @@ import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
 
 import { API_IMG, DataTestId } from '~/consts/consts';
-import { BookmarkIcon } from '~/shared/custom-icons';
+import { BookmarkIcon, HappyFaceIcon } from '~/shared/custom-icons';
 import { serchInputSelector } from '~/store/slices/recipes-slice';
 import { Category } from '~/types/category';
 import { generateTestId, highlightText } from '~/utils';
@@ -130,21 +130,13 @@ export const HorizontalCard = ({ item, index, categories }: HorizontalCardProps)
                     >
                         {bookmarks && (
                             <HStack gap={1}>
-                                <Image
-                                    src='/svg/BsBookmarkHeart.svg'
-                                    boxSize={3}
-                                    alt='bookmarks count'
-                                />
+                                <BookmarkIcon color='black' />
                                 <Box as='span'>{bookmarks}</Box>
                             </HStack>
                         )}
                         {likes && (
                             <HStack alignItems='center' gap={1}>
-                                <Image
-                                    src='/svg/BsEmojiHeartEyes.svg'
-                                    boxSize={3}
-                                    alt='bookmarks count'
-                                />
+                                <HappyFaceIcon color='black' />
                                 <Box as='span'>{likes}</Box>
                             </HStack>
                         )}

@@ -7,7 +7,7 @@ import { Navigation } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 
 import { VerticalCard } from '~/components/vertical-card/VerticalCard';
-import { DataTestId } from '~/consts/consts';
+import { DataTestId, DEFAULT_PAGE } from '~/consts/consts';
 import { useGetRecipesQuery } from '~/query/services/recipes';
 import { ArrowRightIcon } from '~/shared/custom-icons';
 import { useAppDispatch, useAppSelector } from '~/store/hooks';
@@ -15,6 +15,7 @@ import { searchParamsSelector, setError } from '~/store/slices/recipes-slice';
 import { generateTestId } from '~/utils';
 
 const DEFAULT_CARDS_PER_CAROUSEL = 10;
+const MIN_SLIDES_COUNT_FOR_NAV = 4;
 
 export const NewRecipes = () => {
     const dispatch = useAppDispatch();
@@ -26,7 +27,7 @@ export const NewRecipes = () => {
             sortBy: 'createdAt' as const,
             sortOrder: 'desc' as const,
             limit: DEFAULT_CARDS_PER_CAROUSEL,
-            page: 1,
+            page: DEFAULT_PAGE,
         }),
         [searchParams],
     );
@@ -41,10 +42,7 @@ export const NewRecipes = () => {
 
     const newestRecipes = data?.data || [];
 
-    const sortedRecipes = [...newestRecipes].sort(
-        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-    );
-    if (sortedRecipes.length === 0) return;
+    if (newestRecipes.length === 0) return;
 
     return (
         <Box as='section' w='100%' boxSizing='border-box'>
@@ -58,7 +56,7 @@ export const NewRecipes = () => {
                 Новые рецепты
             </Heading>
             <Box pos='relative' data-test-id={DataTestId.Carousel}>
-                {sortedRecipes.length > 0 ? (
+                {newestRecipes.length > 0 ? (
                     <>
                         <Swiper
                             modules={[Navigation]}
@@ -78,7 +76,7 @@ export const NewRecipes = () => {
                                 1536: { slidesPerView: 4, spaceBetween: 18 },
                             }}
                         >
-                            {sortedRecipes.map((recipe, i) => (
+                            {newestRecipes.map((recipe, i) => (
                                 <SwiperSlide
                                     key={recipe._id}
                                     style={{ minHeight: '100%' }}
@@ -91,7 +89,7 @@ export const NewRecipes = () => {
                             ))}
                         </Swiper>
 
-                        {sortedRecipes.length > 3 && (
+                        {newestRecipes.length >= MIN_SLIDES_COUNT_FOR_NAV && (
                             <Box className='swiper-btns'>
                                 <IconButton
                                     data-test-id={DataTestId.CarouselCardBtnBack}

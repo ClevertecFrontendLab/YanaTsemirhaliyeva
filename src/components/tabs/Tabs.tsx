@@ -1,20 +1,12 @@
-import {
-    Box,
-    Button,
-    Center,
-    Grid,
-    Spinner,
-    Tab,
-    TabList,
-    TabPanel,
-    TabPanels,
-    Tabs,
-} from '@chakra-ui/react';
+import { Box, Button, Grid, Tab, TabList, TabPanel, TabPanels, Tabs } from '@chakra-ui/react';
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
 
 import { DEFAULT_CARDS_PER_PAGE } from '~/consts/consts';
-import { useGetRecipesWithFiltersAndPaginateQuery } from '~/query/services/recipes';
+import {
+    useGetRecipesByCategoryWithPaginateQuery,
+    useGetRecipesWithFiltersAndPaginateQuery,
+} from '~/query/services/recipes';
 import { useAppDispatch, useAppSelector } from '~/store/hooks';
 import { categoriesSelector } from '~/store/slices/categories-slice';
 import {
@@ -26,6 +18,7 @@ import {
 } from '~/store/slices/recipes-slice';
 
 import { HorizontalCard } from '../horizontal-card/HorizontalCard';
+import { LoaderFullsize } from '../loader-fullsize/LoaderFullsize';
 
 export const TabsComponent = () => {
     const dispatch = useAppDispatch();
@@ -67,19 +60,51 @@ export const TabsComponent = () => {
         }
     }, [currentSubcategoryId, dispatch, subcategoriesIds]);
 
-    const { data, isLoading } = useGetRecipesWithFiltersAndPaginateQuery(
+    const hasAdditionalFilters = useMemo(
+        () =>
+            !!(
+                searchParams.meat?.length ||
+                searchParams.garnish?.length ||
+                searchParams.allergens?.length ||
+                searchParams.searchString?.length ||
+                false
+            ),
+        [searchParams],
+    );
+
+    const recipesWithFilters = useGetRecipesWithFiltersAndPaginateQuery(
         {
             subcategoriesIds: [currentSubcategoryId],
+            searchString: searchParams.searchString || '',
+            allergens: searchParams.allergens || [],
+            meat: searchParams.meat || [],
+            garnish: searchParams.garnish || [],
+            page,
+            limit: DEFAULT_CARDS_PER_PAGE,
+        },
+        {
+            skip: !currentSubcategoryId || !hasAdditionalFilters,
+            refetchOnMountOrArgChange: true,
+        },
+    );
+
+    const recipesByCategory = useGetRecipesByCategoryWithPaginateQuery(
+        {
+            subCategoryId: currentSubcategoryId,
             searchString: searchParams.searchString || '',
             allergens: searchParams.allergens || [],
             page,
             limit: DEFAULT_CARDS_PER_PAGE,
         },
         {
-            skip: !currentSubcategoryId,
+            skip: !currentSubcategoryId || hasAdditionalFilters,
             refetchOnMountOrArgChange: true,
         },
     );
+
+    const { data, isLoading, isFetching } = hasAdditionalFilters
+        ? recipesWithFilters
+        : recipesByCategory;
 
     const recipesForSubcategory = data?.data || [];
 
@@ -162,10 +187,8 @@ export const TabsComponent = () => {
                         pb={1}
                     >
                         {idx === activeTabIndex ? (
-                            isLoading ? (
-                                <Center p={1}>
-                                    <Spinner color='lime.500' />
-                                </Center>
+                            isLoading || isFetching ? (
+                                <LoaderFullsize isOpen={isLoading || isFetching} />
                             ) : recipesForSubcategory.length > 0 ? (
                                 <Grid
                                     templateColumns={{
