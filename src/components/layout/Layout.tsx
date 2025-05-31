@@ -2,20 +2,14 @@ import { Box, Flex, Hide } from '@chakra-ui/react';
 import { ReactNode, useEffect } from 'react';
 import { useLocation } from 'react-router';
 
-import {
-    ALERT_MESSAGES,
-    AppRoute,
-    DataTestId,
-    DEFAULT_CARDS_PER_PAGE,
-    DEFAULT_PAGE,
-} from '~/consts/consts';
+import { AppRoute, DataTestId } from '~/consts/consts';
 import { useCategoryData } from '~/hooks/use-category-data';
+import { checkAuthTokenForComponent } from '~/query/baseQueryWithReauth';
 import { useGetCategoriesQuery } from '~/query/services/categories';
-import { useGetRecipeByIdQuery, useGetRecipesQuery } from '~/query/services/recipes';
 import { useAppDispatch, useAppSelector } from '~/store/hooks';
+import { alertStatusSelector } from '~/store/slices/alert-slice';
 import { isAuthorizedSelector, isSubmitingFormSelector } from '~/store/slices/auth-slice';
 import { setCategories, setSubCategories } from '~/store/slices/categories-slice';
-import { currentRecipeIdSelector, isFetching } from '~/store/slices/recipes-slice';
 import { saveCategoriesToDB } from '~/utils';
 
 import { AccordionMenu } from '../accordion-menu/AccordionMenu';
@@ -26,8 +20,6 @@ import { Header } from '../header/Header';
 import { LoaderFullsize } from '../loader-fullsize/LoaderFullsize';
 import { UserNav } from '../user-nav/UserNav';
 
-const DEFAULT_SWIPER_SLIDES_COUNT = 10;
-
 type LayoutProps = {
     children: ReactNode;
 };
@@ -35,40 +27,15 @@ type LayoutProps = {
 export const Layout = ({ children }: LayoutProps) => {
     const location = useLocation();
     const dispatch = useAppDispatch();
-    const recipeId = useAppSelector(currentRecipeIdSelector);
-    const isJuiciestFetching = useAppSelector(isFetching);
     const isAuthorized = useAppSelector(isAuthorizedSelector);
     const isAuthDataLoading = useAppSelector(isSubmitingFormSelector);
+    const alertProps = useAppSelector(alertStatusSelector);
 
-    const { data: categoriesData, isLoading: isCategoriesDataLoading } = useGetCategoriesQuery(
-        undefined,
-        { skip: !isAuthorized },
-    );
-    const { data: recipesData, isFetching: isRecipesLoading } = useGetRecipesQuery(
-        {
-            limit: DEFAULT_SWIPER_SLIDES_COUNT,
-            sortBy: 'createdAt',
-        },
-        { skip: !isAuthorized },
-    );
-    const { isFetching: isJuiciestRecipesLoading } = useGetRecipesQuery(
-        {
-            limit: DEFAULT_CARDS_PER_PAGE,
-            sortBy: 'likes',
-            page: DEFAULT_PAGE,
-        },
-        { skip: !isAuthorized },
-    );
-    const { isFetching: isRecipeLoading } = useGetRecipeByIdQuery(recipeId ?? '', {
-        skip: !recipeId || !isAuthorized,
-    });
+    useEffect(() => {
+        checkAuthTokenForComponent(dispatch);
+    }, [dispatch]);
 
-    const isDataLoading =
-        isCategoriesDataLoading ||
-        (isRecipesLoading && !recipesData) ||
-        isRecipeLoading ||
-        isJuiciestRecipesLoading ||
-        isJuiciestFetching;
+    const { data: categoriesData } = useGetCategoriesQuery(undefined, { skip: !isAuthorized });
 
     useEffect(() => {
         if (categoriesData) {
@@ -95,7 +62,7 @@ export const Layout = ({ children }: LayoutProps) => {
                 <Box as='main' display='flex' flexDir='column' flexGrow={1} h='100%'>
                     {children}
                 </Box>
-                <LoaderFullsize isOpen={isAuthDataLoading} />
+                <LoaderFullsize isOpen={isAuthDataLoading} zIndex={1500} />
             </Flex>
         );
     }
@@ -131,11 +98,14 @@ export const Layout = ({ children }: LayoutProps) => {
             >
                 {children}
             </Box>
-            <Hide breakpoint='(max-width: 1200px)'>
-                <Box w='208px' h='100vh' pos='fixed' right='0' pt='72px'>
-                    <UserNav />
-                </Box>
-            </Hide>
+            {location.pathname !== AppRoute.NewRecipe &&
+                !location.pathname.startsWith('/edit-recipe') && (
+                    <Hide breakpoint='(max-width: 1200px)'>
+                        <Box w='208px' h='100vh' pos='fixed' right='0' pt='72px'>
+                            <UserNav />
+                        </Box>
+                    </Hide>
+                )}
             <Box
                 pos='fixed'
                 left='0'
@@ -152,8 +122,12 @@ export const Layout = ({ children }: LayoutProps) => {
             >
                 <Footer />
             </Box>
-            <LoaderFullsize isOpen={isDataLoading} />
-            <AlertComponent {...ALERT_MESSAGES.SERVER_ERROR_LAYOUT} />
+            <AlertComponent
+                title={alertProps.title}
+                status={alertProps.status}
+                desc={alertProps.desc}
+                hasFooter
+            />
         </Flex>
     );
 };

@@ -3,12 +3,13 @@ import { useEffect, useMemo } from 'react';
 import { Link } from 'react-router';
 
 import { HorizontalCard } from '~/components/horizontal-card/HorizontalCard';
-import { AppRoute, DataTestId } from '~/consts/consts';
+import { ALERT_MESSAGES, AppRoute, DataTestId } from '~/consts/consts';
 import { useGetRecipesQuery } from '~/query/services/recipes';
 import { ArrowRightIcon } from '~/shared/custom-icons';
 import { useAppDispatch, useAppSelector } from '~/store/hooks';
+import { setAlertStatus } from '~/store/slices/alert-slice';
 import { categoriesSelector } from '~/store/slices/categories-slice';
-import { searchParamsSelector, setError } from '~/store/slices/recipes-slice';
+import { searchParamsSelector, setIsJuiciestFetching } from '~/store/slices/recipes-slice';
 
 export const JuiciestList = () => {
     const dispatch = useAppDispatch();
@@ -24,11 +25,15 @@ export const JuiciestList = () => {
         [searchParams],
     );
 
-    const { data, isError } = useGetRecipesQuery(params);
+    const { data, isError, isFetching } = useGetRecipesQuery(params);
+
+    useEffect(() => {
+        dispatch(setIsJuiciestFetching(isFetching));
+    }, [dispatch, isFetching]);
 
     useEffect(() => {
         if (isError) {
-            dispatch(setError(true));
+            dispatch(setAlertStatus(ALERT_MESSAGES.SERVER_ERROR));
         }
     }, [dispatch, isError]);
 

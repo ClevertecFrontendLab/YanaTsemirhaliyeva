@@ -62,6 +62,7 @@ export const Header = () => {
                     h='auto'
                     mr={{ md: '128px' }}
                     onClick={handleReset}
+                    data-test-id={DataTestId.HeaderLogo}
                 >
                     <Show above='2xs'>
                         <Image src={LogoFullImg} alt='logo' />

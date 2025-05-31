@@ -6,31 +6,36 @@ import { CaloricContent } from '~/components/caloric-content/CaloricContent';
 import { CookSteps } from '~/components/cook-steps/CookSteps';
 import { FullSizeCard } from '~/components/full-size-card/FullSizeCard';
 import { Ingredients } from '~/components/ingredients/Ingredients';
+import { LoaderFullsize } from '~/components/loader-fullsize/LoaderFullsize';
 import { NewRecipes } from '~/components/new-recipes/NewRecipes';
 import { RecipeAuthor } from '~/components/recipe-author/RecipeAuthor';
+import { ALERT_MESSAGES } from '~/consts/consts';
 import { useGetRecipeByIdQuery } from '~/query/services/recipes';
-import { useAppDispatch } from '~/store/hooks';
-import { setError, setRecipeId, setRecipeTitle } from '~/store/slices/recipes-slice';
+import { useAppDispatch, useAppSelector } from '~/store/hooks';
+import { setAlertStatus } from '~/store/slices/alert-slice';
+import { isAuthorizedSelector } from '~/store/slices/auth-slice';
+import { setRecipeId, setRecipeTitle } from '~/store/slices/recipes-slice';
 
 export const RecipePage = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
+    const isAuthorized = useAppSelector(isAuthorizedSelector);
+
     useEffect(() => {
         if (id) {
             dispatch(setRecipeId(id));
         }
     });
 
-    const { data, error, isError } = useGetRecipeByIdQuery(id ?? '', {
-        skip: !id,
-        refetchOnMountOrArgChange: true,
+    const { data, error, isError, isFetching } = useGetRecipeByIdQuery(id ?? '', {
+        skip: !id || !isAuthorized,
     });
 
     useEffect(() => {
         if (isError && !data) {
             navigate(-1);
-            dispatch(setError(true));
+            dispatch(setAlertStatus(ALERT_MESSAGES.SERVER_ERROR));
         }
     }, [isError, data, navigate, dispatch]);
 
@@ -73,6 +78,7 @@ export const RecipePage = () => {
             <Box pl={{ base: 4, xl: 6 }} pr={{ xl: 12 }}>
                 <NewRecipes />
             </Box>
+            <LoaderFullsize isOpen={isFetching} />
         </Box>
     );
 };

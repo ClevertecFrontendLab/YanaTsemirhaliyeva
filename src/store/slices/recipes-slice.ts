@@ -47,9 +47,10 @@ export type RecipeState = {
     searchQuery: string;
     isDrawerOpen: boolean;
     searchQueryParams: SearchQueryParams;
-    isError: boolean;
     isSearchTriggered: boolean;
-    isFetching: boolean;
+    isSliderFetching: boolean;
+    isJuiciestFetching: boolean;
+    isRelevantFetching: boolean;
 };
 
 // Дефолтные значения для параметров поиска
@@ -82,9 +83,10 @@ const initialState: RecipeState = {
     searchQuery: '',
     isDrawerOpen: false,
     searchQueryParams: defaultSearchParams,
-    isError: false,
     isSearchTriggered: false,
-    isFetching: false,
+    isSliderFetching: false,
+    isJuiciestFetching: false,
+    isRelevantFetching: false,
 };
 
 // Вспомогательные функции
@@ -154,8 +156,6 @@ export const recipeSlice = createSlice({
         },
         applyFilters(state) {
             state.appliedFilters = JSON.parse(JSON.stringify(state.selectedFilters));
-
-            // Отображение выбранных фильтров на параметры поиска
             const allergens = formatAllergensForUrl(getAllergens(state));
 
             state.searchQueryParams = {
@@ -192,17 +192,17 @@ export const recipeSlice = createSlice({
         setDrawerStatus(state, action: PayloadAction<boolean>) {
             state.isDrawerOpen = action.payload;
         },
-        setError: (state, action: PayloadAction<boolean>) => {
-            state.isError = action.payload;
-        },
-        clearError: (state) => {
-            state.isError = false;
-        },
         setIsSearchTriggered: (state, action: PayloadAction<boolean>) => {
             state.isSearchTriggered = action.payload;
         },
-        setIsFetching: (state, action: PayloadAction<boolean>) => {
-            state.isFetching = action.payload;
+        setIsSliderFetching: (state, action: PayloadAction<boolean>) => {
+            state.isSliderFetching = action.payload;
+        },
+        setIsJuiciestFetching: (state, action: PayloadAction<boolean>) => {
+            state.isJuiciestFetching = action.payload;
+        },
+        setIsRelevantFetching: (state, action: PayloadAction<boolean>) => {
+            state.isRelevantFetching = action.payload;
         },
         resetState: () => initialState,
     },
@@ -227,10 +227,10 @@ export const {
     clearSearch,
     setDrawerStatus,
     updateSearchParams,
-    setError,
-    clearError,
     setIsSearchTriggered,
-    setIsFetching,
+    setIsSliderFetching,
+    setIsJuiciestFetching,
+    setIsRelevantFetching,
     applyIntroAllergens,
     resetState,
 } = recipeSlice.actions;
@@ -259,8 +259,9 @@ export const selectors = {
 
     // UI состояние
     drawerStatus: (state: ApplicationState) => state.recipes.isDrawerOpen,
-    isError: (state: ApplicationState) => state.recipes.isError,
-    isFetching: (state: ApplicationState) => state.recipes.isFetching,
+    isSliderFetching: (state: ApplicationState) => state.recipes.isSliderFetching,
+    isJuiciestFetching: (state: ApplicationState) => state.recipes.isJuiciestFetching,
+    isRelevantFetching: (state: ApplicationState) => state.recipes.isRelevantFetching,
 };
 
 // Для обратной совместимости - индивидуальные селекторы
@@ -276,9 +277,10 @@ export const selectedFiltersSelector = selectors.selectedFilters;
 export const serchInputSelector = selectors.searchQuery;
 export const drawerStatusSelector = selectors.drawerStatus;
 export const searchParamsSelector = selectors.searchParams;
-export const isErrorSelector = selectors.isError;
 export const isSearchTriggeredSelector = selectors.isSearchTriggered;
-export const isFetching = selectors.isFetching;
+export const isSliderFetchingSelector = selectors.isSliderFetching;
+export const isJuiciestFetchingSelector = selectors.isJuiciestFetching;
+export const isRelevantFetchingSelector = selectors.isRelevantFetching;
 
 // Редьюсер
 export default recipeSlice.reducer;

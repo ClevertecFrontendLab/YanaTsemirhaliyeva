@@ -24,7 +24,7 @@ import { RegisterFormValues, registerSchema } from '~/schemas/auth.schema';
 import { useAppDispatch, useAppSelector } from '~/store/hooks';
 import {
     isVerificationExpiredSelector,
-    setAlertStatus,
+    setAuthAlertStatus,
     setIsAuthModalOpen,
     setIsSubmitingform,
     setIsVerificationExpired,
@@ -132,7 +132,7 @@ export const RegisterForm = () => {
 
                 if (errorMessage) {
                     dispatch(
-                        setAlertStatus({
+                        setAuthAlertStatus({
                             status: 'error',
                             isError: true,
                             title: errorMessage,
@@ -142,7 +142,7 @@ export const RegisterForm = () => {
                     return;
                 }
             }
-            dispatch(setAlertStatus(ALERT_MESSAGES.SERVER_ERROR));
+            dispatch(setAuthAlertStatus(ALERT_MESSAGES.SERVER_ERROR));
         } finally {
             dispatch(setIsSubmitingform(false));
         }
@@ -346,7 +346,6 @@ export const RegisterForm = () => {
                 onClose={setIsRegistrationSuccess}
                 email={formValues.email}
             />
-
             <VerificationExpiredModal isOpen={isErrorModalOpen} onClose={handleModalClose} />
         </>
     );

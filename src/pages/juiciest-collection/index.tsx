@@ -4,11 +4,13 @@ import { useEffect, useState } from 'react';
 import { CategoryHighlight } from '~/components/category-highlight/CategoryHighlight';
 import { HorizontalCard } from '~/components/horizontal-card/HorizontalCard';
 import { Intro } from '~/components/intro/Intro';
-import { DataTestId, DEFAULT_PAGE } from '~/consts/consts';
+import { LoaderFullsize } from '~/components/loader-fullsize/LoaderFullsize';
+import { ALERT_MESSAGES, DataTestId, DEFAULT_PAGE } from '~/consts/consts';
 import { useGetPaginatedRecipesQuery } from '~/query/services/recipes';
 import { useAppDispatch, useAppSelector } from '~/store/hooks';
+import { setAlertStatus } from '~/store/slices/alert-slice';
 import { categoriesSelector } from '~/store/slices/categories-slice';
-import { searchParamsSelector, setError, setIsFetching } from '~/store/slices/recipes-slice';
+import { searchParamsSelector } from '~/store/slices/recipes-slice';
 
 const CARDS_PER_PAGE = 8;
 
@@ -33,13 +35,9 @@ export const JuiciestCollection = () => {
 
     useEffect(() => {
         if (isError) {
-            dispatch(setError(true));
+            dispatch(setAlertStatus(ALERT_MESSAGES.SERVER_ERROR));
         }
     }, [dispatch, isError]);
-
-    useEffect(() => {
-        dispatch(setIsFetching(isLoading));
-    }, [dispatch, isLoading]);
 
     const handleLoadMore = () => {
         setPage((prevPage) => prevPage + 1);
@@ -113,6 +111,7 @@ export const JuiciestCollection = () => {
                 </Box>
             )}
             <CategoryHighlight isDivider />
+            <LoaderFullsize isOpen={isFetching || isLoading} />
         </Box>
     );
 };

@@ -1,6 +1,6 @@
 import { FetchBaseQueryError } from '@reduxjs/toolkit/query';
 
-import { setAlertStatus } from '~/store/slices/auth-slice';
+import { setAuthAlertStatus } from '~/store/slices/auth-slice';
 import { getErrorMessage } from '~/utils';
 
 import { baseApiSlice } from '../base-api';
@@ -38,20 +38,18 @@ export const authApiSlice = baseApiSlice
                 async onQueryStarted(_, { dispatch, queryFulfilled }) {
                     try {
                         const result = await queryFulfilled;
-                        // Получаем заголовок Authentication-Access из ответа
                         const responseHeaders = (result.meta as { response?: Response })?.response
                             ?.headers;
                         const accessToken = responseHeaders?.get('Authentication-Access');
 
                         if (accessToken) {
-                            // Сохраняем токен в localStorage
-                            localStorage.setItem('accessToken', accessToken);
+                            localStorage.setItem('yeedaaToken', accessToken);
                         }
                     } catch (error) {
                         const errorMessage = getErrorMessage(error);
 
                         dispatch(
-                            setAlertStatus({
+                            setAuthAlertStatus({
                                 status: 'error',
                                 isError: true,
                                 title: errorMessage,

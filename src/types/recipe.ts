@@ -1,12 +1,12 @@
 export type Step = {
     stepNumber: number;
     description: string;
-    image: string;
+    image: string | null;
 };
 
 export type Ingredient = {
     title: string;
-    count: string;
+    count: number;
     measureUnit: string;
 };
 
@@ -44,4 +44,20 @@ export type Recipe = {
     bookmarks: number;
     createdAt: string;
     authorData: AuthorData;
+};
+
+export type NewRecipeRequest = {
+    title: string;
+    description: string;
+    time: number;
+    categoriesIds: string[];
+    portions: number;
+    image: string;
+    steps: Step[];
+    ingredients: Ingredient[];
+};
+
+export type MeasureUnit = {
+    _id: string;
+    name: string;
 };

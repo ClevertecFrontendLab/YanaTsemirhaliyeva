@@ -9,6 +9,7 @@ import {
     ModalFooter,
     ModalOverlay,
     Text,
+    useBreakpointValue,
 } from '@chakra-ui/react';
 import { Link as RouterLink, useNavigate } from 'react-router';
 
@@ -24,6 +25,8 @@ type RegisterSuccessProps = {
 
 export const RegisterSuccessModal = ({ isOpen, onClose, email }: RegisterSuccessProps) => {
     const navigate = useNavigate();
+    const isMobile = useBreakpointValue({ base: true, md: false });
+
     const handleCloseClick = () => {
         onClose(false);
         navigate(AppRoute.Login);
@@ -56,9 +59,10 @@ export const RegisterSuccessModal = ({ isOpen, onClose, email }: RegisterSuccess
                         lineHeight='1.3'
                         pt='10px'
                     >
-                        Остался последний шаг.
-                        <br style={{ display: window.innerWidth >= 1200 ? 'none' : 'block' }} />
-                        Нужно верифицировать ваш e-mail
+                        Остался последний шаг. Нужно верифицировать
+                        <Text as='span' whiteSpace='nowrap' display='inline-block'>
+                            &nbsp;ваш e-mail
+                        </Text>
                     </Heading>
                     <Text textAlign='center' color='blackAlpha.900'>
                         Мы отправили вам на почту
@@ -71,12 +75,12 @@ export const RegisterSuccessModal = ({ isOpen, onClose, email }: RegisterSuccess
                 <ModalFooter p={0} pt={2}>
                     <Text textAlign='center' color='blackAlpha.600' fontSize={12}>
                         Не пришло письмо?
-                        <br style={{ display: window.innerWidth >= 1200 ? 'none' : 'block' }} />
-                        Проверьте папку Спам.
+                        {isMobile && <br />}
+                        &nbsp;Проверьте папку Спам.&nbsp;
                         <br /> По другим вопросам свяжитесь&nbsp;
-                        <br style={{ display: window.innerWidth >= 1200 ? 'none' : 'block' }} />
+                        {isMobile && <br />}
                         <Link as={RouterLink} to='#'>
-                            с &nbsp;поддержкой
+                            с&nbsp;поддержкой
                         </Link>
                     </Text>
                 </ModalFooter>

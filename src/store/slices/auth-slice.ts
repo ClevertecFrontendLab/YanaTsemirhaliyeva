@@ -18,7 +18,7 @@ export type AuthState = {
 };
 
 const initialState: AuthState = {
-    isAuthorized: Boolean(localStorage.getItem('accessToken')),
+    isAuthorized: Boolean(localStorage.getItem('yeedaaToken')),
     alertStatus: { status: 'error', title: '', isError: false, desc: '' },
     isVerificationExpired: false,
     isSubmitingForm: false,
@@ -34,9 +34,9 @@ export const authSlice = createSlice({
         },
         logout: (state) => {
             state.isAuthorized = false;
-            localStorage.removeItem('accessToken');
+            localStorage.removeItem('yeedaaToken');
         },
-        setAlertStatus: (state, action: PayloadAction<Alert>) => {
+        setAuthAlertStatus: (state, action: PayloadAction<Alert>) => {
             state.alertStatus = action.payload;
         },
         setIsVerificationExpired: (state, action: PayloadAction<boolean>) => {
@@ -55,7 +55,7 @@ export const authSlice = createSlice({
 export const {
     login,
     logout,
-    setAlertStatus,
+    setAuthAlertStatus,
     setIsVerificationExpired,
     setIsSubmitingform,
     setIsAuthModalOpen,
@@ -65,7 +65,7 @@ export const {
 export const isAuthorizedSelector = (state: ApplicationState) => state.auth.isAuthorized;
 export const isVerificationExpiredSelector = (state: ApplicationState) =>
     state.auth.isVerificationExpired;
-export const alertStatusSelector = (state: ApplicationState) => state.auth.alertStatus;
+export const alertAuthStatusSelector = (state: ApplicationState) => state.auth.alertStatus;
 export const isSubmitingFormSelector = (state: ApplicationState) => state.auth.isSubmitingForm;
 export const isAuthModalOpenSelector = (state: ApplicationState) => state.auth.isAuthModalOpen;
 

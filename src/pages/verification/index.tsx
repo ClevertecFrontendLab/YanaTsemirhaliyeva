@@ -4,7 +4,7 @@ import { Navigate, useLocation } from 'react-router';
 import { ALERT_MESSAGES, AppRoute } from '~/consts/consts';
 import { useAppDispatch } from '~/store/hooks';
 import {
-    setAlertStatus,
+    setAuthAlertStatus,
     setIsAuthModalOpen,
     setIsVerificationExpired,
 } from '~/store/slices/auth-slice';
@@ -21,7 +21,7 @@ export const VerificationPage = () => {
             dispatch(setIsVerificationExpired(true));
             dispatch(setIsAuthModalOpen(true));
         } else {
-            dispatch(setAlertStatus(ALERT_MESSAGES.VERIFICATION_SUCCESS));
+            dispatch(setAuthAlertStatus(ALERT_MESSAGES.VERIFICATION_SUCCESS));
         }
     }, [emailVerified, dispatch]);
 

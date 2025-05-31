@@ -84,7 +84,6 @@ export const TabsComponent = () => {
         },
         {
             skip: !currentSubcategoryId || !hasAdditionalFilters,
-            refetchOnMountOrArgChange: true,
         },
     );
 
@@ -98,13 +97,10 @@ export const TabsComponent = () => {
         },
         {
             skip: !currentSubcategoryId || hasAdditionalFilters,
-            refetchOnMountOrArgChange: true,
         },
     );
 
-    const { data, isLoading, isFetching } = hasAdditionalFilters
-        ? recipesWithFilters
-        : recipesByCategory;
+    const { data, isFetching } = hasAdditionalFilters ? recipesWithFilters : recipesByCategory;
 
     const recipesForSubcategory = data?.data || [];
 
@@ -187,8 +183,8 @@ export const TabsComponent = () => {
                         pb={1}
                     >
                         {idx === activeTabIndex ? (
-                            isLoading || isFetching ? (
-                                <LoaderFullsize isOpen={isLoading || isFetching} />
+                            isFetching ? (
+                                <LoaderFullsize isOpen={isFetching} />
                             ) : recipesForSubcategory.length > 0 ? (
                                 <Grid
                                     templateColumns={{

@@ -23,7 +23,7 @@ import { INPUT_STYLES } from '~/consts/styles';
 import { useForgotPasswordMutation } from '~/query/services/auth';
 import { PasswordRecoveryFormValues, passwordRecoverySchema } from '~/schemas/auth.schema';
 import { useAppDispatch } from '~/store/hooks';
-import { setAlertStatus } from '~/store/slices/auth-slice';
+import { setAuthAlertStatus } from '~/store/slices/auth-slice';
 
 import { BORDER_COLOR_STYLES, BUTTON_STYLES, MODAL_CLOSE_BUTTON_STYLES } from './consts';
 
@@ -68,10 +68,10 @@ export const PasswordRecoveryModal = ({ isOpen, onClose, onSubmit }: PasswordRec
 
             if (apiError.status === 403) {
                 setValue('email', '');
-                dispatch(setAlertStatus(ALERT_MESSAGES.EMAIL_NOT_FOUND));
+                dispatch(setAuthAlertStatus(ALERT_MESSAGES.EMAIL_NOT_FOUND));
             } else {
                 reset();
-                dispatch(setAlertStatus(ALERT_MESSAGES.SERVER_ERROR));
+                dispatch(setAuthAlertStatus(ALERT_MESSAGES.SERVER_ERROR));
             }
         }
     };

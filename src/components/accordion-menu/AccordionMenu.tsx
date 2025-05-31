@@ -23,8 +23,6 @@ import {
 } from '~/store/slices/recipes-slice';
 import { Category, SubCategory } from '~/types/category';
 
-import { Loader } from '../loader/Loader';
-
 export const AccordionMenu = () => {
     const currentCategory = useAppSelector(currentCategorySelector);
     const currentSubcategory = useAppSelector(currentSubcategorySelector);
@@ -47,7 +45,7 @@ export const AccordionMenu = () => {
     const { isLoading: isCategoriesDataLoading } = useGetCategoriesQuery();
 
     if (isCategoriesDataLoading || !categories.length) {
-        return <Loader boxSize={80} />;
+        return null;
     }
 
     const handleCategoryClick = (category: Category, subCategory: SubCategory) => {

@@ -7,11 +7,12 @@ import { Navigation } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 
 import { VerticalCard } from '~/components/vertical-card/VerticalCard';
-import { DataTestId, DEFAULT_PAGE } from '~/consts/consts';
+import { ALERT_MESSAGES, DataTestId } from '~/consts/consts';
 import { useGetRecipesQuery } from '~/query/services/recipes';
 import { ArrowRightIcon } from '~/shared/custom-icons';
 import { useAppDispatch, useAppSelector } from '~/store/hooks';
-import { searchParamsSelector, setError } from '~/store/slices/recipes-slice';
+import { setAlertStatus } from '~/store/slices/alert-slice';
+import { searchParamsSelector, setIsSliderFetching } from '~/store/slices/recipes-slice';
 import { generateTestId } from '~/utils';
 
 const DEFAULT_CARDS_PER_CAROUSEL = 10;
@@ -27,16 +28,19 @@ export const NewRecipes = () => {
             sortBy: 'createdAt' as const,
             sortOrder: 'desc' as const,
             limit: DEFAULT_CARDS_PER_CAROUSEL,
-            page: DEFAULT_PAGE,
         }),
         [searchParams],
     );
 
-    const { data, isError } = useGetRecipesQuery(queryParams);
+    const { data, isError, isFetching } = useGetRecipesQuery(queryParams);
+
+    useEffect(() => {
+        dispatch(setIsSliderFetching(isFetching));
+    }, [dispatch, isFetching]);
 
     useEffect(() => {
         if (isError) {
-            dispatch(setError(true));
+            dispatch(setAlertStatus(ALERT_MESSAGES.SERVER_ERROR));
         }
     }, [dispatch, isError]);
 

@@ -4,15 +4,16 @@ import { useEffect, useRef, useState } from 'react';
 import { ALERT_MESSAGES } from '~/consts/consts';
 import { useGetRecipesByCategoryQuery } from '~/query/services/recipes';
 import { useAppDispatch, useAppSelector } from '~/store/hooks';
-import { setAlertStatus } from '~/store/slices/auth-slice';
+import { setAlertStatus } from '~/store/slices/alert-slice';
 import { categoriesSelector } from '~/store/slices/categories-slice';
-import { currentCategorySelector } from '~/store/slices/recipes-slice';
+import { currentCategorySelector, setIsRelevantFetching } from '~/store/slices/recipes-slice';
 import { Category } from '~/types/category';
 
 import { NarrowCard } from '../narrow-card/NarrowCard';
 import { SimpleCard } from '../simple-card/SimpleCard';
 
 const LIMIT_CARDS_VALUE = 5;
+const LIMIT_LEFT_SIDE_CARDS = 2;
 
 type CategoryHighlightProps = {
     isDivider?: boolean;
@@ -38,7 +39,7 @@ export const CategoryHighlight = ({ isDivider = false }: CategoryHighlightProps)
         setRandomCategory(newRandomCategory);
     }, [currentCategory?.category, categories]);
 
-    const { data, isError, error } = useGetRecipesByCategoryQuery(
+    const { data, isError, error, isFetching } = useGetRecipesByCategoryQuery(
         {
             subCategoryId: randomCategory?.subCategories[0]?._id ?? '',
             limit: LIMIT_CARDS_VALUE,
@@ -49,14 +50,18 @@ export const CategoryHighlight = ({ isDivider = false }: CategoryHighlightProps)
     );
 
     useEffect(() => {
+        dispatch(setIsRelevantFetching(isFetching));
+    }, [dispatch, isFetching]);
+
+    useEffect(() => {
         if (isError || error) {
-            dispatch(setAlertStatus(ALERT_MESSAGES.SERVER_ERROR));
+            dispatch(setAlertStatus(ALERT_MESSAGES.SERVER_ERROR_LAYOUT));
         }
     }, [dispatch, error, isError]);
 
     if (!randomCategory || !data?.data) return null;
-    const recipesLeft = [...data.data].slice(0, 2);
-    const recipesRight = [...data.data].slice(2, 5);
+    const recipesLeft = [...data.data].slice(0, LIMIT_LEFT_SIDE_CARDS);
+    const recipesRight = [...data.data].slice(LIMIT_LEFT_SIDE_CARDS, LIMIT_CARDS_VALUE);
 
     return (
         <Box as='section'>
