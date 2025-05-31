@@ -62,7 +62,7 @@ export const Layout = ({ children }: LayoutProps) => {
                 <Box as='main' display='flex' flexDir='column' flexGrow={1} h='100%'>
                     {children}
                 </Box>
-                <LoaderFullsize isOpen={isAuthDataLoading} />
+                <LoaderFullsize isOpen={isAuthDataLoading} zIndex={1500} />
             </Flex>
         );
     }

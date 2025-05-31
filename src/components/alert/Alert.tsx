@@ -13,7 +13,6 @@ import { DataTestId } from '~/consts/consts';
 import { useAppDispatch, useAppSelector } from '~/store/hooks';
 import { alertStatusSelector, setAlertStatus } from '~/store/slices/alert-slice';
 import { alertAuthStatusSelector, setAuthAlertStatus } from '~/store/slices/auth-slice';
-// import { clearError, isErrorSelector } from '~/store/slices/recipes-slice';
 
 const DEFAULT_ALERT_STATUS = {
     status: 'error' as const,

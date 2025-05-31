@@ -16,7 +16,7 @@ import {
     useOutsideClick,
 } from '@chakra-ui/react';
 import { useEffect, useRef, useState } from 'react';
-import { Controller, useFormContext } from 'react-hook-form'; // Добавляем импорт
+import { Controller, useFormContext } from 'react-hook-form';
 
 import { DataTestId } from '~/consts/consts';
 import { getFieldStyles } from '~/pages/new-recipe/styles';

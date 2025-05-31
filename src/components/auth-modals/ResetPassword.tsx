@@ -26,7 +26,7 @@ import { useResetPasswordMutation } from '~/query/services/auth';
 import { ResetPasswordParams } from '~/query/types/authApi.types';
 import { resetPasswordSchema } from '~/schemas/auth.schema';
 import { useAppDispatch } from '~/store/hooks';
-import { setAuthAlertStatus } from '~/store/slices/auth-slice';
+import { setAuthAlertStatus, setIsSubmitingform } from '~/store/slices/auth-slice';
 
 import { LoaderFullsize } from '../loader-fullsize/LoaderFullsize';
 import {
@@ -68,6 +68,7 @@ export const ResetPasswordModal = ({ isOpen, onClose, email }: ResetPasswordProp
     }, [email, setValue]);
 
     const handleResetPasswordSubmit = async (data: ResetPasswordParams) => {
+        dispatch(setIsSubmitingform(true));
         try {
             data.email = email;
             await resetPassword(data).unwrap();
@@ -75,6 +76,8 @@ export const ResetPasswordModal = ({ isOpen, onClose, email }: ResetPasswordProp
             onClose(false);
         } catch {
             dispatch(setAuthAlertStatus(ALERT_MESSAGES.SERVER_ERROR));
+        } finally {
+            dispatch(setIsSubmitingform(false));
         }
     };
 

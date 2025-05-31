@@ -6,11 +6,13 @@ import { Loader } from '../loader/Loader';
 
 type LoaderFullsizeProps = {
     isOpen: boolean;
+    zIndex?: number;
     overlayColor?: ModalOverlayProps['bgColor'];
 };
 
 export const LoaderFullsize = ({
     isOpen,
+    zIndex = 10,
     overlayColor = 'blackAlpha.600',
 }: LoaderFullsizeProps) => {
     const isMobileWidth = useBreakpointValue({ base: true, md: false }) ?? true;
@@ -22,7 +24,7 @@ export const LoaderFullsize = ({
             left={0}
             h='100vh'
             w='100vw'
-            zIndex='10'
+            zIndex={zIndex}
             backdropFilter='blur(4px)'
             bgColor={overlayColor}
         >
