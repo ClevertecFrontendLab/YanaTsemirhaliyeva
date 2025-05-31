@@ -8,6 +8,7 @@ import {
     Flex,
     Heading,
     HStack,
+    IconButton,
     Image,
     Show,
     Spacer,
@@ -16,22 +17,81 @@ import {
     TagLabel,
     Text,
 } from '@chakra-ui/react';
+import { useOptimistic } from 'react';
+import { useNavigate, useParams } from 'react-router';
 
-import { API_IMG } from '~/consts/consts';
-import { BookmarkIcon, HappyFaceIcon, TimeIcon } from '~/shared/custom-icons';
-import { useAppSelector } from '~/store/hooks';
+import { ALERT_MESSAGES, API_IMG, AppRoute, DataTestId } from '~/consts/consts';
+import { useDeleteRecipeMutation } from '~/query/services/new-recipe';
+import { useBookmarkRecipeMutation, useLikeRecipeMutation } from '~/query/services/recipes';
+import {
+    BookmarkIcon,
+    HappyFaceIcon,
+    TimeIcon,
+    WastebasketIcon,
+    WriteDraftIcon,
+} from '~/shared/custom-icons';
+import { useAppDispatch, useAppSelector } from '~/store/hooks';
+import { setAlertStatus } from '~/store/slices/alert-slice';
 import { categoriesSelector } from '~/store/slices/categories-slice';
 import { Recipe } from '~/types/recipe';
 import { getUniqueCategories } from '~/utils';
+import { decodeToken } from '~/utils/jwt-decode';
 
 type FullSizeCardProps = {
     item: Recipe;
 };
 
 export const FullSizeCard = ({ item }: FullSizeCardProps) => {
-    const { title, bookmarks, image, likes, time, description, categoriesIds } = item;
+    const navigate = useNavigate();
+    const dispatch = useAppDispatch();
+    const { _id, title, bookmarks, image, likes, time, description, categoriesIds, authorId } =
+        item;
     const categories = useAppSelector(categoriesSelector);
     const uniqueCategories = getUniqueCategories(categories, categoriesIds);
+    const token = localStorage.getItem('yeedaaToken');
+    const userData = decodeToken(token);
+    const isRecipeCreateByCurrentUser = userData?.userId === authorId;
+    const { category, subcategory, id } = useParams();
+    const [optimisticLikes, setOptimisticLikes] = useOptimistic(likes);
+    const [optimisticBookmarks, setOptimisticBookmarks] = useOptimistic(bookmarks);
+    const [likeRecipe] = useLikeRecipeMutation();
+    const [bookmarkRecipe] = useBookmarkRecipeMutation();
+
+    const handleEditClick = () => {
+        navigate(`/edit-recipe/${category}/${subcategory}/${id}`);
+    };
+
+    const [deleteRecipe, { isLoading }] = useDeleteRecipeMutation();
+
+    const handleDeleteRecipe = async () => {
+        try {
+            await deleteRecipe(_id).unwrap();
+            navigate(AppRoute.Index, { replace: true });
+            dispatch(setAlertStatus(ALERT_MESSAGES.RECIPE_DELETE_SUCCESS));
+        } catch {
+            dispatch(setAlertStatus(ALERT_MESSAGES.RECIPE_DELETE_ERROR));
+        }
+    };
+
+    const handleLike = async () => {
+        setOptimisticLikes((prev) => prev + 1);
+        try {
+            await likeRecipe(_id).unwrap();
+        } catch {
+            setOptimisticLikes((prev) => prev - 1);
+            dispatch(setAlertStatus(ALERT_MESSAGES.SERVER_ERROR));
+        }
+    };
+
+    const handleBookmark = async () => {
+        setOptimisticBookmarks((prev) => prev + 1);
+        try {
+            await bookmarkRecipe(_id).unwrap();
+        } catch {
+            setOptimisticBookmarks((prev) => prev - 1);
+            dispatch(setAlertStatus(ALERT_MESSAGES.SERVER_ERROR));
+        }
+    };
 
     return (
         <Card
@@ -90,17 +150,17 @@ export const FullSizeCard = ({ item }: FullSizeCardProps) => {
                         pr={2}
                         alignSelf='baseline'
                     >
-                        {bookmarks && (
+                        {optimisticBookmarks && (
                             <HStack gap={1}>
                                 <BookmarkIcon color='black' />
-                                <Box as='span'>{bookmarks}</Box>
+                                <Box as='span'>{optimisticBookmarks}</Box>
                             </HStack>
                         )}
 
-                        {likes && (
+                        {optimisticLikes && (
                             <HStack alignItems='center' gap={1}>
                                 <HappyFaceIcon color='black' />
-                                <Box as='span'>{likes}</Box>
+                                <Box as='span'>{optimisticLikes}</Box>
                             </HStack>
                         )}
                     </HStack>
@@ -149,66 +209,111 @@ export const FullSizeCard = ({ item }: FullSizeCardProps) => {
                     <Show above='2xs'>
                         <Spacer />
                     </Show>
-                    <Stack direction='row' spacing={2}>
-                        <Button
-                            size={{ base: 'xs', sm: 'sm', xl: 'lg' }}
-                            px={{ base: 2, sm: 3 }}
-                            leftIcon={
-                                <HappyFaceIcon
-                                    boxSize={{ base: 3, sm: 4 }}
-                                    sx={{
-                                        transition: 'fill 0.3s ease-in-out',
-                                        fill: 'currentColor',
-                                        '&:hover': {
-                                            fill: 'lime.600',
-                                        },
-                                    }}
-                                />
-                            }
-                            colorScheme='black'
-                            variant='outline'
-                            fontSize={{ base: 12, sm: 16, xl: 14 }}
-                            sx={{
-                                transition: 'all 0.3s ease-in-out',
-                                '&:focus': {
-                                    outline: 'none',
-                                    borderColor: 'transparent',
-                                },
-                                '&:hover': {
-                                    bgColor: 'lime.600',
-                                    color: 'white',
-                                    borderColor: 'lime.600',
-                                },
-                            }}
-                        >
-                            Оценить рецепт
-                        </Button>
-                        <Button
-                            size={{ base: 'sx', sm: 'sm', xl: 'lg' }}
-                            leftIcon={<BookmarkIcon />}
-                            colorScheme='black'
-                            variant='solid'
-                            bgColor='lime.400'
-                            color='black'
-                            fontWeight={600}
-                            fontSize={{ base: 12, sm: 16, xl: 14 }}
-                            px={{ base: 2, sm: 3 }}
-                            sx={{
-                                transition: 'all 0.3s ease-in-out',
-                                '&:focus': {
-                                    outline: 'none',
-                                    borderColor: 'transparent',
-                                },
-                                '&:hover': {
-                                    bgColor: 'white',
-                                    color: 'black',
-                                    borderColor: 'black',
-                                },
-                            }}
-                        >
-                            Сохранить в закладки
-                        </Button>
-                    </Stack>
+                    {!isRecipeCreateByCurrentUser && (
+                        <Stack direction='row' spacing={2} alignItems='center'>
+                            <Button
+                                size={{ base: 'xs', sm: 'sm', xl: 'lg' }}
+                                px={{ base: 2, sm: 3 }}
+                                leftIcon={
+                                    <HappyFaceIcon
+                                        boxSize={{ base: 3, sm: 4 }}
+                                        sx={{
+                                            transition: 'fill 0.3s ease-in-out',
+                                            fill: 'currentColor',
+                                            '&:hover': {
+                                                fill: 'lime.600',
+                                            },
+                                        }}
+                                    />
+                                }
+                                colorScheme='black'
+                                variant='outline'
+                                fontSize={{ base: 12, sm: 16, xl: 14 }}
+                                sx={{
+                                    transition: 'all 0.3s ease-in-out',
+                                    '&:focus': {
+                                        outline: 'none',
+                                        borderColor: 'transparent',
+                                    },
+                                    '&:hover': {
+                                        bgColor: 'lime.600',
+                                        color: 'white',
+                                        borderColor: 'lime.600',
+                                    },
+                                }}
+                                onClick={handleLike}
+                            >
+                                Оценить рецепт
+                            </Button>
+                            <Button
+                                size={{ base: 'sx', sm: 'sm', xl: 'lg' }}
+                                leftIcon={<BookmarkIcon />}
+                                colorScheme='black'
+                                variant='solid'
+                                bgColor='lime.400'
+                                color='black'
+                                fontWeight={600}
+                                fontSize={{ base: 12, sm: 16, xl: 14 }}
+                                p={1}
+                                px={{ base: 2, sm: 3 }}
+                                sx={{
+                                    transition: 'all 0.3s ease-in-out',
+                                    '&:focus': {
+                                        outline: 'none',
+                                        borderColor: 'transparent',
+                                    },
+                                    '&:hover': {
+                                        bgColor: 'white',
+                                        color: 'black',
+                                        borderColor: 'black',
+                                    },
+                                }}
+                                onClick={handleBookmark}
+                            >
+                                Сохранить в закладки
+                            </Button>
+                        </Stack>
+                    )}
+                    {isRecipeCreateByCurrentUser && (
+                        <Stack direction='row' spacing={2} alignItems='center'>
+                            <IconButton
+                                onClick={handleDeleteRecipe}
+                                icon={<WastebasketIcon />}
+                                color='black'
+                                bgColor='transparent'
+                                boxSize={8}
+                                minW={8}
+                                aria-label='Удалить рецепт'
+                                isLoading={isLoading}
+                                data-test-id={DataTestId.RecipeDeleteBtn}
+                            />
+                            <Button
+                                size={{ base: 'sx', sm: 'sm', xl: 'lg' }}
+                                leftIcon={<WriteDraftIcon boxSize={4} />}
+                                colorScheme='black'
+                                variant='outline'
+                                color='blackAlpha.800'
+                                borderColor='blackAlpha.800'
+                                fontSize={{ base: 12, md: 18 }}
+                                p='3px'
+                                onClick={handleEditClick}
+                                sx={{
+                                    transition: 'all 0.3s ease-in-out',
+                                    '&:focus': {
+                                        outline: 'none',
+                                        borderColor: 'blackAlpha.800',
+                                    },
+                                    '&:hover': {
+                                        bgColor: 'lime.600',
+                                        color: 'white',
+                                        borderColor: 'lime.600',
+                                    },
+                                }}
+                            >
+                                Редактировать рецепт
+                            </Button>
+                        </Stack>
+                    )}
                 </CardFooter>
             </Stack>
         </Card>

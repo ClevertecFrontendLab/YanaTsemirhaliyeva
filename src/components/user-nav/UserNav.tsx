@@ -1,11 +1,15 @@
-import { Box, Flex, List, ListItem, Show, Text, VStack } from '@chakra-ui/react';
+import { Box, Flex, Link, List, ListItem, Show, Text } from '@chakra-ui/react';
+import { Link as RouterLink } from 'react-router';
 
+import { AppRoute, DataTestId } from '~/consts/consts';
 import {
     BookmarkIcon,
     HappyFaceIcon,
     PeopleIcon,
     WriteDownRecipeIcon,
 } from '~/shared/custom-icons';
+
+import { RECIPE_BUTTON_STYLES } from './styles';
 
 export const UserNav = () => (
     <Box
@@ -53,46 +57,12 @@ export const UserNav = () => (
             </ListItem>
         </List>
         <Show above='md'>
-            <VStack
-                gap={3}
-                boxSize='208px'
-                alignItems='center'
-                justifyContent='center'
-                color='blackAlpha.700'
-                pl={{ xl: 8 }}
-                as='button'
-                _hover={{ borderColor: 'transparent' }}
-                _focus={{ outline: 'none' }}
-                sx={{
-                    textDecoration: 'none',
-                    color: 'black',
-                    '& .icon-container': {
-                        position: 'relative',
-                        '&::before': {
-                            content: '""',
-                            position: 'absolute',
-                            top: '0',
-                            left: '0',
-                            right: '0',
-                            bottom: '0',
-                            borderRadius: '50%',
-                            boxShadow: '0 0 40px 10px rgba(196, 255, 97, 0.6)',
-                            zIndex: -1,
-                        },
-                        '&::after': {
-                            content: '""',
-                            position: 'absolute',
-                            top: '-20px',
-                            left: '-40px',
-                            right: '-40px',
-                            bottom: '-40px',
-                            borderRadius: '50%',
-                            background:
-                                'radial-gradient(circle, rgba(196, 255, 97, 0.3) 0%, rgba(255, 255, 255, 0) 100%)',
-                            zIndex: -1,
-                        },
-                    },
-                }}
+            <Link
+                as={RouterLink}
+                to={AppRoute.NewRecipe}
+                {...RECIPE_BUTTON_STYLES}
+                flexDir='column'
+                data-test-id={DataTestId.AddRecipeBtn}
             >
                 <Flex className='icon-container'>
                     <WriteDownRecipeIcon boxSize='48px' />
@@ -100,7 +70,7 @@ export const UserNav = () => (
                 <Text fontSize={12} color='blackAlpha.700'>
                     Записать рецепт
                 </Text>
-            </VStack>
+            </Link>
         </Show>
     </Box>
 );

@@ -1,10 +1,4 @@
-import {
-    Modal,
-    ModalContent,
-    ModalOverlay,
-    ModalOverlayProps,
-    useBreakpointValue,
-} from '@chakra-ui/react';
+import { Center, ModalOverlayProps, useBreakpointValue } from '@chakra-ui/react';
 
 import { DataTestId } from '~/consts/consts';
 
@@ -15,25 +9,29 @@ type LoaderFullsizeProps = {
     overlayColor?: ModalOverlayProps['bgColor'];
 };
 
-export const LoaderFullsize = ({ isOpen, overlayColor = 'black.300' }: LoaderFullsizeProps) => {
+export const LoaderFullsize = ({
+    isOpen,
+    overlayColor = 'blackAlpha.600',
+}: LoaderFullsizeProps) => {
     const isMobileWidth = useBreakpointValue({ base: true, md: false }) ?? true;
-
+    if (!isOpen) return null;
     return (
-        <Modal
-            isOpen={isOpen}
-            onClose={() => console.log('AppLoader закрыт')}
-            closeOnEsc={false}
-            isCentered={true}
+        <Center
+            position='fixed'
+            top={0}
+            left={0}
+            h='100vh'
+            w='100vw'
+            zIndex='10'
+            backdropFilter='blur(4px)'
+            bgColor={overlayColor}
         >
-            <ModalOverlay bgColor={overlayColor} backdropFilter='blur(4px)' pointerEvents='none' />
-            <ModalContent w='fit-content' bg='transparent' border='none' shadow='none'>
-                <Loader
-                    boxSize={isMobileWidth ? 134 : 206}
-                    size='xl'
-                    color='black'
-                    data-test-id={DataTestId.AppLoader}
-                />
-            </ModalContent>
-        </Modal>
+            <Loader
+                boxSize={isMobileWidth ? 134 : 206}
+                size='xl'
+                color='black'
+                data-test-id={DataTestId.AppLoader}
+            />
+        </Center>
     );
 };

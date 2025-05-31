@@ -20,8 +20,11 @@ import {
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
 
-import { API_IMG, DataTestId } from '~/consts/consts';
+import { ALERT_MESSAGES, API_IMG, DataTestId } from '~/consts/consts';
+import { useBookmarkRecipeMutation } from '~/query/services/recipes';
 import { BookmarkIcon, HappyFaceIcon } from '~/shared/custom-icons';
+import { useAppDispatch } from '~/store/hooks';
+import { setAlertStatus } from '~/store/slices/alert-slice';
 import { serchInputSelector } from '~/store/slices/recipes-slice';
 import { Category } from '~/types/category';
 import { generateTestId, highlightText } from '~/utils';
@@ -48,9 +51,11 @@ export const HorizontalCard = ({ item, index, categories }: HorizontalCardProps)
     const searchInputCurrent = useSelector(serchInputSelector);
     const isTruncated = useBreakpointValue({ base: false, sm: true });
     const navigate = useNavigate();
+    const dispatch = useAppDispatch();
+    const [bookmarkRecipe] = useBookmarkRecipeMutation();
 
-    const matchedCategories = categories?.filter((category) =>
-        category.subCategories?.some((sub) => categoriesIds.includes(sub._id)),
+    const matchedCategories = categories.filter((category) =>
+        category.subCategories.some((sub) => categoriesIds.includes(sub._id)),
     );
 
     const handleCardClick = () => {
@@ -58,6 +63,14 @@ export const HorizontalCard = ({ item, index, categories }: HorizontalCardProps)
             navigate(
                 `/${matchedCategories[0].category}/${matchedCategories[0].subCategories?.[0]?.category}/${_id}`,
             );
+        }
+    };
+
+    const handleBookmark = async () => {
+        try {
+            await bookmarkRecipe(_id).unwrap();
+        } catch {
+            dispatch(setAlertStatus(ALERT_MESSAGES.SERVER_ERROR));
         }
     };
 
@@ -176,6 +189,7 @@ export const HorizontalCard = ({ item, index, categories }: HorizontalCardProps)
                     <Spacer />
                     <Stack direction='row' spacing={2} flexWrap='wrap'>
                         <Button
+                            onClick={handleBookmark}
                             size={{ base: 'xs', sm: 'sm' }}
                             leftIcon={
                                 <BookmarkIcon

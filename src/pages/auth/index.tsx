@@ -3,10 +3,10 @@ import { Box, Flex, Image, Text, VStack } from '@chakra-ui/react';
 import { AlertComponent } from '~/components/alert/Alert';
 import { AuthTabs } from '~/components/auth-tabs/AuthTabs';
 import { useAppSelector } from '~/store/hooks';
-import { alertStatusSelector, isAuthModalOpenSelector } from '~/store/slices/auth-slice';
+import { alertAuthStatusSelector, isAuthModalOpenSelector } from '~/store/slices/auth-slice';
 
 export const AuthPage = () => {
-    const alertProps = useAppSelector(alertStatusSelector);
+    const alertProps = useAppSelector(alertAuthStatusSelector);
     const isModalOpen = useAppSelector(isAuthModalOpenSelector);
 
     return (

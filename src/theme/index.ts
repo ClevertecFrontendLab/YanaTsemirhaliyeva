@@ -10,6 +10,7 @@ const breakpoints = {
     md: '1200.9px',
     sm: '960px',
     xs: '768px',
+    xxs: '740px',
     '2xs': '620px',
     '3xs': '360px',
     base: '0px',

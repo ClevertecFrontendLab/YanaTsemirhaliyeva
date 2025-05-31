@@ -4,8 +4,10 @@ import { baseApiSlice } from '~/query/base-api';
 import { apiSlice } from '~/query/create-api';
 
 import appReducer, { appSlice } from './app-slice';
+import alertReducer, { alertSlice } from './slices/alert-slice';
 import authReducer, { authSlice } from './slices/auth-slice';
 import categoryReducer, { categorySlice } from './slices/categories-slice';
+import newRecipeReducer, { newRecipeSlice } from './slices/new-recipe';
 import recipeReducer, { recipeSlice } from './slices/recipes-slice';
 
 const isProduction = false;
@@ -15,6 +17,8 @@ const rootReducer = combineReducers({
     [recipeSlice.name]: recipeReducer,
     [categorySlice.name]: categoryReducer,
     [authSlice.name]: authReducer,
+    [newRecipeSlice.name]: newRecipeReducer,
+    [alertSlice.name]: alertReducer,
     [baseApiSlice.reducerPath]: baseApiSlice.reducer,
 });
 

@@ -19,14 +19,14 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router';
 
-import { ALERT_MESSAGES, DataTestId, InputAriaLabel, InputType } from '~/consts/consts';
+import { ALERT_MESSAGES, AppRoute, DataTestId, InputAriaLabel, InputType } from '~/consts/consts';
 import { INPUT_STYLES } from '~/consts/styles';
 import { useLoginMutation, useVerifyOtpMutation } from '~/query/services/auth';
 import { LoginFormValues, loginSchema } from '~/schemas/auth.schema';
 import { useAppDispatch } from '~/store/hooks';
 import {
     login as authLogin,
-    setAlertStatus,
+    setAuthAlertStatus,
     setIsAuthModalOpen,
     setIsSubmitingform,
 } from '~/store/slices/auth-slice';
@@ -71,18 +71,18 @@ export const LoginForm = () => {
         try {
             await login(data).unwrap();
             dispatch(authLogin());
-            navigate('/');
+            navigate(AppRoute.Index);
         } catch (err) {
             const status = (err as FetchBaseQueryError)?.status;
 
             if (status === 403) {
-                dispatch(setAlertStatus(ALERT_MESSAGES.EMAIL_NOT_VERIFIED));
+                dispatch(setAuthAlertStatus(ALERT_MESSAGES.EMAIL_NOT_VERIFIED));
             } else if (typeof status === 'number' && status >= 500 && status < 600) {
                 setServerErrorOpen(true);
                 dispatch(setIsAuthModalOpen(true));
                 reset();
             } else {
-                dispatch(setAlertStatus(ALERT_MESSAGES.INVALID_DATA));
+                dispatch(setAuthAlertStatus(ALERT_MESSAGES.INVALID_DATA));
                 reset();
             }
         } finally {
@@ -120,7 +120,7 @@ export const LoginForm = () => {
             setPinError(true);
             const status = (err as FetchBaseQueryError)?.status;
             setErrorStatus(status as number | undefined);
-            dispatch(setAlertStatus(ALERT_MESSAGES.SERVER_ERROR));
+            dispatch(setAuthAlertStatus(ALERT_MESSAGES.SERVER_ERROR));
             dispatch(setIsAuthModalOpen(true));
         } finally {
             dispatch(setIsSubmitingform(false));
@@ -159,7 +159,7 @@ export const LoginForm = () => {
                             data-test-id={DataTestId.LoginInput}
                             id='login'
                             type='text'
-                            placeholder='bake_and_pie'
+                            placeholder='Логин'
                             borderColor={borderColor}
                             {...INPUT_STYLES}
                             {...register('login', { onBlur: handleTrimBlur })}

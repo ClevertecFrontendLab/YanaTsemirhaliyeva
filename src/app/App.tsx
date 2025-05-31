@@ -1,8 +1,9 @@
 import './App.css';
 
-import { AppRoutes } from '~/components/app-routes/AppRoutes';
+import { Outlet } from 'react-router';
+
 import { Layout } from '~/components/layout/Layout';
-import ScrollToTop from '~/hooks/scroll-to-top';
+import { ScrollToTop } from '~/hooks/scroll-to-top';
 import { useGetPostsQuery } from '~/query/services/posts.ts';
 
 function App() {
@@ -12,7 +13,7 @@ function App() {
         <>
             <ScrollToTop />
             <Layout>
-                <AppRoutes />
+                <Outlet />
             </Layout>
         </>
     );
