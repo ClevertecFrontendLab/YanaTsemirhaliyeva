@@ -18,6 +18,7 @@ import { recipeSchema } from '~/schemas/recipe.schema';
 import { useAppDispatch, useAppSelector } from '~/store/hooks';
 import { setAlertStatus } from '~/store/slices/alert-slice';
 import { categoriesSelector, subCategoriesSelector } from '~/store/slices/categories-slice';
+import { currentSubcategorySelector, setCategory } from '~/store/slices/recipes-slice';
 import { NewRecipeRequest } from '~/types/recipe';
 import { cleanRecipeFormData } from '~/utils/clean-data';
 
@@ -46,6 +47,7 @@ export const NewRecipe = () => {
     const savedSuccessfullyRef = useRef(false);
     const [imgPreview, setImgPreview] = useState<string | null>(null);
     const [updateRecipe] = useUpdateRecipeMutation();
+    const currentSubcategory = useAppSelector(currentSubcategorySelector);
 
     const recipeId = id ?? '';
     const isEditing = !!id;
@@ -254,6 +256,11 @@ export const NewRecipe = () => {
         if (fields.length === 1) {
             append({ stepNumber: 1, description: '', image: null });
         }
+        const updatedSteps = getValues('steps').map((step, i) => ({
+            ...step,
+            stepNumber: i + 1,
+        }));
+        setValue('steps', updatedSteps);
         setIsFormDirty(true);
     };
 
@@ -279,6 +286,13 @@ export const NewRecipe = () => {
         setIsFormDirty(true);
         setImgPreview(null);
         setModalOpen(false);
+    };
+
+    const handleConfirmModalClose = () => {
+        if (currentSubcategory) {
+            dispatch(setCategory(null));
+        }
+        setIsModalConfirmOpen(false);
     };
 
     return (
@@ -311,7 +325,7 @@ export const NewRecipe = () => {
             />
             <ConfirmFormModal
                 isOpen={isModalConfirmOpen}
-                onClose={() => setIsModalConfirmOpen(false)}
+                onClose={handleConfirmModalClose}
                 onSaveDraft={onSaveDraft}
                 onLeaveWithoutSaving={handleLeaveWithoutSaving}
             />

@@ -14,6 +14,7 @@ import {
 import { DataTestId } from '~/consts/consts';
 import { WriteDraftIcon } from '~/shared/custom-icons';
 
+import modalImg from '../../assets/img/meal.jpg';
 import { BUTTON_STYLES, MODAL_CLOSE_BUTTON_STYLES } from '../auth-modals/consts';
 
 type ConfirmFormModalProps = {
@@ -45,7 +46,7 @@ export const ConfirmFormModal = ({
                 sx={{ fontFamily: 'Inter' }}
                 data-test-id={DataTestId.RecipePreventiveModal}
             >
-                <Image src='img/modals/meal.jpg' boxSize={{ base: 108, md: 206 }} />
+                <Image src={modalImg} boxSize={{ base: 108, md: 206 }} />
                 <ModalCloseButton
                     {...MODAL_CLOSE_BUTTON_STYLES}
                     data-test-id={DataTestId.CloseBtn}

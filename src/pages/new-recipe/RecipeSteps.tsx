@@ -10,7 +10,7 @@ import {
     Textarea,
     VStack,
 } from '@chakra-ui/react';
-import { Controller, useFormContext } from 'react-hook-form';
+import { Controller, useFieldArray, useFormContext } from 'react-hook-form';
 
 import { API_IMG, DataTestId } from '~/consts/consts';
 import { PlusIcon, UploadImg, WastebasketIcon } from '~/shared/custom-icons';
@@ -31,6 +31,12 @@ export const RecipeSteps = ({ handleOpenModal, addStep, removeStep }: RecipeStep
         formState: { errors },
         watch,
     } = useFormContext<NewRecipeRequest>();
+
+    const { fields } = useFieldArray({
+        control,
+        name: 'steps',
+    });
+
     const steps = watch('steps');
 
     return (
@@ -51,7 +57,7 @@ export const RecipeSteps = ({ handleOpenModal, addStep, removeStep }: RecipeStep
                             borderRadius={8}
                             gap={0}
                             w='100%'
-                            key={step.stepNumber}
+                            key={`${fields[index]?.id ? fields[index].id : index}`}
                             minH='160px'
                             alignItems='stretch'
                             flexDir={{ base: 'column', '2xs': 'row' }}
