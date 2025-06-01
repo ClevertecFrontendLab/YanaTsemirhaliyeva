@@ -25,7 +25,6 @@ export const LoaderFullsize = ({
             h='100vh'
             w='100vw'
             zIndex={zIndex}
-            backdropFilter='blur(4px)'
             bgColor={overlayColor}
         >
             <Loader

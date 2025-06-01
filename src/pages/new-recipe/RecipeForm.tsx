@@ -129,6 +129,7 @@ export const RecipeForm = ({
                         <Input
                             data-test-id={DataTestId.RecipeTitle}
                             {...INPUT_STYLES}
+                            color='blackAlpha.900'
                             id='title'
                             type='text'
                             placeholder='Название рецепта'

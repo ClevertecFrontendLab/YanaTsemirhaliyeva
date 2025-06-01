@@ -185,14 +185,8 @@ export const recipeApiSlice = baseApiSlice
                     'page',
                 ]),
                 providesTags: (result) =>
-                    result
-                        ? [
-                              ...result.data.map(({ _id }) => ({
-                                  type: Tags.RECIPES as const,
-                                  id: _id,
-                              })),
-                              { type: Tags.RECIPES, id: 'LIST' },
-                          ]
+                    result && result.data
+                        ? result.data.map(({ _id }) => ({ type: Tags.RECIPES as const, id: _id }))
                         : [{ type: Tags.RECIPES, id: 'LIST' }],
             }),
 
@@ -222,14 +216,8 @@ export const recipeApiSlice = baseApiSlice
                     'subcategoriesIds',
                 ]),
                 providesTags: (result) =>
-                    result
-                        ? [
-                              ...result.data.map(({ _id }) => ({
-                                  type: Tags.RECIPES as const,
-                                  id: _id,
-                              })),
-                              { type: Tags.RECIPES, id: 'LIST' },
-                          ]
+                    result && result.data
+                        ? result.data.map(({ _id }) => ({ type: Tags.RECIPES as const, id: _id }))
                         : [{ type: Tags.RECIPES, id: 'LIST' }],
             }),
             likeRecipe: builder.mutation<{ message: string; likes: number }, string>({

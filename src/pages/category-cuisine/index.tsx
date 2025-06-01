@@ -2,12 +2,20 @@ import { Box } from '@chakra-ui/react';
 
 import { CategoryHighlight } from '~/components/category-highlight/CategoryHighlight';
 import { Intro } from '~/components/intro/Intro';
+import { LoaderFullsize } from '~/components/loader-fullsize/LoaderFullsize';
 import { TabsComponent } from '~/components/tabs/Tabs';
 import { useAppSelector } from '~/store/hooks';
-import { currentCategorySelector } from '~/store/slices/recipes-slice';
+import {
+    currentCategorySelector,
+    isCategoryCuisineDataFetchingSelector,
+    isRelevantFetchingSelector,
+} from '~/store/slices/recipes-slice';
 
 export const CategoryCuisine = () => {
     const currentCategory = useAppSelector(currentCategorySelector);
+    const isCategoryCuisineDataFetching = useAppSelector(isCategoryCuisineDataFetchingSelector);
+    const isRelevantFetching = useAppSelector(isRelevantFetchingSelector);
+    const isDataLoading = isRelevantFetching || isCategoryCuisineDataFetching;
 
     if (!currentCategory) return null;
 
@@ -35,6 +43,7 @@ export const CategoryCuisine = () => {
             >
                 <CategoryHighlight isDivider />
             </Box>
+            <LoaderFullsize isOpen={isDataLoading} />
         </Box>
     );
 };

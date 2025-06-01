@@ -51,6 +51,7 @@ export type RecipeState = {
     isSliderFetching: boolean;
     isJuiciestFetching: boolean;
     isRelevantFetching: boolean;
+    isCategoryCuisineDataFetching: boolean;
 };
 
 // Дефолтные значения для параметров поиска
@@ -87,6 +88,7 @@ const initialState: RecipeState = {
     isSliderFetching: false,
     isJuiciestFetching: false,
     isRelevantFetching: false,
+    isCategoryCuisineDataFetching: false,
 };
 
 // Вспомогательные функции
@@ -204,6 +206,9 @@ export const recipeSlice = createSlice({
         setIsRelevantFetching: (state, action: PayloadAction<boolean>) => {
             state.isRelevantFetching = action.payload;
         },
+        setIsCategoryCuisineDataFetching: (state, action: PayloadAction<boolean>) => {
+            state.isCategoryCuisineDataFetching = action.payload;
+        },
         resetState: () => initialState,
     },
 });
@@ -231,6 +236,7 @@ export const {
     setIsSliderFetching,
     setIsJuiciestFetching,
     setIsRelevantFetching,
+    setIsCategoryCuisineDataFetching,
     applyIntroAllergens,
     resetState,
 } = recipeSlice.actions;
@@ -262,6 +268,8 @@ export const selectors = {
     isSliderFetching: (state: ApplicationState) => state.recipes.isSliderFetching,
     isJuiciestFetching: (state: ApplicationState) => state.recipes.isJuiciestFetching,
     isRelevantFetching: (state: ApplicationState) => state.recipes.isRelevantFetching,
+    isCategoryCuisineDataFetching: (state: ApplicationState) =>
+        state.recipes.isCategoryCuisineDataFetching,
 };
 
 // Для обратной совместимости - индивидуальные селекторы
@@ -281,6 +289,7 @@ export const isSearchTriggeredSelector = selectors.isSearchTriggered;
 export const isSliderFetchingSelector = selectors.isSliderFetching;
 export const isJuiciestFetchingSelector = selectors.isJuiciestFetching;
 export const isRelevantFetchingSelector = selectors.isRelevantFetching;
+export const isCategoryCuisineDataFetchingSelector = selectors.isCategoryCuisineDataFetching;
 
 // Редьюсер
 export default recipeSlice.reducer;
