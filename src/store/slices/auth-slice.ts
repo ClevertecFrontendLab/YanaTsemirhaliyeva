@@ -1,5 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
+import { TOKEN_NAME } from '~/consts/consts';
+
 import { ApplicationState } from '../configure-store';
 
 type Alert = {
@@ -18,7 +20,7 @@ export type AuthState = {
 };
 
 const initialState: AuthState = {
-    isAuthorized: Boolean(localStorage.getItem('yeedaaToken')),
+    isAuthorized: Boolean(localStorage.getItem(TOKEN_NAME)),
     alertStatus: { status: 'error', title: '', isError: false, desc: '' },
     isVerificationExpired: false,
     isSubmitingForm: false,
@@ -34,7 +36,7 @@ export const authSlice = createSlice({
         },
         logout: (state) => {
             state.isAuthorized = false;
-            localStorage.removeItem('yeedaaToken');
+            localStorage.removeItem(TOKEN_NAME);
         },
         setAuthAlertStatus: (state, action: PayloadAction<Alert>) => {
             state.alertStatus = action.payload;
@@ -51,7 +53,6 @@ export const authSlice = createSlice({
     },
 });
 
-// Экшены
 export const {
     login,
     logout,
@@ -61,7 +62,6 @@ export const {
     setIsAuthModalOpen,
 } = authSlice.actions;
 
-// Селекторы
 export const isAuthorizedSelector = (state: ApplicationState) => state.auth.isAuthorized;
 export const isVerificationExpiredSelector = (state: ApplicationState) =>
     state.auth.isVerificationExpired;
@@ -69,5 +69,4 @@ export const alertAuthStatusSelector = (state: ApplicationState) => state.auth.a
 export const isSubmitingFormSelector = (state: ApplicationState) => state.auth.isSubmitingForm;
 export const isAuthModalOpenSelector = (state: ApplicationState) => state.auth.isAuthModalOpen;
 
-// Редьюсер
 export default authSlice.reducer;

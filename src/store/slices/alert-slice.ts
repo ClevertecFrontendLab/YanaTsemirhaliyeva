@@ -27,11 +27,8 @@ export const alertSlice = createSlice({
     },
 });
 
-// Экшены
 export const { setAlertStatus } = alertSlice.actions;
 
-// Селекторы
 export const alertStatusSelector = (state: ApplicationState) => state.alert.alertStatus;
 
-// Редьюсер
 export default alertSlice.reducer;

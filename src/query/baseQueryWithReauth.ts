@@ -3,7 +3,7 @@ import { BaseQueryFn, FetchArgs, FetchBaseQueryError } from '@reduxjs/toolkit/qu
 import { fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { Mutex } from 'async-mutex';
 
-import { API_URL } from '~/consts/consts';
+import { API_URL, TOKEN_NAME } from '~/consts/consts';
 import { AppDispatch } from '~/store/hooks';
 import { login, logout } from '~/store/slices/auth-slice';
 
@@ -16,7 +16,7 @@ type TokenRefreshResponse = {
 const baseQuery = fetchBaseQuery({
     baseUrl: API_URL,
     prepareHeaders: (headers) => {
-        const token = localStorage.getItem('yeedaaToken');
+        const token = localStorage.getItem(TOKEN_NAME);
         if (token) {
             headers.set('Authorization', `Bearer ${token}`);
         }
@@ -28,7 +28,7 @@ const baseQuery = fetchBaseQuery({
 const mutex = new Mutex();
 
 export const checkAuthToken = async (api: BaseQueryApi) => {
-    const token = localStorage.getItem('yeedaaToken');
+    const token = localStorage.getItem(TOKEN_NAME);
 
     if (!token) {
         api.dispatch(logout());
@@ -66,32 +66,32 @@ export const checkAuthToken = async (api: BaseQueryApi) => {
                 const newToken = responseHeaders?.get('Authentication-Access');
 
                 if (newToken) {
-                    localStorage.setItem('yeedaaToken', newToken);
+                    localStorage.setItem(TOKEN_NAME, newToken);
                     api.dispatch(login());
                     return true;
                 } else {
                     const data = refreshResult.data as TokenRefreshResponse;
                     if (data.accessToken) {
-                        localStorage.setItem('yeedaaToken', data.accessToken);
+                        localStorage.setItem(TOKEN_NAME, data.accessToken);
                         api.dispatch(login());
                         return true;
                     }
                 }
             }
 
-            localStorage.removeItem('yeedaaToken');
+            localStorage.removeItem(TOKEN_NAME);
             api.dispatch(logout());
             return false;
         }
     } catch {
-        localStorage.removeItem('yeedaaToken');
+        localStorage.removeItem(TOKEN_NAME);
         api.dispatch(logout());
         return false;
     }
 };
 
 export const checkAuthTokenForComponent = async (dispatch: AppDispatch) => {
-    const token = localStorage.getItem('yeedaaToken');
+    const token = localStorage.getItem(TOKEN_NAME);
 
     if (!token) {
         dispatch(logout());
@@ -120,25 +120,25 @@ export const checkAuthTokenForComponent = async (dispatch: AppDispatch) => {
                 const newToken = refreshResponse.headers.get('Authentication-Access');
 
                 if (newToken) {
-                    localStorage.setItem('yeedaaToken', newToken);
+                    localStorage.setItem(TOKEN_NAME, newToken);
                     dispatch(login());
                     return true;
                 } else {
                     const refreshData = (await refreshResponse.json()) as TokenRefreshResponse;
                     if (refreshData.accessToken) {
-                        localStorage.setItem('yeedaaToken', refreshData.accessToken);
+                        localStorage.setItem(TOKEN_NAME, refreshData.accessToken);
                         dispatch(login());
                         return true;
                     }
                 }
             }
 
-            localStorage.removeItem('yeedaaToken');
+            localStorage.removeItem(TOKEN_NAME);
             dispatch(logout());
             return false;
         }
     } catch {
-        localStorage.removeItem('yeedaaToken');
+        localStorage.removeItem(TOKEN_NAME);
         dispatch(logout());
         return false;
     }
@@ -172,22 +172,22 @@ export const baseQueryWithReauth: BaseQueryFn<
                     const newToken = responseHeaders?.get('Authentication-Access');
 
                     if (newToken) {
-                        localStorage.setItem('yeedaaToken', newToken);
+                        localStorage.setItem(TOKEN_NAME, newToken);
                         api.dispatch(login());
                         result = await baseQuery(args, api, extraOptions);
                     } else {
                         const data = refreshResult.data as TokenRefreshResponse;
                         if (data.accessToken) {
-                            localStorage.setItem('yeedaaToken', data.accessToken);
+                            localStorage.setItem(TOKEN_NAME, data.accessToken);
                             api.dispatch(login());
                             result = await baseQuery(args, api, extraOptions);
                         } else {
-                            localStorage.removeItem('yeedaaToken');
+                            localStorage.removeItem(TOKEN_NAME);
                             api.dispatch(logout());
                         }
                     }
                 } else {
-                    localStorage.removeItem('yeedaaToken');
+                    localStorage.removeItem(TOKEN_NAME);
                     api.dispatch(logout());
                 }
             } finally {

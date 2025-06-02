@@ -3,7 +3,6 @@ import { NewRecipeRequest } from '~/types/recipe';
 export const cleanRecipeFormData = (recipe: NewRecipeRequest): Partial<NewRecipeRequest> => {
     const result: Partial<NewRecipeRequest> = {};
 
-    // Обрабатываем основные поля
     if (recipe.title && recipe.title.trim() !== '') result.title = recipe.title;
     if (recipe.description && recipe.description.trim() !== '')
         result.description = recipe.description;
@@ -11,12 +10,10 @@ export const cleanRecipeFormData = (recipe: NewRecipeRequest): Partial<NewRecipe
     if (recipe.portions) result.portions = recipe.portions;
     if (recipe.image && recipe.image.trim() !== '') result.image = recipe.image;
 
-    // Обрабатываем categoriesIds
     if (recipe.categoriesIds && recipe.categoriesIds.length > 0) {
         result.categoriesIds = recipe.categoriesIds;
     }
 
-    // Обрабатываем шаги
     if (recipe.steps && recipe.steps.length > 0) {
         result.steps = recipe.steps
             .map((step) => ({
@@ -31,7 +28,6 @@ export const cleanRecipeFormData = (recipe: NewRecipeRequest): Partial<NewRecipe
             .filter((step) => step.description !== '' || step.image !== null);
     }
 
-    // Обрабатываем ингредиенты
     if (recipe.ingredients && recipe.ingredients.length > 0) {
         result.ingredients = recipe.ingredients
             .map((ingredient) => ({

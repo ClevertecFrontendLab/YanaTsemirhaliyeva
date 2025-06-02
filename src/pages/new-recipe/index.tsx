@@ -1,7 +1,6 @@
 import { Box } from '@chakra-ui/react';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect, useRef, useState } from 'react';
-import { FormProvider, useFieldArray, useForm } from 'react-hook-form';
+import { FormProvider } from 'react-hook-form';
 import { useNavigate, useParams } from 'react-router';
 
 import { AddImgModal } from '~/components/new-recipe-modals/AddImgModal';
@@ -13,8 +12,6 @@ import {
     useSaveDraftMutation,
     useUpdateRecipeMutation,
 } from '~/query/services/new-recipe';
-import { useGetRecipeByIdQuery } from '~/query/services/recipes';
-import { recipeSchema } from '~/schemas/recipe.schema';
 import { useAppDispatch, useAppSelector } from '~/store/hooks';
 import { setAlertStatus } from '~/store/slices/alert-slice';
 import { categoriesSelector, subCategoriesSelector } from '~/store/slices/categories-slice';
@@ -22,17 +19,13 @@ import { currentSubcategorySelector, setCategory } from '~/store/slices/recipes-
 import { NewRecipeRequest } from '~/types/recipe';
 import { cleanRecipeFormData } from '~/utils/clean-data';
 
+import { DEFAULT_INGREDIENT_VALUE } from './consts';
+import { useRecipeFormMethods } from './hooks/use-recipe-form-method';
+import { useRecipeModals } from './hooks/use-recipe-modals';
 import { RecipeForm } from './RecipeForm';
-
-const DEFAULT_PORTIONS_VALUE = 4;
-const DEFAULT_TIME_VALUE = 30;
-const DEFAULT_INGREDIENT_VALUE = 100;
 
 export const NewRecipe = () => {
     const { id } = useParams();
-    const [isModalOpen, setModalOpen] = useState(false);
-    const [modalType, setModalType] = useState<'main' | 'step'>('main');
-    const [currentStepIndex, setCurrentStepIndex] = useState<number | null>(null);
     const [hasTitle, setHasTitle] = useState(true);
     const [isFormDirty, setIsFormDirty] = useState(false);
     const [isModalConfirmOpen, setIsModalConfirmOpen] = useState(false);
@@ -45,70 +38,37 @@ export const NewRecipe = () => {
     const categories = useAppSelector(categoriesSelector);
     const subCategories = useAppSelector(subCategoriesSelector);
     const savedSuccessfullyRef = useRef(false);
-    const [imgPreview, setImgPreview] = useState<string | null>(null);
     const [updateRecipe] = useUpdateRecipeMutation();
     const currentSubcategory = useAppSelector(currentSubcategorySelector);
 
     const recipeId = id ?? '';
     const isEditing = !!id;
 
-    const { data: recipeData } = useGetRecipeByIdQuery(recipeId, { skip: !isEditing });
-
-    const methods = useForm<NewRecipeRequest>({
-        resolver: zodResolver(recipeSchema),
-        defaultValues: {
-            title: '',
-            description: '',
-            time: DEFAULT_TIME_VALUE,
-            categoriesIds: [],
-            portions: DEFAULT_PORTIONS_VALUE,
-            image: '',
-            steps: [{ stepNumber: 1, description: '', image: null }],
-            ingredients: [{ title: '', count: DEFAULT_INGREDIENT_VALUE, measureUnit: '' }],
-        },
-        mode: 'onSubmit',
-        shouldUnregister: false,
-    });
-
     const {
-        control,
-        formState: { isDirty },
+        methods,
+        isDirty,
         trigger,
         watch,
         setValue,
         getValues,
-        reset,
-    } = methods;
-
-    const { fields, append, remove, update } = useFieldArray({
-        control,
-        name: 'steps',
-    });
+        fields,
+        append,
+        remove,
+        update,
+        ingredientFields,
+        appendIngredient,
+        removeIngredient,
+    } = useRecipeFormMethods(isEditing, recipeId);
 
     const {
-        fields: ingredientFields,
-        append: appendIngredient,
-        remove: removeIngredient,
-        replace,
-    } = useFieldArray({
-        control,
-        name: 'ingredients',
-    });
-
-    useEffect(() => {
-        if (recipeData) {
-            reset(recipeData);
-            replace(recipeData.ingredients || []);
-        }
-    }, [recipeData, replace, reset]);
-
-    useEffect(() => {
-        if (recipeData?.ingredients) {
-            recipeData.ingredients.forEach((ingredient, index) => {
-                setValue(`ingredients.${index}.measureUnit`, ingredient.measureUnit ?? '');
-            });
-        }
-    }, [recipeData, setValue]);
+        isModalOpen,
+        modalType,
+        currentStepIndex,
+        imgPreview,
+        handleOpenModal,
+        handleCloseModal,
+        handleDeleteImage,
+    } = useRecipeModals(watch, fields, setValue, update, setIsFormDirty);
 
     const onSubmit = async (data: NewRecipeRequest) => {
         try {
@@ -216,21 +176,8 @@ export const NewRecipe = () => {
         }
     };
 
-    const handleOpenModal = (type: 'main' | 'step', index?: number) => {
-        setModalType(type);
-        setCurrentStepIndex(index ?? null);
-        if (type === 'main') {
-            setImgPreview(watch('image') || null);
-        } else if (type === 'step' && index !== undefined) {
-            setImgPreview(fields[index]?.image || null);
-        } else {
-            setImgPreview(null);
-        }
-        setModalOpen(true);
-    };
-
-    const handleCloseModal = (imageUrl?: string) => {
-        setModalOpen(false);
+    const handleImageModalClose = (imageUrl?: string) => {
+        handleCloseModal();
         if (imageUrl) {
             if (modalType === 'main') {
                 setValue('image', imageUrl || '');
@@ -274,20 +221,6 @@ export const NewRecipe = () => {
         setIsFormDirty(true);
     };
 
-    const handleDeleteImage = () => {
-        if (modalType === 'main') {
-            setValue('image', '');
-        } else if (modalType === 'step' && currentStepIndex !== null) {
-            update(currentStepIndex, {
-                ...fields[currentStepIndex],
-                image: null,
-            });
-        }
-        setIsFormDirty(true);
-        setImgPreview(null);
-        setModalOpen(false);
-    };
-
     const handleConfirmModalClose = () => {
         if (currentSubcategory) {
             dispatch(setCategory(null));
@@ -317,7 +250,7 @@ export const NewRecipe = () => {
             </FormProvider>
             <AddImgModal
                 isOpen={isModalOpen}
-                onClose={handleCloseModal}
+                onClose={handleImageModalClose}
                 imgPreview={imgPreview}
                 onDelete={handleDeleteImage}
                 index={currentStepIndex || 0}

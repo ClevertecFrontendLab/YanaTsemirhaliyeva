@@ -54,12 +54,6 @@ export const SubcategorySelect = ({
     const fieldError = errors[name];
     const showError = hasError || !!fieldError;
 
-    useEffect(() => {
-        if (menuButtonRef.current) {
-            setMenuWidth(`${menuButtonRef.current.offsetWidth}px`);
-        }
-    }, [isOpen]);
-
     useOutsideClick({
         ref: menuRef as React.RefObject<HTMLElement>,
         handler: () => {
@@ -92,6 +86,12 @@ export const SubcategorySelect = ({
                 : [...currentValue, subCategory._id],
         );
     };
+
+    useEffect(() => {
+        if (menuButtonRef.current) {
+            setMenuWidth(`${menuButtonRef.current.offsetWidth}px`);
+        }
+    }, [isOpen]);
 
     return (
         <Box

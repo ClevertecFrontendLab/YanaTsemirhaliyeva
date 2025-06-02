@@ -20,7 +20,7 @@ import {
 import { useOptimistic } from 'react';
 import { useNavigate, useParams } from 'react-router';
 
-import { ALERT_MESSAGES, API_IMG, AppRoute, DataTestId } from '~/consts/consts';
+import { ALERT_MESSAGES, API_IMG, AppRoute, DataTestId, TOKEN_NAME } from '~/consts/consts';
 import { useDeleteRecipeMutation } from '~/query/services/new-recipe';
 import { useBookmarkRecipeMutation, useLikeRecipeMutation } from '~/query/services/recipes';
 import {
@@ -40,15 +40,22 @@ import { decodeToken } from '~/utils/jwt-decode';
 type FullSizeCardProps = {
     item: Recipe;
 };
-
-export const FullSizeCard = ({ item }: FullSizeCardProps) => {
+export const FullSizeCard = ({
+    _id,
+    title,
+    bookmarks,
+    image,
+    likes,
+    time,
+    description,
+    categoriesIds,
+    authorId,
+}: FullSizeCardProps['item']) => {
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
-    const { _id, title, bookmarks, image, likes, time, description, categoriesIds, authorId } =
-        item;
     const categories = useAppSelector(categoriesSelector);
     const uniqueCategories = getUniqueCategories(categories, categoriesIds);
-    const token = localStorage.getItem('yeedaaToken');
+    const token = localStorage.getItem(TOKEN_NAME);
     const userData = decodeToken(token);
     const isRecipeCreateByCurrentUser = userData?.userId === authorId;
     const { category, subcategory, id } = useParams();

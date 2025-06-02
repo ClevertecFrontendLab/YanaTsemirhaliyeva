@@ -1,5 +1,6 @@
 import { FetchBaseQueryError } from '@reduxjs/toolkit/query';
 
+import { TOKEN_NAME } from '~/consts/consts';
 import { MeasureUnit, NewRecipeRequest } from '~/types/recipe';
 
 import { baseApiSlice } from '../base-api';
@@ -24,7 +25,7 @@ export const newRecipeApiSlice = baseApiSlice
                                 (error.data as { statusCode?: number })?.statusCode,
                             message:
                                 (error.data as { message?: string })?.message ??
-                                'Ошибка рубликации рецепта',
+                                'Ошибка публикации рецепта',
                         };
                     }
                     return { statusCode: 500, message: 'Неизвестная ошибка' };
@@ -79,7 +80,7 @@ export const newRecipeApiSlice = baseApiSlice
                                 (error.data as { statusCode?: number })?.statusCode,
                             message:
                                 (error.data as { message?: string })?.message ??
-                                'Ошибка рубликации рецепта',
+                                'Ошибка публикации рецепта',
                         };
                     }
                     return { statusCode: 500, message: 'Неизвестная ошибка' };
@@ -98,7 +99,7 @@ export const newRecipeApiSlice = baseApiSlice
                         method: 'POST',
                         body: formData,
                         headers: {
-                            Authorization: `Bearer ${localStorage.getItem('yeedaaToken')}`,
+                            Authorization: `Bearer ${localStorage.getItem(TOKEN_NAME)}`,
                         },
                     };
                 },

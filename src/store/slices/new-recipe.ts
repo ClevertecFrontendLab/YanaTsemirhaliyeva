@@ -97,7 +97,6 @@ export const newRecipeSlice = createSlice({
     },
 });
 
-// Экшены
 export const {
     setTitle,
     setTime,
@@ -112,29 +111,15 @@ export const {
     clearSubCategories,
 } = newRecipeSlice.actions;
 
-// Селекторы
-export const selectors = {
-    title: (state: ApplicationState) => state.newRecipe.title,
-    time: (state: ApplicationState) => state.newRecipe.time,
-    description: (state: ApplicationState) => state.newRecipe.description,
-    portions: (state: ApplicationState) => state.newRecipe.portions,
-    image: (state: ApplicationState) => state.newRecipe.image,
-    categoriesIds: (state: ApplicationState) => state.newRecipe.categoriesIds,
-    steps: (state: ApplicationState) => state.newRecipe.steps,
-    ingredients: (state: ApplicationState) => state.newRecipe.ingredients,
-    selectedSubCategories: (state: ApplicationState) => state.newRecipe.selectedSubCategories,
-};
+export const titleSelector = (state: ApplicationState) => state.newRecipe.title;
+export const timeSelector = (state: ApplicationState) => state.newRecipe.time;
+export const descriptionSelector = (state: ApplicationState) => state.newRecipe.description;
+export const portionsSelector = (state: ApplicationState) => state.newRecipe.portions;
+export const imageSelector = (state: ApplicationState) => state.newRecipe.image;
+export const categoriesIdsSelector = (state: ApplicationState) => state.newRecipe.categoriesIds;
+export const stepsSelector = (state: ApplicationState) => state.newRecipe.steps;
+export const ingredientsSelector = (state: ApplicationState) => state.newRecipe.ingredients;
+export const selectedSubCategoriesSelector = (state: ApplicationState) =>
+    state.newRecipe.selectedSubCategories;
 
-// Для обратной совместимости - индивидуальные селекторы
-export const titleSelector = selectors.title;
-export const descriptionSelector = selectors.description;
-export const timeSelector = selectors.time;
-export const portionsSelector = selectors.portions;
-export const imageSelector = selectors.image;
-export const categoriesIdsSelector = selectors.categoriesIds;
-export const stepsSelector = selectors.steps;
-export const ingredientsSelector = selectors.ingredients;
-export const selectedSubCategoriesSelector = selectors.selectedSubCategories;
-
-// Редьюсер
 export default newRecipeSlice.reducer;

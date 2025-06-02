@@ -14,13 +14,14 @@ export enum AppRoute {
     Verification = '/verification',
 }
 
-// Шаблоны динамических маршрутов
 export const DynamicRoutes = {
     CategoryRoot: '/:category',
     SubcategoryPage: '/:category/:subcategory',
     RecipePage: '/:category/:subcategory/:id',
     EditRecipePage: '/edit-recipe/:category/:subcategory/:id',
 };
+
+export const TOKEN_NAME = 'yeedaaToken';
 
 export const DEFAULT_CARDS_PER_PAGE = 8;
 export const DEFAULT_PAGE = 1;

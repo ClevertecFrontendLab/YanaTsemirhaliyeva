@@ -26,7 +26,6 @@ type IngredientsProps = {
 export const Ingredients = ({ portions = 1, ingredients }: IngredientsProps) => {
     const [currentPortions, setCurrentPortions] = useState(portions);
 
-    // Функция для перерасчёта количества ингредиентов
     const calculateIngredientCount = (count: string | number) => {
         const baseCount = typeof count === 'string' ? parseFloat(count) : count;
         if (isNaN(baseCount)) return count;
@@ -55,7 +54,6 @@ export const Ingredients = ({ portions = 1, ingredients }: IngredientsProps) => 
                         maxW={20}
                         value={currentPortions}
                         min={1}
-                        max={10}
                         onChange={(valueString) => setCurrentPortions(Number(valueString))}
                     >
                         <NumberInputField />

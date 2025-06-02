@@ -53,7 +53,7 @@ export const RecipePage = () => {
         <Box>
             <Box pl={{ base: 4, md: '26px' }} pr={18}>
                 <Box mb={{ base: 6, md: 10 }} pt={{ md: 7 }} pr={{ md: 9 }}>
-                    <FullSizeCard item={data} />
+                    <FullSizeCard {...data} />
                 </Box>
                 <Box pr={{ md: 10 }}>
                     <VStack

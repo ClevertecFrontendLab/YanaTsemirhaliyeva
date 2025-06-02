@@ -1,5 +1,6 @@
 import { FetchBaseQueryError } from '@reduxjs/toolkit/query';
 
+import { TOKEN_NAME } from '~/consts/consts';
 import { setAuthAlertStatus } from '~/store/slices/auth-slice';
 import { getErrorMessage } from '~/utils';
 
@@ -43,7 +44,7 @@ export const authApiSlice = baseApiSlice
                         const accessToken = responseHeaders?.get('Authentication-Access');
 
                         if (accessToken) {
-                            localStorage.setItem('yeedaaToken', accessToken);
+                            localStorage.setItem(TOKEN_NAME, accessToken);
                         }
                     } catch (error) {
                         const errorMessage = getErrorMessage(error);

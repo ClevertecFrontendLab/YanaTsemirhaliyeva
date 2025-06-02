@@ -77,7 +77,7 @@ export const LoginForm = () => {
 
             if (status === 403) {
                 dispatch(setAuthAlertStatus(ALERT_MESSAGES.EMAIL_NOT_VERIFIED));
-            } else if (typeof status === 'number' && status >= 500 && status < 600) {
+            } else if (typeof status === 'number' && status >= 500) {
                 setServerErrorOpen(true);
                 dispatch(setIsAuthModalOpen(true));
                 reset();

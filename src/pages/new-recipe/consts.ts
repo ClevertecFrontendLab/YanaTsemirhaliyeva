@@ -1,0 +1,3 @@
+export const DEFAULT_PORTIONS_VALUE = 4;
+export const DEFAULT_TIME_VALUE = 30;
+export const DEFAULT_INGREDIENT_VALUE = 100;

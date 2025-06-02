@@ -23,13 +23,11 @@ import { UploadImg } from '~/shared/custom-icons';
 import { NewRecipeRequest } from '~/types/recipe';
 
 import { ActionFormBtns } from './ActionFormBtns';
+import { DEFAULT_PORTIONS_VALUE, DEFAULT_TIME_VALUE } from './consts';
 import { IngredientField } from './IngredientField';
 import { IngredientsHeader } from './IngredientHeader';
 import { RecipeSteps } from './RecipeSteps';
 import { FORM_NEW_RECIPE_STYLES, getFieldStyles } from './styles';
-
-const DEFAULT_PORTIONS_VALUE = 4;
-const DEFAULT_TIME_VALUE = 30;
 
 type RecipeFormProps = {
     methods: UseFormReturn<NewRecipeRequest>;

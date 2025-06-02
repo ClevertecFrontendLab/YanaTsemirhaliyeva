@@ -91,7 +91,6 @@ export const Breadcrumbs = ({ onBreadcrumbClick }: BreadcrumbsProps) => {
                 },
             }}
         >
-            {/* Главная */}
             <BreadcrumbItem>
                 <BreadcrumbLink
                     as={Link}
@@ -108,7 +107,6 @@ export const Breadcrumbs = ({ onBreadcrumbClick }: BreadcrumbsProps) => {
                 </BreadcrumbLink>
             </BreadcrumbItem>
 
-            {/* Статическая страница "Самое сочное" */}
             {routeNames[location.pathname] && (
                 <BreadcrumbItem isCurrentPage>
                     <BreadcrumbLink
@@ -122,7 +120,6 @@ export const Breadcrumbs = ({ onBreadcrumbClick }: BreadcrumbsProps) => {
                 </BreadcrumbItem>
             )}
 
-            {/* Категория */}
             {category && (
                 <BreadcrumbItem>
                     <BreadcrumbLink
@@ -141,7 +138,6 @@ export const Breadcrumbs = ({ onBreadcrumbClick }: BreadcrumbsProps) => {
                 </BreadcrumbItem>
             )}
 
-            {/* Подкатегория */}
             {subcategory && (
                 <BreadcrumbItem isCurrentPage={!id}>
                     <BreadcrumbLink
