@@ -29,12 +29,9 @@ export const categorySlice = createSlice({
     },
 });
 
-// Экшены
 export const { setCategories, setSubCategories } = categorySlice.actions;
 
-// Селекторы
 export const categoriesSelector = (state: ApplicationState) => state.categories.categories;
 export const subCategoriesSelector = (state: ApplicationState) => state.categories.subCategories;
 
-// Редьюсер
 export default categorySlice.reducer;

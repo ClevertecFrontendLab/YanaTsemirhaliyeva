@@ -11,8 +11,8 @@ import { useEffect } from 'react';
 
 import { DataTestId } from '~/consts/consts';
 import { useAppDispatch, useAppSelector } from '~/store/hooks';
-import { alertStatusSelector, setAlertStatus } from '~/store/slices/auth-slice';
-import { clearError, isErrorSelector } from '~/store/slices/recipes-slice';
+import { alertStatusSelector, setAlertStatus } from '~/store/slices/alert-slice';
+import { alertAuthStatusSelector, setAuthAlertStatus } from '~/store/slices/auth-slice';
 
 const DEFAULT_ALERT_STATUS = {
     status: 'error' as const,
@@ -32,31 +32,30 @@ type AlertComponentProps = {
 
 export const AlertComponent = ({ status, title, desc, hasFooter = false }: AlertComponentProps) => {
     const dispatch = useAppDispatch();
-    const isError = useAppSelector(isErrorSelector);
-    const isAuthError = useAppSelector(alertStatusSelector);
+    const isAuthError = useAppSelector(alertAuthStatusSelector);
+    const isError = useAppSelector(alertStatusSelector);
 
     useEffect(() => {
         const timer = setTimeout(() => {
-            dispatch(clearError());
             dispatch(setAlertStatus(DEFAULT_ALERT_STATUS));
+            dispatch(setAuthAlertStatus(DEFAULT_ALERT_STATUS));
         }, TIME);
         return () => {
             clearTimeout(timer);
         };
-    }, [dispatch, isError, isAuthError]);
+    }, [dispatch, isAuthError, isError]);
 
     const handleAlertClose = () => {
-        dispatch(clearError());
         dispatch(setAlertStatus(DEFAULT_ALERT_STATUS));
+        dispatch(setAuthAlertStatus(DEFAULT_ALERT_STATUS));
     };
 
     return (
-        isError ||
-        (isAuthError.isError && (
+        (isError.isError || isAuthError.isError) && (
             <Center
                 zIndex={1500}
-                position='absolute'
-                bottom={hasFooter ? { base: '100px', lg: '30px' } : '30px'}
+                position='fixed'
+                bottom={hasFooter ? { base: '100px', lg: '100px' } : '30px'}
                 left='50%'
                 transform='translateX(-50%)'
                 width={{ base: '328px', md: '400px' }}
@@ -82,6 +81,6 @@ export const AlertComponent = ({ status, title, desc, hasFooter = false }: Alert
                     />
                 </Alert>
             </Center>
-        ))
+        )
     );
 };

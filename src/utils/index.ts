@@ -133,6 +133,10 @@ export async function getCategoryAndSubcategoryFromUrl(pathname: string): Promis
     };
 
     const pathParts = pathname.split('/').filter(Boolean);
+    if (pathParts[0] === 'edit-recipe') {
+        pathParts.shift();
+    }
+
     if (pathParts.length === 0) return { ...result, isValid: false };
 
     const categorySlug = pathParts[0];

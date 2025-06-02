@@ -92,6 +92,16 @@ export const recipeApiSlice = baseApiSlice
                     params: buildQueryParams(rest),
                 }),
                 forceRefetch: createForceRefetchHandler(['searchString', 'allergens']),
+                providesTags: (result) =>
+                    result
+                        ? [
+                              ...result.data.map(({ _id }) => ({
+                                  type: Tags.RECIPES as const,
+                                  id: _id,
+                              })),
+                              { type: Tags.RECIPES, id: 'LIST' },
+                          ]
+                        : [{ type: Tags.RECIPES, id: 'LIST' }],
             }),
 
             getRecipes: builder.query<RecipeResponse, GetRecipesParams>({
@@ -104,12 +114,26 @@ export const recipeApiSlice = baseApiSlice
                     }),
                 }),
                 forceRefetch: createForceRefetchHandler(['searchString', 'subcategoriesIds']),
+                providesTags: (result) =>
+                    result
+                        ? [
+                              ...result.data.map(({ _id }) => ({
+                                  type: Tags.RECIPES as const,
+                                  id: _id,
+                              })),
+                              { type: Tags.RECIPES, id: 'LIST' },
+                          ]
+                        : [{ type: Tags.RECIPES, id: 'LIST' }],
             }),
 
             getRecipeById: builder.query<Recipe, string>({
                 query: (recipeId) => ({
                     url: `${ApiEndpoints.RECIPES}/${recipeId}`,
                 }),
+                providesTags: (result, _error, arg) =>
+                    result
+                        ? [{ type: Tags.RECIPES, id: arg }]
+                        : [{ type: Tags.RECIPES, id: 'LIST' }],
             }),
 
             getPaginatedRecipes: builder.query<RecipeResponse, GetPaginatedRecipesParams>({
@@ -160,6 +184,10 @@ export const recipeApiSlice = baseApiSlice
                     'allergens',
                     'page',
                 ]),
+                providesTags: (result) =>
+                    result && result.data
+                        ? result.data.map(({ _id }) => ({ type: Tags.RECIPES as const, id: _id }))
+                        : [{ type: Tags.RECIPES, id: 'LIST' }],
             }),
 
             getRecipesWithFiltersAndPaginate: builder.query<
@@ -187,6 +215,33 @@ export const recipeApiSlice = baseApiSlice
                     'garnish',
                     'subcategoriesIds',
                 ]),
+                providesTags: (result) =>
+                    result && result.data
+                        ? result.data.map(({ _id }) => ({ type: Tags.RECIPES as const, id: _id }))
+                        : [{ type: Tags.RECIPES, id: 'LIST' }],
+            }),
+            likeRecipe: builder.mutation<{ message: string; likes: number }, string>({
+                query: (recipeId) => ({
+                    url: `${ApiEndpoints.RECIPES}/${recipeId}/like`,
+                    method: 'POST',
+                }),
+                transformErrorResponse: (error) =>
+                    typeof error.data === 'object' && error.data !== null
+                        ? (error.data as { message?: string })
+                        : { message: 'Неизвестная ошибка' },
+                invalidatesTags: (_result, _error, arg) => [{ type: Tags.RECIPES, id: arg }],
+            }),
+
+            bookmarkRecipe: builder.mutation<{ message: string; bookmarks: number }, string>({
+                query: (recipeId) => ({
+                    url: `${ApiEndpoints.RECIPES}/${recipeId}/bookmark`,
+                    method: 'POST',
+                }),
+                transformErrorResponse: (error) =>
+                    typeof error.data === 'object' && error.data !== null
+                        ? (error.data as { message?: string })
+                        : { message: 'Неизвестная ошибка' },
+                invalidatesTags: (_result, _error, arg) => [{ type: Tags.RECIPES, id: arg }],
             }),
         }),
     });
@@ -198,4 +253,6 @@ export const {
     useGetPaginatedRecipesQuery,
     useGetRecipesByCategoryWithPaginateQuery,
     useGetRecipesWithFiltersAndPaginateQuery,
+    useBookmarkRecipeMutation,
+    useLikeRecipeMutation,
 } = recipeApiSlice;

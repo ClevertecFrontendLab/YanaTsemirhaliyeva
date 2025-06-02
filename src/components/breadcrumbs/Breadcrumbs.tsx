@@ -14,6 +14,11 @@ import {
 import { Category, SubCategory } from '~/types/category';
 import { getCategoryAndSubcategoryFromUrl } from '~/utils';
 
+const routeNames: Record<string, string> = {
+    [AppRoute.Juicy]: 'Самое сочное',
+    [AppRoute.NewRecipe]: 'Новый рецепт',
+};
+
 type CategoryData = {
     category: Category | null;
     subcategory: SubCategory | null;
@@ -86,7 +91,6 @@ export const Breadcrumbs = ({ onBreadcrumbClick }: BreadcrumbsProps) => {
                 },
             }}
         >
-            {/* Главная */}
             <BreadcrumbItem>
                 <BreadcrumbLink
                     as={Link}
@@ -103,21 +107,19 @@ export const Breadcrumbs = ({ onBreadcrumbClick }: BreadcrumbsProps) => {
                 </BreadcrumbLink>
             </BreadcrumbItem>
 
-            {/* Статическая страница "Самое сочное" */}
-            {location.pathname === AppRoute.Juicy && (
+            {routeNames[location.pathname] && (
                 <BreadcrumbItem isCurrentPage>
                     <BreadcrumbLink
                         as={Link}
-                        to={AppRoute.Juicy}
+                        to={location.pathname}
                         color='black'
                         pointerEvents='none'
                     >
-                        Самое сочное
+                        {routeNames[location.pathname]}
                     </BreadcrumbLink>
                 </BreadcrumbItem>
             )}
 
-            {/* Категория */}
             {category && (
                 <BreadcrumbItem>
                     <BreadcrumbLink
@@ -136,7 +138,6 @@ export const Breadcrumbs = ({ onBreadcrumbClick }: BreadcrumbsProps) => {
                 </BreadcrumbItem>
             )}
 
-            {/* Подкатегория */}
             {subcategory && (
                 <BreadcrumbItem isCurrentPage={!id}>
                     <BreadcrumbLink

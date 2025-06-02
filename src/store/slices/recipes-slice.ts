@@ -6,10 +6,8 @@ import { formatAllergensForUrl } from '~/utils';
 
 import { ApplicationState } from '../configure-store';
 
-// Типы для фильтров
 export type FilterTypes = 'meatTypes' | 'garnishTypes' | 'allergens' | 'categories' | 'authors';
 
-// Типизация параметров поиска
 export type SearchQueryParams = {
     searchString?: string;
     allergens?: string[];
@@ -22,7 +20,6 @@ export type SearchQueryParams = {
     limit?: number;
 };
 
-// Типизация фильтров
 export type FiltersMap = {
     meatTypes?: string[];
     garnishTypes?: string[];
@@ -31,7 +28,6 @@ export type FiltersMap = {
     authors?: string[];
 };
 
-// Типизация состояния рецептов
 export type RecipeState = {
     recipes: Recipe[];
     filteredRecipes: Recipe[];
@@ -47,12 +43,13 @@ export type RecipeState = {
     searchQuery: string;
     isDrawerOpen: boolean;
     searchQueryParams: SearchQueryParams;
-    isError: boolean;
     isSearchTriggered: boolean;
-    isFetching: boolean;
+    isSliderFetching: boolean;
+    isJuiciestFetching: boolean;
+    isRelevantFetching: boolean;
+    isCategoryCuisineDataFetching: boolean;
 };
 
-// Дефолтные значения для параметров поиска
 const DEFAULT_PAGE = 1;
 const DEFAULT_LIMIT = 8;
 
@@ -66,7 +63,6 @@ const defaultSearchParams: SearchQueryParams = {
     limit: DEFAULT_LIMIT,
 };
 
-// Начальное состояние
 const initialState: RecipeState = {
     recipes: [],
     filteredRecipes: [],
@@ -82,12 +78,13 @@ const initialState: RecipeState = {
     searchQuery: '',
     isDrawerOpen: false,
     searchQueryParams: defaultSearchParams,
-    isError: false,
     isSearchTriggered: false,
-    isFetching: false,
+    isSliderFetching: false,
+    isJuiciestFetching: false,
+    isRelevantFetching: false,
+    isCategoryCuisineDataFetching: false,
 };
 
-// Вспомогательные функции
 const getAllergens = (state: RecipeState): string[] => [
     ...state.allergens,
     ...(state.appliedFilters.allergens || []),
@@ -154,8 +151,6 @@ export const recipeSlice = createSlice({
         },
         applyFilters(state) {
             state.appliedFilters = JSON.parse(JSON.stringify(state.selectedFilters));
-
-            // Отображение выбранных фильтров на параметры поиска
             const allergens = formatAllergensForUrl(getAllergens(state));
 
             state.searchQueryParams = {
@@ -192,23 +187,25 @@ export const recipeSlice = createSlice({
         setDrawerStatus(state, action: PayloadAction<boolean>) {
             state.isDrawerOpen = action.payload;
         },
-        setError: (state, action: PayloadAction<boolean>) => {
-            state.isError = action.payload;
-        },
-        clearError: (state) => {
-            state.isError = false;
-        },
         setIsSearchTriggered: (state, action: PayloadAction<boolean>) => {
             state.isSearchTriggered = action.payload;
         },
-        setIsFetching: (state, action: PayloadAction<boolean>) => {
-            state.isFetching = action.payload;
+        setIsSliderFetching: (state, action: PayloadAction<boolean>) => {
+            state.isSliderFetching = action.payload;
+        },
+        setIsJuiciestFetching: (state, action: PayloadAction<boolean>) => {
+            state.isJuiciestFetching = action.payload;
+        },
+        setIsRelevantFetching: (state, action: PayloadAction<boolean>) => {
+            state.isRelevantFetching = action.payload;
+        },
+        setIsCategoryCuisineDataFetching: (state, action: PayloadAction<boolean>) => {
+            state.isCategoryCuisineDataFetching = action.payload;
         },
         resetState: () => initialState,
     },
 });
 
-// Экшены
 export const {
     setRecipes,
     toggleFilterAllergen,
@@ -227,58 +224,42 @@ export const {
     clearSearch,
     setDrawerStatus,
     updateSearchParams,
-    setError,
-    clearError,
     setIsSearchTriggered,
-    setIsFetching,
+    setIsSliderFetching,
+    setIsJuiciestFetching,
+    setIsRelevantFetching,
+    setIsCategoryCuisineDataFetching,
     applyIntroAllergens,
     resetState,
 } = recipeSlice.actions;
 
-// Селекторы сгруппированные по типу данных
-export const selectors = {
-    // Данные рецептов
-    recipes: (state: ApplicationState) => state.recipes.filteredRecipes,
+export const recipesSelector = (state: ApplicationState) => state.recipes.filteredRecipes;
+export const currentCategorySelector = (state: ApplicationState) => state.recipes.currentCategory;
+export const currentSubcategorySelector = (state: ApplicationState) =>
+    state.recipes.currentSubcategory;
+export const currentRecipeTitleSelector = (state: ApplicationState) =>
+    state.recipes.currentRecipeTitle;
+export const currentRecipeIdSelector = (state: ApplicationState) => state.recipes.currentRecipeId;
 
-    // Категории и рецепты
-    currentCategory: (state: ApplicationState) => state.recipes.currentCategory,
-    currentSubcategory: (state: ApplicationState) => state.recipes.currentSubcategory,
-    currentRecipeTitle: (state: ApplicationState) => state.recipes.currentRecipeTitle,
-    currentRecipeId: (state: ApplicationState) => state.recipes.currentRecipeId,
+export const allergensSelector = (state: ApplicationState) => state.recipes.allergens;
+export const isFilterActiveSelector = (state: ApplicationState) =>
+    state.recipes.isFilterAllergenActive;
+export const isIntroActiveSelector = (state: ApplicationState) =>
+    state.recipes.isIntroAllergenActive;
+export const selectedFiltersSelector = (state: ApplicationState) => state.recipes.selectedFilters;
 
-    // Фильтры и аллергены
-    allergens: (state: ApplicationState) => state.recipes.allergens,
-    isFilterActive: (state: ApplicationState) => state.recipes.isFilterAllergenActive,
-    isIntroActive: (state: ApplicationState) => state.recipes.isIntroAllergenActive,
-    selectedFilters: (state: ApplicationState) => state.recipes.selectedFilters,
+export const serchInputSelector = (state: ApplicationState) => state.recipes.searchQuery;
+export const searchParamsSelector = (state: ApplicationState) => state.recipes.searchQueryParams;
+export const isSearchTriggeredSelector = (state: ApplicationState) =>
+    state.recipes.isSearchTriggered;
 
-    // Поиск
-    searchQuery: (state: ApplicationState) => state.recipes.searchQuery,
-    searchParams: (state: ApplicationState) => state.recipes.searchQueryParams,
-    isSearchTriggered: (state: ApplicationState) => state.recipes.isSearchTriggered,
+export const drawerStatusSelector = (state: ApplicationState) => state.recipes.isDrawerOpen;
+export const isSliderFetchingSelector = (state: ApplicationState) => state.recipes.isSliderFetching;
+export const isJuiciestFetchingSelector = (state: ApplicationState) =>
+    state.recipes.isJuiciestFetching;
+export const isRelevantFetchingSelector = (state: ApplicationState) =>
+    state.recipes.isRelevantFetching;
+export const isCategoryCuisineDataFetchingSelector = (state: ApplicationState) =>
+    state.recipes.isCategoryCuisineDataFetching;
 
-    // UI состояние
-    drawerStatus: (state: ApplicationState) => state.recipes.isDrawerOpen,
-    isError: (state: ApplicationState) => state.recipes.isError,
-    isFetching: (state: ApplicationState) => state.recipes.isFetching,
-};
-
-// Для обратной совместимости - индивидуальные селекторы
-export const recipesSelector = selectors.recipes;
-export const allergensSelector = selectors.allergens;
-export const currentCategorySelector = selectors.currentCategory;
-export const currentSubcategorySelector = selectors.currentSubcategory;
-export const currentRecipeTitleSelector = selectors.currentRecipeTitle;
-export const currentRecipeIdSelector = selectors.currentRecipeId;
-export const isFilterActiveSelector = selectors.isFilterActive;
-export const isIntroActiveSelector = selectors.isIntroActive;
-export const selectedFiltersSelector = selectors.selectedFilters;
-export const serchInputSelector = selectors.searchQuery;
-export const drawerStatusSelector = selectors.drawerStatus;
-export const searchParamsSelector = selectors.searchParams;
-export const isErrorSelector = selectors.isError;
-export const isSearchTriggeredSelector = selectors.isSearchTriggered;
-export const isFetching = selectors.isFetching;
-
-// Редьюсер
 export default recipeSlice.reducer;

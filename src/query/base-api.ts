@@ -1,9 +1,9 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { createApi } from '@reduxjs/toolkit/query/react';
 
-import { API_URL } from '~/consts/consts';
+import { baseQueryWithReauth } from './baseQueryWithReauth';
 
 export const baseApiSlice = createApi({
     reducerPath: 'yee-daa-api',
-    baseQuery: fetchBaseQuery({ baseUrl: API_URL }),
+    baseQuery: baseQueryWithReauth,
     endpoints: () => ({}),
 });

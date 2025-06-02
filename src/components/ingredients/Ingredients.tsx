@@ -26,9 +26,8 @@ type IngredientsProps = {
 export const Ingredients = ({ portions = 1, ingredients }: IngredientsProps) => {
     const [currentPortions, setCurrentPortions] = useState(portions);
 
-    // Функция для перерасчёта количества ингредиентов
-    const calculateIngredientCount = (count: string) => {
-        const baseCount = parseFloat(count);
+    const calculateIngredientCount = (count: string | number) => {
+        const baseCount = typeof count === 'string' ? parseFloat(count) : count;
         if (isNaN(baseCount)) return count;
         const scaledCount = (baseCount / portions) * currentPortions;
         return Number.isInteger(scaledCount) ? scaledCount.toString() : scaledCount.toFixed(1);
@@ -55,7 +54,6 @@ export const Ingredients = ({ portions = 1, ingredients }: IngredientsProps) => 
                         maxW={20}
                         value={currentPortions}
                         min={1}
-                        max={10}
                         onChange={(valueString) => setCurrentPortions(Number(valueString))}
                     >
                         <NumberInputField />
@@ -87,7 +85,7 @@ export const Ingredients = ({ portions = 1, ingredients }: IngredientsProps) => 
                         <Text>{item.title}</Text>
                         <Spacer />
                         <Text>
-                            {item.count !== '0' && calculateIngredientCount(item.count)}{' '}
+                            {item.count !== 0 && calculateIngredientCount(item.count)}{' '}
                             {item.measureUnit}
                         </Text>
                     </ListItem>

@@ -1,5 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
+import { TOKEN_NAME } from '~/consts/consts';
+
 import { ApplicationState } from '../configure-store';
 
 type Alert = {
@@ -18,7 +20,7 @@ export type AuthState = {
 };
 
 const initialState: AuthState = {
-    isAuthorized: Boolean(localStorage.getItem('accessToken')),
+    isAuthorized: Boolean(localStorage.getItem(TOKEN_NAME)),
     alertStatus: { status: 'error', title: '', isError: false, desc: '' },
     isVerificationExpired: false,
     isSubmitingForm: false,
@@ -34,9 +36,9 @@ export const authSlice = createSlice({
         },
         logout: (state) => {
             state.isAuthorized = false;
-            localStorage.removeItem('accessToken');
+            localStorage.removeItem(TOKEN_NAME);
         },
-        setAlertStatus: (state, action: PayloadAction<Alert>) => {
+        setAuthAlertStatus: (state, action: PayloadAction<Alert>) => {
             state.alertStatus = action.payload;
         },
         setIsVerificationExpired: (state, action: PayloadAction<boolean>) => {
@@ -51,23 +53,20 @@ export const authSlice = createSlice({
     },
 });
 
-// Экшены
 export const {
     login,
     logout,
-    setAlertStatus,
+    setAuthAlertStatus,
     setIsVerificationExpired,
     setIsSubmitingform,
     setIsAuthModalOpen,
 } = authSlice.actions;
 
-// Селекторы
 export const isAuthorizedSelector = (state: ApplicationState) => state.auth.isAuthorized;
 export const isVerificationExpiredSelector = (state: ApplicationState) =>
     state.auth.isVerificationExpired;
-export const alertStatusSelector = (state: ApplicationState) => state.auth.alertStatus;
+export const alertAuthStatusSelector = (state: ApplicationState) => state.auth.alertStatus;
 export const isSubmitingFormSelector = (state: ApplicationState) => state.auth.isSubmitingForm;
 export const isAuthModalOpenSelector = (state: ApplicationState) => state.auth.isAuthModalOpen;
 
-// Редьюсер
 export default authSlice.reducer;

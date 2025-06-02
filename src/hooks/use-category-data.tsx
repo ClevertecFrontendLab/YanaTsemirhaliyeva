@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 
-import { AppRoute } from '~/consts/consts';
+import { AppRoute, DynamicRoutes } from '~/consts/consts';
 import { useAppDispatch } from '~/store/hooks';
 import {
     setCategory,
@@ -29,6 +29,8 @@ export const useCategoryData = () => {
                 AppRoute.Login,
                 AppRoute.Register,
                 AppRoute.Verification,
+                AppRoute.NewRecipe,
+                DynamicRoutes.EditRecipePage,
             ].map(String);
             if (excludedRoutes.includes(location.pathname)) {
                 dispatch(setCategory(null));

@@ -13,12 +13,12 @@ import {
     currentCategorySelector,
     currentSubcategorySelector,
     searchParamsSelector,
+    setIsCategoryCuisineDataFetching,
     setSubcategory,
     updateSearchParams,
 } from '~/store/slices/recipes-slice';
 
 import { HorizontalCard } from '../horizontal-card/HorizontalCard';
-import { LoaderFullsize } from '../loader-fullsize/LoaderFullsize';
 
 export const TabsComponent = () => {
     const dispatch = useAppDispatch();
@@ -84,7 +84,6 @@ export const TabsComponent = () => {
         },
         {
             skip: !currentSubcategoryId || !hasAdditionalFilters,
-            refetchOnMountOrArgChange: true,
         },
     );
 
@@ -98,15 +97,16 @@ export const TabsComponent = () => {
         },
         {
             skip: !currentSubcategoryId || hasAdditionalFilters,
-            refetchOnMountOrArgChange: true,
         },
     );
 
-    const { data, isLoading, isFetching } = hasAdditionalFilters
-        ? recipesWithFilters
-        : recipesByCategory;
+    const { data, isFetching } = hasAdditionalFilters ? recipesWithFilters : recipesByCategory;
 
     const recipesForSubcategory = data?.data || [];
+
+    useEffect(() => {
+        dispatch(setIsCategoryCuisineDataFetching(isFetching));
+    }, [dispatch, isFetching]);
 
     const handleTabChange = (index: number) => {
         setPage(1);
@@ -186,10 +186,8 @@ export const TabsComponent = () => {
                         pl={{ md: 7 }}
                         pb={1}
                     >
-                        {idx === activeTabIndex ? (
-                            isLoading || isFetching ? (
-                                <LoaderFullsize isOpen={isLoading || isFetching} />
-                            ) : recipesForSubcategory.length > 0 ? (
+                        {idx === activeTabIndex &&
+                            (recipesForSubcategory.length > 0 ? (
                                 <Grid
                                     templateColumns={{
                                         base: '1fr',
@@ -214,8 +212,7 @@ export const TabsComponent = () => {
                                 <Box textAlign='center' mt='16px' fontSize='lg' color='gray.500'>
                                     По вашему запросу не найдено рецептов
                                 </Box>
-                            )
-                        ) : null}
+                            ))}
                         {data?.data && page < data?.meta?.totalPages && (
                             <Box textAlign='center' mt='16px'>
                                 <Button
