@@ -14,13 +14,18 @@ import { useGetRecipeByIdQuery } from '~/query/services/recipes';
 import { useAppDispatch, useAppSelector } from '~/store/hooks';
 import { setAlertStatus } from '~/store/slices/alert-slice';
 import { isAuthorizedSelector } from '~/store/slices/auth-slice';
-import { setRecipeId, setRecipeTitle } from '~/store/slices/recipes-slice';
+import {
+    isRecipeAuthorFetchingSelector,
+    setRecipeId,
+    setRecipeTitle,
+} from '~/store/slices/recipes-slice';
 
 export const RecipePage = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
     const isAuthorized = useAppSelector(isAuthorizedSelector);
+    const isRecipeAuthorLoading = useAppSelector(isRecipeAuthorFetchingSelector);
 
     useEffect(() => {
         if (id) {
@@ -70,7 +75,7 @@ export const RecipePage = () => {
                         >
                             <Ingredients portions={data.portions!} ingredients={data.ingredients} />
                             <CookSteps {...data} />
-                            <RecipeAuthor />
+                            <RecipeAuthor {...data} />
                         </VStack>
                     </VStack>
                 </Box>
@@ -78,7 +83,7 @@ export const RecipePage = () => {
             <Box pl={{ base: 4, xl: 6 }} pr={{ xl: 12 }}>
                 <NewRecipes />
             </Box>
-            <LoaderFullsize isOpen={isFetching} />
+            <LoaderFullsize isOpen={isFetching || isRecipeAuthorLoading} />
         </Box>
     );
 };

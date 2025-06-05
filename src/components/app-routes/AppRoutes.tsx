@@ -4,6 +4,8 @@ import App from '~/app/App.tsx';
 import { ProtectedRouteElement } from '~/components/protected-route/ProtectedRoute';
 import { AppRoute, DynamicRoutes } from '~/consts/consts';
 import { AuthPage } from '~/pages/auth';
+import { BloggerProfilePage } from '~/pages/blogger-profile';
+import { BlogsPage } from '~/pages/blogs';
 import { CategoryCuisine } from '~/pages/category-cuisine';
 import { ErrorPage } from '~/pages/error';
 import { Home } from '~/pages/home';
@@ -60,6 +62,14 @@ export const router = createBrowserRouter(
                         {
                             path: DynamicRoutes.RecipePage,
                             element: <RecipePage />,
+                        },
+                        {
+                            path: AppRoute.Blogs,
+                            element: <BlogsPage />,
+                        },
+                        {
+                            path: DynamicRoutes.BloggerProfile,
+                            element: <BloggerProfilePage />,
                         },
                         {
                             path: AppRoute.NotFound,

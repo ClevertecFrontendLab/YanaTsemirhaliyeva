@@ -6,6 +6,7 @@ import { apiSlice } from '~/query/create-api';
 import appReducer, { appSlice } from './app-slice';
 import alertReducer, { alertSlice } from './slices/alert-slice';
 import authReducer, { authSlice } from './slices/auth-slice';
+import bloggersReducer, { bloggersSlice } from './slices/bloggers-slice';
 import categoryReducer, { categorySlice } from './slices/categories-slice';
 import newRecipeReducer, { newRecipeSlice } from './slices/new-recipe';
 import recipeReducer, { recipeSlice } from './slices/recipes-slice';
@@ -19,6 +20,7 @@ const rootReducer = combineReducers({
     [authSlice.name]: authReducer,
     [newRecipeSlice.name]: newRecipeReducer,
     [alertSlice.name]: alertReducer,
+    [bloggersSlice.name]: bloggersReducer,
     [baseApiSlice.reducerPath]: baseApiSlice.reducer,
 });
 

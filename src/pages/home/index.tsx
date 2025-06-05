@@ -8,6 +8,7 @@ import { LoaderFullsize } from '~/components/loader-fullsize/LoaderFullsize';
 import { NewRecipes } from '~/components/new-recipes/NewRecipes';
 import { useAppSelector } from '~/store/hooks';
 import {
+    isBloggersFetchingSelector,
     isJuiciestFetchingSelector,
     isRelevantFetchingSelector,
     isSliderFetchingSelector,
@@ -17,8 +18,10 @@ export const Home = () => {
     const isJuiciestFetching = useAppSelector(isJuiciestFetchingSelector);
     const isSliderFetching = useAppSelector(isSliderFetchingSelector);
     const isRelevantFetching = useAppSelector(isRelevantFetchingSelector);
+    const isBlogsFetchings = useAppSelector(isBloggersFetchingSelector);
 
-    const isDataLoading = isSliderFetching || isJuiciestFetching || isRelevantFetching;
+    const isDataLoading =
+        isSliderFetching || isJuiciestFetching || isRelevantFetching || isBlogsFetchings;
 
     return (
         <Box

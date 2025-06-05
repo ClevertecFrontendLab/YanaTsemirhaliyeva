@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router';
 
 import { AppRoute, DynamicRoutes } from '~/consts/consts';
 import { useAppDispatch } from '~/store/hooks';
+import { setCurrentUser } from '~/store/slices/bloggers-slice';
 import {
     setCategory,
     setRecipeTitle,
@@ -17,6 +18,10 @@ export const useCategoryData = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
+        const isBloggerProfile = /^\/blogs\/[^/]+$/.test(location.pathname);
+        if (!isBloggerProfile) {
+            dispatch(setCurrentUser(null));
+        }
         const fetchCategoryData = async () => {
             const { category, subcategory, id, isValid } = await getCategoryAndSubcategoryFromUrl(
                 location.pathname,
@@ -31,8 +36,13 @@ export const useCategoryData = () => {
                 AppRoute.Verification,
                 AppRoute.NewRecipe,
                 DynamicRoutes.EditRecipePage,
+                AppRoute.Blogs,
+                DynamicRoutes.BloggerProfile,
             ].map(String);
-            if (excludedRoutes.includes(location.pathname)) {
+
+            const isBloggerProfile = location.pathname.startsWith('/blogs/');
+
+            if (excludedRoutes.includes(location.pathname) || isBloggerProfile) {
                 dispatch(setCategory(null));
                 dispatch(setSubcategory(null));
                 dispatch(

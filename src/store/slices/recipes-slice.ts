@@ -47,6 +47,8 @@ export type RecipeState = {
     isSliderFetching: boolean;
     isJuiciestFetching: boolean;
     isRelevantFetching: boolean;
+    isBloggersLoading: boolean;
+    isRecipeAuthorLoading: boolean;
     isCategoryCuisineDataFetching: boolean;
 };
 
@@ -82,6 +84,8 @@ const initialState: RecipeState = {
     isSliderFetching: false,
     isJuiciestFetching: false,
     isRelevantFetching: false,
+    isBloggersLoading: false,
+    isRecipeAuthorLoading: false,
     isCategoryCuisineDataFetching: false,
 };
 
@@ -199,6 +203,12 @@ export const recipeSlice = createSlice({
         setIsRelevantFetching: (state, action: PayloadAction<boolean>) => {
             state.isRelevantFetching = action.payload;
         },
+        setIsBloggersFetching: (state, action: PayloadAction<boolean>) => {
+            state.isBloggersLoading = action.payload;
+        },
+        setIsRecipeAuthorFetching: (state, action: PayloadAction<boolean>) => {
+            state.isRecipeAuthorLoading = action.payload;
+        },
         setIsCategoryCuisineDataFetching: (state, action: PayloadAction<boolean>) => {
             state.isCategoryCuisineDataFetching = action.payload;
         },
@@ -228,6 +238,8 @@ export const {
     setIsSliderFetching,
     setIsJuiciestFetching,
     setIsRelevantFetching,
+    setIsBloggersFetching,
+    setIsRecipeAuthorFetching,
     setIsCategoryCuisineDataFetching,
     applyIntroAllergens,
     resetState,
@@ -259,6 +271,10 @@ export const isJuiciestFetchingSelector = (state: ApplicationState) =>
     state.recipes.isJuiciestFetching;
 export const isRelevantFetchingSelector = (state: ApplicationState) =>
     state.recipes.isRelevantFetching;
+export const isBloggersFetchingSelector = (state: ApplicationState) =>
+    state.recipes.isBloggersLoading;
+export const isRecipeAuthorFetchingSelector = (state: ApplicationState) =>
+    state.recipes.isRecipeAuthorLoading;
 export const isCategoryCuisineDataFetchingSelector = (state: ApplicationState) =>
     state.recipes.isCategoryCuisineDataFetching;
 

@@ -12,6 +12,7 @@ export enum AppRoute {
     VerifyOTP = '/verify-otp',
     ResetPassword = '/reset-password',
     Verification = '/verification',
+    Blogs = '/blogs',
 }
 
 export const DynamicRoutes = {
@@ -19,6 +20,7 @@ export const DynamicRoutes = {
     SubcategoryPage: '/:category/:subcategory',
     RecipePage: '/:category/:subcategory/:id',
     EditRecipePage: '/edit-recipe/:category/:subcategory/:id',
+    BloggerProfile: '/blogs/:userId',
 };
 
 export const TOKEN_NAME = 'yeedaaToken';
@@ -115,6 +117,43 @@ export enum DataTestId {
     RecipeDeleteBtn = 'recipe-delete-button',
     HeaderLogo = 'header-logo',
     AddRecipeBtn = 'add-recipe-button',
+    MainPageBlogsBox = 'main-page-blogs-box',
+    MainPageBlogsBtn = 'main-page-blogs-button',
+    MainPageBlogsGrid = 'main-page-blogs-grid',
+    BlogsCard = 'blogs-card',
+    BlogsCardName = 'blogs-card-name',
+    BlogsCardLogin = 'blogs-card-login',
+    BlogsCardNotesText = 'blogs-card-notes-text',
+    BlogsCardNewRecipesBadge = 'blogs-card-new-recipes-badge',
+    BlogsCardRecipesBtn = 'blogs-card-recipes-button',
+    BlogsCardNotesBtn = 'blogs-card-notes-button',
+    BlogsFavoritesBox = 'blogs-favorites-box',
+    BlogsFavoritesGrid = 'blogs-favorites-grid',
+    BlogsOthersBox = 'blogs-others-box',
+    BlogsOthersGrid = 'blogs-others-grid',
+    BlogsOthersBtn = 'blogs-others-button',
+    BloggerUserInfoBox = 'blogger-user-info-box',
+    RecipeCardList = 'recipe-card-list',
+    BlogNotesBox = 'blog-notes-box',
+    BloggerUserInfoName = 'blogger-user-info-name',
+    BloggerUserInfoLogin = 'blogger-user-info-login',
+    BloggerFollowersCount = 'blogger-followers-count',
+    BloggerFollowersBookmarks = 'blogger-followers-bookmarks',
+    BloggerUserNotesCount = 'blogger-user-notes-count',
+    BloggerUserNotesGrid = 'blogger-user-notes-grid',
+    BloggerUserNotesBtn = 'blogger-user-notes-button',
+    NotesCardDate = 'notes-card-date',
+    NotesCardText = 'notes-card-text',
+    BloggerUserOtherBlogsBtn = 'blogger-user-other-blogs-button',
+    BloggerUserOtherBlogsGrid = 'blogger-user-other-blogs-grid',
+    BlogsToggleSubscribe = 'blog-toggle-subscribe',
+    BlogsToggleUnsubscribe = 'blog-toggle-unsubscribe',
+    BloggerUserBreadCrumbName = 'blogger-user-breadcrumb-name',
+    BloggerUserBreadCrumbSection = 'blogger-user-breadcrumb-section',
+    ErrorNotificationTitle = 'error-notification-title',
+    ErrorNotificationDesc = 'error-notification-description',
+    BlogTooltip = 'blog-tooltip',
+    MobileLoader = 'mobile-loader',
 }
 
 export const ALERT_MESSAGES = {
