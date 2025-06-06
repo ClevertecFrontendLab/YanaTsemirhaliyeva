@@ -158,19 +158,14 @@ export const FullSizeCard = ({
                         pr={2}
                         alignSelf='baseline'
                     >
-                        {localBookmarks && (
-                            <HStack gap={1}>
-                                <BookmarkIcon color='black' />
-                                <Box as='span'>{localBookmarks}</Box>
-                            </HStack>
-                        )}
-
-                        {localLikes && (
-                            <HStack alignItems='center' gap={1}>
-                                <HappyFaceIcon color='black' />
-                                <Box as='span'>{localLikes}</Box>
-                            </HStack>
-                        )}
+                        <HStack gap={1}>
+                            <BookmarkIcon color='black' />
+                            <Box as='span'>{localBookmarks}</Box>
+                        </HStack>
+                        <HStack alignItems='center' gap={1}>
+                            <HappyFaceIcon color='black' />
+                            <Box as='span'>{localLikes}</Box>
+                        </HStack>
                     </HStack>
                 </CardHeader>
                 <CardBody

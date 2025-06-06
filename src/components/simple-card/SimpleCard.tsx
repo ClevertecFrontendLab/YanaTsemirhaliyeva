@@ -85,26 +85,22 @@ export const SimpleCard = ({ item }: SimpleCardProps) => {
                     lineHeight='140%'
                     pr={{ base: 0, xl: 4 }}
                 >
-                    {bookmarks && (
-                        <HStack>
-                            <Image
-                                src='/svg/BsBookmarkHeart.svg'
-                                boxSize='12px'
-                                alt='bookmarks count'
-                            />
-                            <Box as='span'>{bookmarks}</Box>
-                        </HStack>
-                    )}
-                    {likes && (
-                        <HStack>
-                            <Image
-                                src='/svg/BsEmojiHeartEyes.svg'
-                                boxSize='12px'
-                                alt='bookmarks count'
-                            />
-                            <Box as='span'>{likes}</Box>
-                        </HStack>
-                    )}
+                    <HStack>
+                        <Image
+                            src='/svg/BsBookmarkHeart.svg'
+                            boxSize='12px'
+                            alt='bookmarks count'
+                        />
+                        <Box as='span'>{bookmarks}</Box>
+                    </HStack>
+                    <HStack>
+                        <Image
+                            src='/svg/BsEmojiHeartEyes.svg'
+                            boxSize='12px'
+                            alt='bookmarks count'
+                        />
+                        <Box as='span'>{likes}</Box>
+                    </HStack>
                 </HStack>
             </CardFooter>
         </Card>

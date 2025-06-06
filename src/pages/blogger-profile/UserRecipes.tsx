@@ -13,7 +13,7 @@ type UserRecipesTypes = {
     list: Recipe[];
 };
 
-export const UserRecipes = ({ list }: UserRecipesTypes) => {
+export const UserRecipes = ({ list = [] }: UserRecipesTypes) => {
     const categories = useAppSelector(categoriesSelector);
     const [isDisplayAllRecipes, setIsDisplayAllRecipes] = useState(false);
     const recipesToDisplay = isDisplayAllRecipes
@@ -21,6 +21,7 @@ export const UserRecipes = ({ list }: UserRecipesTypes) => {
         : list.slice(0, DEFAULT_RECIPES_DISPLAY_COUNT);
 
     const handleLoadMore = () => setIsDisplayAllRecipes(true);
+    if (list.length === 0) return;
 
     return (
         <VStack as='section'>

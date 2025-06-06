@@ -148,18 +148,14 @@ export const HorizontalCard = ({ item, index, categories }: HorizontalCardProps)
                         pr={2}
                         alignSelf={categories.length > 1 ? 'flex-start' : 'auto'}
                     >
-                        {bookmarks && (
-                            <HStack gap={1}>
-                                <BookmarkIcon color='black' />
-                                <Box as='span'>{bookmarks}</Box>
-                            </HStack>
-                        )}
-                        {likes && (
-                            <HStack alignItems='center' gap={1}>
-                                <HappyFaceIcon color='black' />
-                                <Box as='span'>{likes}</Box>
-                            </HStack>
-                        )}
+                        <HStack gap={1}>
+                            <BookmarkIcon color='black' />
+                            <Box as='span'>{bookmarks}</Box>
+                        </HStack>
+                        <HStack alignItems='center' gap={1}>
+                            <HappyFaceIcon color='black' />
+                            <Box as='span'>{likes}</Box>
+                        </HStack>
                     </HStack>
                 </CardHeader>
                 <CardBody

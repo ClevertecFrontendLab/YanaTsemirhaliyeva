@@ -72,7 +72,6 @@ export const MenuComponent = ({
     return (
         <Box width={width} ref={menuRef}>
             <Menu isOpen={isOpen}>
-                {/* Кнопка для открытия/закрытия меню */}
                 <MenuButton
                     data-test-id={dataTestId}
                     ref={menuButtonRef}
@@ -124,7 +123,6 @@ export const MenuComponent = ({
                     )}
                 </MenuButton>
 
-                {/* Выпадающий список */}
                 <MenuList
                     w={menuWidth}
                     minW={menuWidth}
@@ -173,7 +171,6 @@ export const MenuComponent = ({
                         </MenuItem>
                     ))}
 
-                    {/* для добавления пользовательского элемента */}
                     {isAddItem && newItem && (
                         <MenuItem
                             closeOnSelect={false}

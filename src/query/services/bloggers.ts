@@ -10,6 +10,7 @@ import {
     BloggerParams,
     ToggleSubscriptionParams,
 } from '../types/bloggerApi.types';
+import { handleApiError } from './utils';
 
 export const bloggerApiSlice = baseApiSlice
     .enhanceEndpoints({ addTagTypes: [Tags.BLOGGERS, Tags.RECIPES] })
@@ -66,9 +67,7 @@ export const bloggerApiSlice = baseApiSlice
                     method: 'GET',
                 }),
                 transformErrorResponse: (error) =>
-                    typeof error.data === 'object' && error.data !== null
-                        ? (error.data as { message?: string })
-                        : { message: ALERT_MESSAGES.SERVER_ERROR },
+                    handleApiError(error, ALERT_MESSAGES.SERVER_ERROR.desc),
                 providesTags: [{ type: Tags.RECIPES }],
             }),
         }),

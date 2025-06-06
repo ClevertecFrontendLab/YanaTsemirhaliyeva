@@ -4,8 +4,11 @@ import { fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { Mutex } from 'async-mutex';
 
 import { API_URL, TOKEN_NAME } from '~/consts/consts';
+import { ErrorCodes } from '~/consts/errors';
 import { AppDispatch } from '~/store/hooks';
 import { login, logout } from '~/store/slices/auth-slice';
+
+import { ApiEndpoints } from './constants/api';
 
 type TokenRefreshResponse = {
     accessToken?: string;
@@ -38,7 +41,7 @@ export const checkAuthToken = async (api: BaseQueryApi) => {
     try {
         const checkResult = await baseQuery(
             {
-                url: '/auth/check-auth',
+                url: ApiEndpoints.AUTH_REFRESH,
                 method: 'GET',
                 credentials: 'include',
             },
@@ -52,7 +55,7 @@ export const checkAuthToken = async (api: BaseQueryApi) => {
         } else {
             const refreshResult = await baseQuery(
                 {
-                    url: '/auth/refresh',
+                    url: ApiEndpoints.AUTH_REFRESH,
                     method: 'GET',
                     credentials: 'include',
                 },
@@ -152,13 +155,16 @@ export const baseQueryWithReauth: BaseQueryFn<
     await mutex.waitForUnlock();
     let result = await baseQuery(args, api, extraOptions);
 
-    if (result.error?.status === 401 || result.error?.status === 403) {
+    if (
+        result.error?.status === ErrorCodes.Unauthorized ||
+        result.error?.status === ErrorCodes.Forbidden
+    ) {
         if (!mutex.isLocked()) {
             const release = await mutex.acquire();
             try {
                 const refreshResult = await baseQuery(
                     {
-                        url: '/auth/refresh',
+                        url: ApiEndpoints.AUTH_REFRESH,
                         method: 'GET',
                         credentials: 'include',
                     },

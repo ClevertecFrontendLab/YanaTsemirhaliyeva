@@ -145,18 +145,14 @@ export const VerticalCard = ({ item }: VerticalCardProps) => {
                     lineHeight='140%'
                     pr={2}
                 >
-                    {bookmarks && (
-                        <HStack>
-                            <BookmarkIcon color='black' />
-                            <Box as='span'>{bookmarks}</Box>
-                        </HStack>
-                    )}
-                    {likes && (
-                        <HStack>
-                            <HappyFaceIcon color='black' />
-                            <Box as='span'>{likes}</Box>
-                        </HStack>
-                    )}
+                    <HStack>
+                        <BookmarkIcon color='black' />
+                        <Box as='span'>{bookmarks}</Box>
+                    </HStack>
+                    <HStack>
+                        <HappyFaceIcon color='black' />
+                        <Box as='span'>{likes}</Box>
+                    </HStack>
                 </HStack>
             </CardFooter>
         </Card>

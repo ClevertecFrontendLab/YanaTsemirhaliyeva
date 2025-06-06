@@ -64,20 +64,24 @@ export const CardBlogger = ({
         <Card
             data-test-id={DataTestId.BloggerUserInfoBox}
             alignItems='center'
-            flexDir='row'
+            flexDir={{ base: 'column', sm: 'row' }}
             boxShadow='none'
             justifyContent='center'
             gap={6}
         >
             <Avatar name={firstName} src={firstName} size='2xl' />
-            <VStack alignItems='flex-start'>
+            <VStack alignItems='flex-start' w={{ base: '100%', sm: 'fit-content' }} maxW='100%'>
                 <CardHeader
                     data-test-id={DataTestId.BloggerUserInfoName}
                     p={0}
-                    fontSize={48}
+                    fontSize={{ base: 24, md: 48 }}
                     color='black'
                     fontWeight={700}
                     mb={3}
+                    lineHeight='148%'
+                    textAlign={{ base: 'center', sm: 'left' }}
+                    m={{ base: '0 auto', sm: '0' }}
+                    wordBreak='break-word'
                 >
                     {firstName} {lastName}
                 </CardHeader>
@@ -86,10 +90,11 @@ export const CardBlogger = ({
                     fontSize={14}
                     color='blackAlpha.700'
                     data-test-id={DataTestId.BloggerUserInfoLogin}
+                    margin={{ base: '0 auto', sm: '0' }}
                 >
                     @{login}
                 </CardBody>
-                <CardFooter p={0} justifyContent='space-between' w='100%'>
+                <CardFooter p={0} justifyContent='space-between' w='100%' gap={4}>
                     {isFavoriteBlogger ? (
                         <Tooltip
                             data-test-id={DataTestId.BlogTooltip}
@@ -147,27 +152,22 @@ export const CardBlogger = ({
 
                     <HStack>
                         <HStack>
-                            {totalBookmarks && (
-                                <HStack gap={1} data-test-id={DataTestId.BloggerFollowersBookmarks}>
-                                    <BookmarkIcon color='black' boxSize={3} />
-                                    <Box as='span' color='lime.600' fontWeight={600} fontSize={12}>
-                                        {totalBookmarks}
-                                    </Box>
-                                </HStack>
-                            )}
-
-                            {totalSubscribers && (
-                                <HStack
-                                    alignItems='center'
-                                    gap={1}
-                                    data-test-id={DataTestId.BloggerFollowersCount}
-                                >
-                                    <SubscribersIcon color='black' boxSize={3} />
-                                    <Box as='span' color='lime.600' fontWeight={600} fontSize={12}>
-                                        {totalSubscribers}
-                                    </Box>
-                                </HStack>
-                            )}
+                            <HStack gap={1} data-test-id={DataTestId.BloggerFollowersBookmarks}>
+                                <BookmarkIcon color='black' boxSize={3} />
+                                <Box as='span' color='lime.600' fontWeight={600} fontSize={12}>
+                                    {totalBookmarks}
+                                </Box>
+                            </HStack>
+                            <HStack
+                                alignItems='center'
+                                gap={1}
+                                data-test-id={DataTestId.BloggerFollowersCount}
+                            >
+                                <SubscribersIcon color='black' boxSize={3} />
+                                <Box as='span' color='lime.600' fontWeight={600} fontSize={12}>
+                                    {totalSubscribers}
+                                </Box>
+                            </HStack>
                         </HStack>
                     </HStack>
                 </CardFooter>

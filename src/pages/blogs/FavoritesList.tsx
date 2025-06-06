@@ -134,33 +134,18 @@ export const FavoritesList = ({ list }: FavoritesListProps) => (
                         </ButtonGroup>
                         <HStack>
                             <HStack>
-                                {blogger.bookmarksCount && (
-                                    <HStack gap={1}>
-                                        <BookmarkIcon color='black' boxSize={3} />
-                                        <Box
-                                            as='span'
-                                            color='lime.600'
-                                            fontWeight={600}
-                                            fontSize={12}
-                                        >
-                                            {blogger.bookmarksCount}
-                                        </Box>
-                                    </HStack>
-                                )}
-
-                                {blogger.subscribersCount && (
-                                    <HStack alignItems='center' gap={1}>
-                                        <SubscribersIcon color='black' boxSize={3} />
-                                        <Box
-                                            as='span'
-                                            color='lime.600'
-                                            fontWeight={600}
-                                            fontSize={12}
-                                        >
-                                            {blogger.subscribersCount}
-                                        </Box>
-                                    </HStack>
-                                )}
+                                <HStack gap={1}>
+                                    <BookmarkIcon color='black' boxSize={3} />
+                                    <Box as='span' color='lime.600' fontWeight={600} fontSize={12}>
+                                        {blogger.bookmarksCount}
+                                    </Box>
+                                </HStack>
+                                <HStack alignItems='center' gap={1}>
+                                    <SubscribersIcon color='black' boxSize={3} />
+                                    <Box as='span' color='lime.600' fontWeight={600} fontSize={12}>
+                                        {blogger.subscribersCount}
+                                    </Box>
+                                </HStack>
                             </HStack>
                         </HStack>
                     </CardFooter>
@@ -169,6 +154,7 @@ export const FavoritesList = ({ list }: FavoritesListProps) => (
                             pos='absolute'
                             right={2}
                             top={2}
+                            fontWeight={400}
                             data-test-id={DataTestId.BlogsCardNewRecipesBadge}
                         >
                             {getRecipeText(blogger.newRecipesCount)}

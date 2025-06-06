@@ -12,7 +12,7 @@ import {
     HStack,
     Text,
 } from '@chakra-ui/react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router';
 
 import { Loader } from '~/components/loader/Loader';
@@ -22,27 +22,32 @@ import { BookmarkIcon, SubscribeIcon, SubscribersIcon } from '~/shared/custom-ic
 import { BloggerResponse } from '~/types/blogs';
 import { decodeToken } from '~/utils/jwt-decode';
 
+import { BUTTON_STYLES } from './styles';
+
 type OtherBlogItemProps = {
     blogger: BloggerResponse;
     variant?: 'section' | 'page';
 };
+
 export const OtherBlogItem = ({ blogger, variant = 'page' }: OtherBlogItemProps) => {
     const token = localStorage.getItem(TOKEN_NAME);
     const currentUserData = decodeToken(token);
     const [isFavorite, setIsFavorite] = useState(false);
 
-    const [toggleSubscription, { isLoading }] = useToggleSubscriptionMutation();
+    const [toggleSubscription, { isLoading, isSuccess }] = useToggleSubscriptionMutation();
 
     const handleSubscription = (id: string) => {
         toggleSubscription({
             toUserId: id,
             fromUserId: currentUserData?.userId,
-        })
-            .unwrap()
-            .then(() => {
-                setIsFavorite((prev) => !prev);
-            });
+        });
     };
+
+    useEffect(() => {
+        if (isSuccess) {
+            setIsFavorite((prev) => !prev);
+        }
+    }, [isSuccess]);
 
     return (
         <Card
@@ -119,10 +124,7 @@ export const OtherBlogItem = ({ blogger, variant = 'page' }: OtherBlogItemProps)
                 >
                     <Button
                         variant={isFavorite ? 'outline' : 'solid'}
-                        colorScheme='black'
-                        color={isFavorite ? 'blackAlpha.800' : 'white'}
-                        bgColor={isFavorite ? 'transparent' : 'black'}
-                        borderColor={isFavorite ? 'blackAlpha.600' : 'black'}
+                        {...BUTTON_STYLES[isFavorite ? 'outline' : 'solid']}
                         size='xs'
                         leftIcon={<SubscribeIcon />}
                         onClick={() => handleSubscription(blogger._id)}
@@ -150,23 +152,18 @@ export const OtherBlogItem = ({ blogger, variant = 'page' }: OtherBlogItemProps)
                     order={variant === 'page' ? { base: 1, '2xs': 2 } : { base: 1, xl: 2 }}
                     mb={variant === 'page' ? { base: 3, '2xs': 0 } : { base: 3, '2xl': 0 }}
                 >
-                    {blogger.bookmarksCount && (
-                        <HStack gap={1}>
-                            <BookmarkIcon color='black' boxSize={3} />
-                            <Box as='span' color='lime.600' fontWeight={600} fontSize={12}>
-                                {blogger.bookmarksCount}
-                            </Box>
-                        </HStack>
-                    )}
-
-                    {blogger.subscribersCount && (
-                        <HStack alignItems='center' gap={1}>
-                            <SubscribersIcon color='black' boxSize={3} />
-                            <Box as='span' color='lime.600' fontWeight={600} fontSize={12}>
-                                {blogger.subscribersCount}
-                            </Box>
-                        </HStack>
-                    )}
+                    <HStack gap={1}>
+                        <BookmarkIcon color='black' boxSize={3} />
+                        <Box as='span' color='lime.600' fontWeight={600} fontSize={12}>
+                            {blogger.bookmarksCount}
+                        </Box>
+                    </HStack>
+                    <HStack alignItems='center' gap={1}>
+                        <SubscribersIcon color='black' boxSize={3} />
+                        <Box as='span' color='lime.600' fontWeight={600} fontSize={12}>
+                            {blogger.subscribersCount}
+                        </Box>
+                    </HStack>
                 </HStack>
             </CardFooter>
             {isLoading && (

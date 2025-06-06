@@ -43,7 +43,7 @@ export const CategoryCuisine = () => {
             >
                 <CategoryHighlight isDivider />
             </Box>
-            <LoaderFullsize isOpen={isDataLoading} />
+            <LoaderFullsize isLoading={isDataLoading} />
         </Box>
     );
 };

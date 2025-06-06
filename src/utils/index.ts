@@ -374,3 +374,6 @@ export const getErrorMessage = (error: unknown): string => {
 
     return 'Произошла ошибка';
 };
+
+export const isFetchBaseQueryError = (error: unknown): error is FetchBaseQueryError =>
+    typeof error === 'object' && error !== null && 'status' in error;

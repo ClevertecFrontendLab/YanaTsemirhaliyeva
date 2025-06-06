@@ -12,3 +12,6 @@ export const formatDate = (isoString: string) => {
 
     return `${formattedDate} ${formattedTime}`;
 };
+
+export const getGridColumnSpan = (index: number, notesLength: number): string =>
+    index < Math.floor(notesLength / 3) * 3 ? 'span 2' : 'span 3';

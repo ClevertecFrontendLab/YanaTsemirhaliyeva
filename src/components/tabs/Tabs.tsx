@@ -124,9 +124,7 @@ export const TabsComponent = () => {
         }
     };
 
-    const handleLoadMore = () => {
-        setPage((prevPage) => prevPage + 1);
-    };
+    const handleLoadMore = () => setPage((prevPage) => prevPage + 1);
 
     if (!currentCategory) return null;
 

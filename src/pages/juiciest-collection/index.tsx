@@ -111,7 +111,7 @@ export const JuiciestCollection = () => {
                 </Box>
             )}
             <CategoryHighlight isDivider />
-            <LoaderFullsize isOpen={isFetching || isLoading} />
+            <LoaderFullsize isLoading={isFetching || isLoading} />
         </Box>
     );
 };

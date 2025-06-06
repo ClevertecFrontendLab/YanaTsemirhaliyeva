@@ -34,11 +34,14 @@ import { BUTTON_STYLES } from '../auth-modals/consts';
 import { RegisterSuccessModal } from '../auth-modals/RegisterSuccess';
 import { VerificationExpiredModal } from '../auth-modals/VerificationExpired';
 
+const DEFAULT_STEP_NUMBER = 1;
+const SECOND_STEP_NUMBER = 2;
+
 export const RegisterForm = () => {
     const dispatch = useAppDispatch();
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-    const [step, setStep] = useState(1);
+    const [step, setStep] = useState(DEFAULT_STEP_NUMBER);
     const [progressValue, setProgressValue] = useState(0);
     const [isRegistrationSuccess, setIsRegistrationSuccess] = useState(false);
     const isError = useAppSelector(isVerificationExpiredSelector);
@@ -105,7 +108,7 @@ export const RegisterForm = () => {
         if (!formValues.lastName) setError('lastName', { message: 'Введите фамилию' });
         if (!formValues.email) setError('email', { message: 'Введите e-mail' });
 
-        if (isValid) setStep(2);
+        if (isValid) setStep(SECOND_STEP_NUMBER);
     };
 
     const onSubmit = async (data: RegisterFormValues) => {
@@ -160,7 +163,8 @@ export const RegisterForm = () => {
                 <VStack spacing={4} align='flex-start'>
                     <Box width='full'>
                         <Text>
-                            Шаг {step}.{step === 1 ? 'Личная информация' : 'Логин и пароль'}
+                            Шаг {step}.
+                            {step === DEFAULT_STEP_NUMBER ? 'Личная информация' : 'Логин и пароль'}
                         </Text>
                         <Progress
                             data-test-id={DataTestId.SignUpProgress}
@@ -170,7 +174,7 @@ export const RegisterForm = () => {
                         />
                     </Box>
 
-                    {step === 1 && (
+                    {step === DEFAULT_STEP_NUMBER && (
                         <>
                             <FormControl isInvalid={!!errors.firstName}>
                                 <FormLabel htmlFor='firstName'>Ваше имя</FormLabel>
@@ -225,7 +229,7 @@ export const RegisterForm = () => {
                             </Button>
                         </>
                     )}
-                    {step === 2 && (
+                    {step === SECOND_STEP_NUMBER && (
                         <>
                             <FormControl isInvalid={!!errors.login}>
                                 <FormLabel htmlFor='login'>Логин для входа на сайт</FormLabel>

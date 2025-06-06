@@ -8,16 +8,20 @@ import {
     SimpleGrid,
     Text,
 } from '@chakra-ui/react';
-import { useState } from 'react';
+import { RefObject, useState } from 'react';
 
 import { DataTestId } from '~/consts/consts';
 import { Note } from '~/types/blogs';
 
-import { formatDate } from './utils';
+import { formatDate, getGridColumnSpan } from './utils';
 
 const DEFAULT_NOTES_TO_DISPLAY = 3;
 
-export const Notes = ({ notes }: { notes: Note[] }) => {
+type NotesProps = {
+    notes: Note[];
+    notesRef: RefObject<HTMLElement | null>;
+};
+export const Notes = ({ notes, notesRef }: NotesProps) => {
     const [isNeedToShowAllNotes, setIsNeedToShowAllNotes] = useState(false);
 
     const hanldeShowMoreClick = () => setIsNeedToShowAllNotes((prev) => !prev);
@@ -25,18 +29,19 @@ export const Notes = ({ notes }: { notes: Note[] }) => {
     return (
         <Box
             data-test-id={DataTestId.BlogNotesBox}
+            ref={notesRef}
             as='section'
             bgColor='blackAlpha.50'
             p='24px 24px 18px'
             id='notes'
             borderRadius={16}
         >
-            <Heading color='black' fontSize={36} fontWeight={400} mb={4}>
+            <Heading color='black' fontSize={{ base: 20, md: 36 }} fontWeight={400} mb={4}>
                 Заметки&nbsp;
                 <Text
                     as='span'
                     color='blackAlpha.600'
-                    fontSize={30}
+                    fontSize={{ base: 20, md: 30 }}
                     data-test-id={DataTestId.BloggerUserNotesCount}
                 >
                     ({notes.length})
@@ -59,7 +64,7 @@ export const Notes = ({ notes }: { notes: Note[] }) => {
                             }
                             gridColumn={{
                                 base: 'span 1',
-                                '2xs': i < Math.floor(notes.length / 3) * 3 ? 'span 2' : 'span 3',
+                                '2xs': getGridColumnSpan(i, notes.length),
                             }}
                         >
                             <CardHeader
@@ -82,7 +87,7 @@ export const Notes = ({ notes }: { notes: Note[] }) => {
                     ))}
                 </SimpleGrid>
             )}
-            {notes.length > 3 && (
+            {notes.length > DEFAULT_NOTES_TO_DISPLAY && (
                 <Button
                     data-test-id={DataTestId.BloggerUserNotesBtn}
                     variant='ghost'

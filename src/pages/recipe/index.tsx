@@ -83,7 +83,7 @@ export const RecipePage = () => {
             <Box pl={{ base: 4, xl: 6 }} pr={{ xl: 12 }}>
                 <NewRecipes />
             </Box>
-            <LoaderFullsize isOpen={isFetching || isRecipeAuthorLoading} />
+            <LoaderFullsize isLoading={isFetching || isRecipeAuthorLoading} />
         </Box>
     );
 };

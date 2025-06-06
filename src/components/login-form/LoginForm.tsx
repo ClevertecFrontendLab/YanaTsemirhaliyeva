@@ -20,6 +20,7 @@ import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router';
 
 import { ALERT_MESSAGES, AppRoute, DataTestId, InputAriaLabel, InputType } from '~/consts/consts';
+import { ErrorCodes } from '~/consts/errors';
 import { INPUT_STYLES } from '~/consts/styles';
 import { useLoginMutation, useVerifyOtpMutation } from '~/query/services/auth';
 import { LoginFormValues, loginSchema } from '~/schemas/auth.schema';
@@ -75,9 +76,9 @@ export const LoginForm = () => {
         } catch (err) {
             const status = (err as FetchBaseQueryError)?.status;
 
-            if (status === 403) {
+            if (status === ErrorCodes.Forbidden) {
                 dispatch(setAuthAlertStatus(ALERT_MESSAGES.EMAIL_NOT_VERIFIED));
-            } else if (typeof status === 'number' && status >= 500) {
+            } else if (typeof status === 'number' && status >= ErrorCodes.InternalServerError) {
                 setServerErrorOpen(true);
                 dispatch(setIsAuthModalOpen(true));
                 reset();

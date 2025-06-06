@@ -6,6 +6,7 @@ import { useNavigate, useParams } from 'react-router';
 import { AddImgModal } from '~/components/new-recipe-modals/AddImgModal';
 import { ConfirmFormModal } from '~/components/new-recipe-modals/ConfirmFormModal';
 import { ALERT_MESSAGES, AppRoute, DataTestId } from '~/consts/consts';
+import { ErrorCodes } from '~/consts/errors';
 import { useBlockNavigation } from '~/hooks/use-block-navigation';
 import {
     useCreateRecipeMutation,
@@ -104,7 +105,7 @@ export const NewRecipe = () => {
             }, 10);
         } catch (err) {
             const status = (err as { statusCode?: number })?.statusCode;
-            if (status === 409) {
+            if (status === ErrorCodes.Conflict) {
                 dispatch(setAlertStatus(ALERT_MESSAGES.RECIPE_TITLE_CONFLICT));
             } else {
                 dispatch(setAlertStatus(ALERT_MESSAGES.RECIPE_POST_ERROR));
@@ -149,7 +150,7 @@ export const NewRecipe = () => {
             navigate(AppRoute.Index);
         } catch (err) {
             const status = (err as { statusCode?: number })?.statusCode;
-            if (status === 409) {
+            if (status === ErrorCodes.Conflict) {
                 dispatch(setAlertStatus(ALERT_MESSAGES.RECIPE_TITLE_CONFLICT));
             } else {
                 dispatch(setAlertStatus(ALERT_MESSAGES.RECIPE_SAVE_DRAFT_ERROR));

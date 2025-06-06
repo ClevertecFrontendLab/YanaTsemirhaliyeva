@@ -19,6 +19,7 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { ALERT_MESSAGES, DataTestId } from '~/consts/consts';
+import { ErrorCodes } from '~/consts/errors';
 import { INPUT_STYLES } from '~/consts/styles';
 import { useForgotPasswordMutation } from '~/query/services/auth';
 import { PasswordRecoveryFormValues, passwordRecoverySchema } from '~/schemas/auth.schema';
@@ -66,7 +67,7 @@ export const PasswordRecoveryModal = ({ isOpen, onClose, onSubmit }: PasswordRec
             setIsServerError(true);
             const apiError = error as FetchBaseQueryError;
 
-            if (apiError.status === 403) {
+            if (apiError.status === ErrorCodes.Forbidden) {
                 setValue('email', '');
                 dispatch(setAuthAlertStatus(ALERT_MESSAGES.EMAIL_NOT_FOUND));
             } else {

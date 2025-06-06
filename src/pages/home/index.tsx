@@ -49,7 +49,7 @@ export const Home = () => {
                     <CategoryHighlight isDivider />
                 </Box>
             </VStack>
-            <LoaderFullsize isOpen={isDataLoading} />
+            <LoaderFullsize isLoading={isDataLoading} />
         </Box>
     );
 };

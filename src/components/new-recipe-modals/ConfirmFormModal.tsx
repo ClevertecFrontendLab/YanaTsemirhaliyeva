@@ -30,9 +30,7 @@ export const ConfirmFormModal = ({
     onSaveDraft,
     onLeaveWithoutSaving,
 }: ConfirmFormModalProps) => {
-    const handleCloseClick = () => {
-        onClose();
-    };
+    const handleCloseClick = () => onClose();
 
     return (
         <Modal onClose={handleCloseClick} isOpen={isOpen} isCentered>

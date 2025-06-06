@@ -131,7 +131,6 @@ export const Intro = ({ title, desc }: IntroProps) => {
         dispatch(updateSearchParams(updatedSearchParams));
     };
 
-    // Активируем тень при клике внутри Intro
     const handleClickInsideIntro = () => {
         setShadowVisible(true);
     };

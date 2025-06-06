@@ -5,18 +5,18 @@ import { DataTestId } from '~/consts/consts';
 import { Loader } from '../loader/Loader';
 
 type LoaderFullsizeProps = {
-    isOpen: boolean;
+    isLoading: boolean;
     zIndex?: number;
     overlayColor?: ModalOverlayProps['bgColor'];
 };
 
 export const LoaderFullsize = ({
-    isOpen,
+    isLoading,
     zIndex = 10,
     overlayColor = 'blackAlpha.600',
 }: LoaderFullsizeProps) => {
     const isMobileWidth = useBreakpointValue({ base: true, md: false }) ?? true;
-    if (!isOpen) return null;
+    if (!isLoading) return null;
     return (
         <Center
             position='fixed'

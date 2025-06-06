@@ -1,9 +1,9 @@
 import { Box } from '@chakra-ui/react';
-import { FetchBaseQueryError } from '@reduxjs/toolkit/query';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router';
 
 import { ALERT_MESSAGES, AppRoute, TOKEN_NAME } from '~/consts/consts';
+import { ErrorCodes } from '~/consts/errors';
 import {
     useGetBloggerByIdQuery,
     useGetBloggersQuery,
@@ -12,6 +12,7 @@ import {
 import { useAppDispatch } from '~/store/hooks';
 import { setAlertStatus } from '~/store/slices/alert-slice';
 import { setCurrentUser } from '~/store/slices/bloggers-slice';
+import { isFetchBaseQueryError } from '~/utils';
 import { decodeToken } from '~/utils/jwt-decode';
 
 import { CardBlogger } from './CardBlogger';
@@ -28,6 +29,7 @@ export const BloggerProfilePage = () => {
     const navigate = useNavigate();
     const token = localStorage.getItem(TOKEN_NAME);
     const currentUserData = decodeToken(token);
+    const notesRef = useRef<HTMLElement | null>(null);
 
     const {
         data: userInfo,
@@ -53,17 +55,14 @@ export const BloggerProfilePage = () => {
         limit: TOTAL_BLOGS_COUNT,
     });
 
-    const isFetchBaseQueryError = (error: unknown): error is FetchBaseQueryError =>
-        typeof error === 'object' && error !== null && 'status' in error;
-
     useEffect(() => {
         if (
             (isUserDataError &&
                 isFetchBaseQueryError(userDataError) &&
-                userDataError.status === 404) ||
+                userDataError.status === ErrorCodes.NotFound) ||
             (isRecipesDataError &&
                 isFetchBaseQueryError(recipesError) &&
-                recipesError.status === 404)
+                recipesError.status === ErrorCodes.NotFound)
         ) {
             navigate(AppRoute.NotFound, { replace: true });
             dispatch(setAlertStatus(ALERT_MESSAGES.SERVER_ERROR));
@@ -72,10 +71,10 @@ export const BloggerProfilePage = () => {
         if (
             (isUserDataError &&
                 isFetchBaseQueryError(userDataError) &&
-                userDataError.status !== 404) ||
+                userDataError.status !== ErrorCodes.NotFound) ||
             (isRecipesDataError &&
                 isFetchBaseQueryError(recipesError) &&
-                recipesError.status !== 404) ||
+                recipesError.status !== ErrorCodes.NotFound) ||
             isBloggerDataError
         ) {
             navigate(AppRoute.Index, { replace: true });
@@ -95,7 +94,7 @@ export const BloggerProfilePage = () => {
     useEffect(() => {
         if (location.hash === '#notes') {
             setTimeout(() => {
-                document.getElementById('notes')?.scrollIntoView({ behavior: 'smooth' });
+                notesRef.current?.scrollIntoView({ behavior: 'smooth' });
             }, 100);
         }
     }, [location]);
@@ -120,6 +119,7 @@ export const BloggerProfilePage = () => {
             mt={-2}
             pl={{ base: '26px' }}
             pr={{ base: '54px' }}
+            pt={{ base: 6, sm: 0 }}
         >
             {userInfo && (
                 <CardBlogger
@@ -130,9 +130,9 @@ export const BloggerProfilePage = () => {
                     {...userInfo}
                 />
             )}
-            {userRecipes && <UserRecipes list={userRecipes?.recipes ?? []} />}
-            <Notes notes={userRecipes?.notes ?? []} />
-            {otherBloggers && <OtherBlogsSection list={otherBloggers.others ?? []} />}
+            {userRecipes && <UserRecipes list={userRecipes.recipes} />}
+            {userRecipes && <Notes notes={userRecipes.notes} notesRef={notesRef} />}
+            {otherBloggers && <OtherBlogsSection list={otherBloggers.others} />}
         </Box>
     );
 };

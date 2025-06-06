@@ -38,7 +38,7 @@ export const BlogsPage = () => {
         }
     }, [dispatch, isError, navigate]);
 
-    if (isLoading) return <LoaderFullsize isOpen={isLoading} />;
+    if (isLoading) return <LoaderFullsize isLoading={isLoading} />;
     if (!data) return null;
 
     const otherBloggersToDisplay =
@@ -58,12 +58,12 @@ export const BlogsPage = () => {
                 Кулинарные блоги
             </Heading>
             <Flex flexDir='column' gap={6}>
-                {data.favorites && (
+                {data.favorites.length > 0 && (
                     <Box mb={{ base: 2, md: 4 }}>
                         <FavoritesList list={data.favorites} />
                     </Box>
                 )}
-                {otherBloggersToDisplay && (
+                {otherBloggersToDisplay.length > 0 && (
                     <Box
                         display='flex'
                         flexDir='column'
