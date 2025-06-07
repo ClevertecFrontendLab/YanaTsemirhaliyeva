@@ -2,8 +2,10 @@ import { Box } from '@chakra-ui/react';
 import { useEffect, useRef } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router';
 
+import { HelmetComponent } from '~/components/helmet-component/HelmetComponent';
 import { ALERT_MESSAGES, AppRoute, TOKEN_NAME } from '~/consts/consts';
 import { ErrorCodes } from '~/consts/errors';
+import { PAGE_META } from '~/consts/page-meta';
 import {
     useGetBloggerByIdQuery,
     useGetBloggersQuery,
@@ -112,26 +114,29 @@ export const BloggerProfilePage = () => {
     }, [dispatch, userInfo]);
 
     return (
-        <Box
-            display='flex'
-            flexDir='column'
-            gap={10}
-            mt={{ base: 1, md: 0 }}
-            pl={{ base: 4, sm: 5, md: '26px' }}
-            pr={{ base: 4, sm: 5, md: '54px' }}
-        >
-            {userInfo && (
-                <CardBlogger
-                    id={userInfo.bloggerInfo._id}
-                    firstName={userInfo.bloggerInfo.firstName}
-                    lastName={userInfo.bloggerInfo.lastName}
-                    login={userInfo.bloggerInfo.login}
-                    {...userInfo}
-                />
-            )}
-            {userRecipes && <UserRecipes list={userRecipes.recipes} />}
-            {userRecipes && <Notes notes={userRecipes.notes} notesRef={notesRef} />}
-            {otherBloggers && <OtherBlogsSection list={otherBloggers.others} />}
-        </Box>
+        <>
+            <HelmetComponent {...PAGE_META.BloggerProfile} />
+            <Box
+                display='flex'
+                flexDir='column'
+                gap={10}
+                mt={{ base: 1, md: 0 }}
+                pl={{ base: 4, sm: 5, md: '26px' }}
+                pr={{ base: 4, sm: 5, md: '54px' }}
+            >
+                {userInfo && (
+                    <CardBlogger
+                        id={userInfo.bloggerInfo._id}
+                        firstName={userInfo.bloggerInfo.firstName}
+                        lastName={userInfo.bloggerInfo.lastName}
+                        login={userInfo.bloggerInfo.login}
+                        {...userInfo}
+                    />
+                )}
+                {userRecipes && <UserRecipes list={userRecipes.recipes} />}
+                {userRecipes && <Notes notes={userRecipes.notes} notesRef={notesRef} />}
+                {otherBloggers && <OtherBlogsSection list={otherBloggers.others} />}
+            </Box>
+        </>
     );
 };

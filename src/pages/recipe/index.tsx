@@ -5,11 +5,13 @@ import { useNavigate, useParams } from 'react-router';
 import { CaloricContent } from '~/components/caloric-content/CaloricContent';
 import { CookSteps } from '~/components/cook-steps/CookSteps';
 import { FullSizeCard } from '~/components/full-size-card/FullSizeCard';
+import { HelmetComponent } from '~/components/helmet-component/HelmetComponent';
 import { Ingredients } from '~/components/ingredients/Ingredients';
 import { LoaderFullsize } from '~/components/loader-fullsize/LoaderFullsize';
 import { NewRecipes } from '~/components/new-recipes/NewRecipes';
 import { RecipeAuthor } from '~/components/recipe-author/RecipeAuthor';
 import { ALERT_MESSAGES } from '~/consts/consts';
+import { PAGE_META } from '~/consts/page-meta';
 import { useGetRecipeByIdQuery } from '~/query/services/recipes';
 import { useAppDispatch, useAppSelector } from '~/store/hooks';
 import { setAlertStatus } from '~/store/slices/alert-slice';
@@ -56,6 +58,7 @@ export const RecipePage = () => {
 
     return (
         <Box>
+            <HelmetComponent {...PAGE_META.Recipe} />
             <Box pl={{ base: 4, md: '26px' }} pr={18}>
                 <Box mb={{ base: 6, md: 10 }} pt={{ md: 7 }} pr={{ md: 9 }}>
                     <FullSizeCard {...data} />

@@ -1,9 +1,11 @@
 import { Box } from '@chakra-ui/react';
 
 import { CategoryHighlight } from '~/components/category-highlight/CategoryHighlight';
+import { HelmetComponent } from '~/components/helmet-component/HelmetComponent';
 import { Intro } from '~/components/intro/Intro';
 import { LoaderFullsize } from '~/components/loader-fullsize/LoaderFullsize';
 import { TabsComponent } from '~/components/tabs/Tabs';
+import { PAGE_META } from '~/consts/page-meta';
 import { useAppSelector } from '~/store/hooks';
 import {
     currentCategorySelector,
@@ -21,6 +23,7 @@ export const CategoryCuisine = () => {
 
     return (
         <Box>
+            <HelmetComponent {...PAGE_META.CategoryCuisine} />
             <Box
                 m={{
                     base: '0 auto 22px',

@@ -2,9 +2,11 @@ import { Box, Button, Flex, Heading, useBreakpointValue } from '@chakra-ui/react
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 
+import { HelmetComponent } from '~/components/helmet-component/HelmetComponent';
 import { LoaderFullsize } from '~/components/loader-fullsize/LoaderFullsize';
 import { NewRecipes } from '~/components/new-recipes/NewRecipes';
 import { ALERT_MESSAGES, AppRoute, DataTestId, TOKEN_NAME } from '~/consts/consts';
+import { PAGE_META } from '~/consts/page-meta';
 import { useGetBloggersQuery } from '~/query/services/bloggers';
 import { ArrowRightIcon } from '~/shared/custom-icons';
 import { useAppDispatch } from '~/store/hooks';
@@ -47,56 +49,59 @@ export const BlogsPage = () => {
     const handleBtnClick = () => setIsAllBlogs((prev) => !prev);
 
     return (
-        <Box p={6} color='black'>
-            <Heading
-                textAlign='center'
-                fontSize={{ base: 24, md: 48 }}
-                color='black'
-                mb={6}
-                mt={-6}
-            >
-                Кулинарные блоги
-            </Heading>
-            <Flex flexDir='column' gap={6}>
-                {data.favorites.length > 0 && (
-                    <Box mb={{ base: 2, md: 4 }}>
-                        <FavoritesList list={data.favorites} />
-                    </Box>
-                )}
-                {otherBloggersToDisplay.length > 0 && (
-                    <Box
-                        display='flex'
-                        flexDir='column'
-                        as='section'
-                        bgColor='blackAlpha.200'
-                        borderRadius={12}
-                        pb={6}
-                        mb={3}
-                    >
-                        <OtherBlogList list={otherBloggersToDisplay} />
-                        <Button
-                            data-test-id={DataTestId.BlogsOthersBtn}
-                            iconSpacing={2}
-                            size='md'
-                            m='0 auto'
-                            variant='ghost'
-                            colorScheme='black'
-                            onClick={handleBtnClick}
-                            fontSize={18}
-                            pt='10px'
-                            leftIcon={
-                                isAllBlogs ? (
-                                    <ArrowRightIcon sx={{ transform: 'rotate(180deg)' }} />
-                                ) : undefined
-                            }
-                            rightIcon={!isAllBlogs ? <ArrowRightIcon /> : undefined}
+        <>
+            <HelmetComponent {...PAGE_META.Blogs} />
+            <Box p={6} color='black'>
+                <Heading
+                    textAlign='center'
+                    fontSize={{ base: 24, md: 48 }}
+                    color='black'
+                    mb={6}
+                    mt={-6}
+                >
+                    Кулинарные блоги
+                </Heading>
+                <Flex flexDir='column' gap={6}>
+                    {data.favorites.length > 0 && (
+                        <Box mb={{ base: 2, md: 4 }}>
+                            <FavoritesList list={data.favorites} />
+                        </Box>
+                    )}
+                    {otherBloggersToDisplay.length > 0 && (
+                        <Box
+                            display='flex'
+                            flexDir='column'
+                            as='section'
+                            bgColor='blackAlpha.200'
+                            borderRadius={12}
+                            pb={6}
+                            mb={3}
                         >
-                            {isAllBlogs ? 'Свернуть' : 'Все авторы'}
-                        </Button>
-                    </Box>
-                )}
-                <NewRecipes />
-            </Flex>
-        </Box>
+                            <OtherBlogList list={otherBloggersToDisplay} />
+                            <Button
+                                data-test-id={DataTestId.BlogsOthersBtn}
+                                iconSpacing={2}
+                                size='md'
+                                m='0 auto'
+                                variant='ghost'
+                                colorScheme='black'
+                                onClick={handleBtnClick}
+                                fontSize={18}
+                                pt='10px'
+                                leftIcon={
+                                    isAllBlogs ? (
+                                        <ArrowRightIcon sx={{ transform: 'rotate(180deg)' }} />
+                                    ) : undefined
+                                }
+                                rightIcon={!isAllBlogs ? <ArrowRightIcon /> : undefined}
+                            >
+                                {isAllBlogs ? 'Свернуть' : 'Все авторы'}
+                            </Button>
+                        </Box>
+                    )}
+                    <NewRecipes />
+                </Flex>
+            </Box>
+        </>
     );
 };
