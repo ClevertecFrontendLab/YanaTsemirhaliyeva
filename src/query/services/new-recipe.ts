@@ -1,11 +1,10 @@
-import { FetchBaseQueryError } from '@reduxjs/toolkit/query';
-
 import { TOKEN_NAME } from '~/consts/consts';
 import { MeasureUnit, NewRecipeRequest } from '~/types/recipe';
 
 import { baseApiSlice } from '../base-api';
 import { ApiEndpoints } from '../constants/api';
 import { Tags } from '../constants/tags';
+import { handleApiError } from './utils';
 
 export const newRecipeApiSlice = baseApiSlice
     .enhanceEndpoints({ addTagTypes: [Tags.RECIPES] })
@@ -17,19 +16,8 @@ export const newRecipeApiSlice = baseApiSlice
                     method: 'POST',
                     body: newRecipe,
                 }),
-                transformErrorResponse: (error) => {
-                    if (typeof error === 'object' && error !== null) {
-                        return {
-                            statusCode:
-                                (error as FetchBaseQueryError)?.status ??
-                                (error.data as { statusCode?: number })?.statusCode,
-                            message:
-                                (error.data as { message?: string })?.message ??
-                                'Ошибка публикации рецепта',
-                        };
-                    }
-                    return { statusCode: 500, message: 'Неизвестная ошибка' };
-                },
+                transformErrorResponse: (error) =>
+                    handleApiError(error, 'Ошибка публикации рецепта'),
                 invalidatesTags: [{ type: Tags.RECIPES, id: 'LIST' }],
             }),
             saveDraft: builder.mutation<{ draftId: string }, Partial<NewRecipeRequest>>({
@@ -38,29 +26,17 @@ export const newRecipeApiSlice = baseApiSlice
                     method: 'POST',
                     body: draft,
                 }),
-                transformErrorResponse: (error) => {
-                    if (typeof error === 'object' && error !== null) {
-                        return {
-                            statusCode:
-                                (error as FetchBaseQueryError)?.status ??
-                                (error.data as { statusCode?: number })?.statusCode,
-                            message:
-                                (error.data as { message?: string })?.message ??
-                                'Ошибка сохранения черновика',
-                        };
-                    }
-                    return { statusCode: 500, message: 'Неизвестная ошибка' };
-                },
+                transformErrorResponse: (error) =>
+                    handleApiError(error, 'Ошибка сохранения черновика'),
             }),
             deleteRecipe: builder.mutation<{ message: string }, string>({
                 query: (recipeId) => ({
                     url: `${ApiEndpoints.RECIPES}/${recipeId}`,
                     method: 'DELETE',
                 }),
-                transformErrorResponse: (error) =>
-                    typeof error.data === 'object' && error.data !== null
-                        ? (error.data as { message?: string })
-                        : { message: 'Неизвестная ошибка' },
+                transformErrorResponse: (error) => ({
+                    message: handleApiError(error, 'Неизвестная ошибка').message,
+                }),
                 invalidatesTags: () => [{ type: Tags.RECIPES, id: 'LIST' }],
             }),
             updateRecipe: builder.mutation<
@@ -72,19 +48,8 @@ export const newRecipeApiSlice = baseApiSlice
                     method: 'PATCH',
                     body: data,
                 }),
-                transformErrorResponse: (error) => {
-                    if (typeof error === 'object' && error !== null) {
-                        return {
-                            statusCode:
-                                (error as FetchBaseQueryError)?.status ??
-                                (error.data as { statusCode?: number })?.statusCode,
-                            message:
-                                (error.data as { message?: string })?.message ??
-                                'Ошибка публикации рецепта',
-                        };
-                    }
-                    return { statusCode: 500, message: 'Неизвестная ошибка' };
-                },
+                transformErrorResponse: (error) =>
+                    handleApiError(error, 'Ошибка публикации рецепта'),
                 invalidatesTags: (_result, _error, arg) => [
                     { type: Tags.RECIPES, id: arg.recipeId },
                 ],

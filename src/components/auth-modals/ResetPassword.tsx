@@ -244,7 +244,7 @@ export const ResetPasswordModal = ({ isOpen, onClose, email }: ResetPasswordProp
                     </ModalBody>
                 </ModalContent>
             </Modal>
-            <LoaderFullsize isOpen={isLoading} />
+            <LoaderFullsize isLoading={isLoading} />
         </>
     );
 };

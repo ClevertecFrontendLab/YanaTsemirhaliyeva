@@ -79,7 +79,6 @@ export const MenuCategory = ({
     return (
         <Box width={width} ref={menuRef}>
             <Menu isOpen={isOpen}>
-                {/* Кнопка для открытия/закрытия меню */}
                 <MenuButton
                     data-test-id={dataTestId}
                     ref={menuButtonRef}
@@ -131,7 +130,6 @@ export const MenuCategory = ({
                     )}
                 </MenuButton>
 
-                {/* Выпадающий список */}
                 <MenuList
                     w={menuWidth}
                     minW={menuWidth}

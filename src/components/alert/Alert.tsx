@@ -68,8 +68,14 @@ export const AlertComponent = ({ status, title, desc, hasFooter = false }: Alert
                 >
                     <AlertIcon />
                     <Box width='100%'>
-                        <AlertTitle>{title}</AlertTitle>
-                        {desc && <AlertDescription>{desc}</AlertDescription>}
+                        <AlertTitle data-test-id={DataTestId.ErrorNotificationTitle}>
+                            {title}
+                        </AlertTitle>
+                        {desc && (
+                            <AlertDescription data-test-id={DataTestId.ErrorNotificationDesc}>
+                                {desc}
+                            </AlertDescription>
+                        )}
                     </Box>
                     <CloseButton
                         data-test-id={DataTestId.CloseAlertBtn}

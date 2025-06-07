@@ -13,4 +13,6 @@ export enum ApiEndpoints {
     UPLOAD_FILE = '/file/upload',
     MEASURE_UNITS = '/measure-units',
     RECIPE_DRAFT = '/recipe/draft',
+    BLOGGERS = 'bloggers',
+    USERS_SUBSCRIPTION = 'users/toggle-subscription',
 }

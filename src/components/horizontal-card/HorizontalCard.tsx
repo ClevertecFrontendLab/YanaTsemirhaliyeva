@@ -92,15 +92,22 @@ export const HorizontalCard = ({ item, index, categories }: HorizontalCardProps)
                   0 2px 4px -1px rgba(32, 126, 0, 0.06)
                 `,
             }}
+            w='100%'
         >
-            <Image
-                objectFit='cover'
-                width={{ base: '48%', xs: '44.5%', sm: '39.5%', xl: '52%' }}
-                src={`${API_IMG}${image}`}
-                alt={title}
+            <Box
                 pos='relative'
+                width={{ base: '48%', xs: '44.5%', sm: '39.5%', xl: '52%' }}
                 overflow='hidden'
-            />
+            >
+                <Image
+                    objectFit='cover'
+                    src={`${API_IMG}${image}`}
+                    alt={title}
+                    pos='absolute'
+                    h='100%'
+                    w='100%'
+                />
+            </Box>
             <Stack
                 width={{ base: '52%', xs: '55.5%', sm: '60.5%', xl: '48%' }}
                 gap={{ base: '1px', sm: 2 }}
@@ -141,18 +148,14 @@ export const HorizontalCard = ({ item, index, categories }: HorizontalCardProps)
                         pr={2}
                         alignSelf={categories.length > 1 ? 'flex-start' : 'auto'}
                     >
-                        {bookmarks && (
-                            <HStack gap={1}>
-                                <BookmarkIcon color='black' />
-                                <Box as='span'>{bookmarks}</Box>
-                            </HStack>
-                        )}
-                        {likes && (
-                            <HStack alignItems='center' gap={1}>
-                                <HappyFaceIcon color='black' />
-                                <Box as='span'>{likes}</Box>
-                            </HStack>
-                        )}
+                        <HStack gap={1}>
+                            <BookmarkIcon color='black' />
+                            <Box as='span'>{bookmarks}</Box>
+                        </HStack>
+                        <HStack alignItems='center' gap={1}>
+                            <HappyFaceIcon color='black' />
+                            <Box as='span'>{likes}</Box>
+                        </HStack>
                     </HStack>
                 </CardHeader>
                 <CardBody

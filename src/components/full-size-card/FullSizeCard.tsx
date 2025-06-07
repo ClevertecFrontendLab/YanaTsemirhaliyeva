@@ -13,11 +13,9 @@ import {
     Show,
     Spacer,
     Stack,
-    Tag,
-    TagLabel,
     Text,
 } from '@chakra-ui/react';
-import { useOptimistic } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 
 import { ALERT_MESSAGES, API_IMG, AppRoute, DataTestId, TOKEN_NAME } from '~/consts/consts';
@@ -36,6 +34,9 @@ import { categoriesSelector } from '~/store/slices/categories-slice';
 import { Recipe } from '~/types/recipe';
 import { getUniqueCategories } from '~/utils';
 import { decodeToken } from '~/utils/jwt-decode';
+
+import { TagComponent } from '../tag/Tag';
+import { FULL_CARD_STYLES } from './styles';
 
 type FullSizeCardProps = {
     item: Recipe;
@@ -59,10 +60,10 @@ export const FullSizeCard = ({
     const userData = decodeToken(token);
     const isRecipeCreateByCurrentUser = userData?.userId === authorId;
     const { category, subcategory, id } = useParams();
-    const [optimisticLikes, setOptimisticLikes] = useOptimistic(likes);
-    const [optimisticBookmarks, setOptimisticBookmarks] = useOptimistic(bookmarks);
     const [likeRecipe] = useLikeRecipeMutation();
     const [bookmarkRecipe] = useBookmarkRecipeMutation();
+    const [localLikes, setLocalLikes] = useState(likes);
+    const [localBookmarks, setLocalBookmarks] = useState(bookmarks);
 
     const handleEditClick = () => {
         navigate(`/edit-recipe/${category}/${subcategory}/${id}`);
@@ -80,23 +81,35 @@ export const FullSizeCard = ({
         }
     };
 
+    useEffect(() => {
+        setLocalLikes(likes);
+        setLocalBookmarks(bookmarks);
+    }, [likes, bookmarks]);
+
+    const [isLiking, setIsLiking] = useState(false);
+    const [isBookmarking, setIsBookmarking] = useState(false);
+
     const handleLike = async () => {
-        setOptimisticLikes((prev) => prev + 1);
+        if (isLiking) return;
+        setIsLiking(true);
         try {
             await likeRecipe(_id).unwrap();
         } catch {
-            setOptimisticLikes((prev) => prev - 1);
             dispatch(setAlertStatus(ALERT_MESSAGES.SERVER_ERROR));
+        } finally {
+            setIsLiking(false);
         }
     };
 
     const handleBookmark = async () => {
-        setOptimisticBookmarks((prev) => prev + 1);
+        if (isBookmarking) return;
+        setIsBookmarking(true);
         try {
             await bookmarkRecipe(_id).unwrap();
         } catch {
-            setOptimisticBookmarks((prev) => prev - 1);
             dispatch(setAlertStatus(ALERT_MESSAGES.SERVER_ERROR));
+        } finally {
+            setIsBookmarking(false);
         }
     };
 
@@ -131,19 +144,7 @@ export const FullSizeCard = ({
                     <HStack flexWrap='wrap'>
                         {uniqueCategories.map((cat, i) => (
                             <Box key={i}>
-                                <Tag
-                                    size={{ base: 'sm', sm: 'md' }}
-                                    variant='subtle'
-                                    backgroundColor='lime.50'
-                                    gap={{ base: '1px', sm: 2 }}
-                                    top='7px'
-                                    left='8px'
-                                    borderRadius={{ base: '4px', sm: 'lg' }}
-                                    px={{ sm: '4px' }}
-                                >
-                                    <Image src={`${API_IMG}${cat.icon}`} boxSize={5} />
-                                    <TagLabel>{cat.title}</TagLabel>
-                                </Tag>
+                                <TagComponent title={cat.title} icon={cat.icon} />
                             </Box>
                         ))}
                     </HStack>
@@ -157,19 +158,14 @@ export const FullSizeCard = ({
                         pr={2}
                         alignSelf='baseline'
                     >
-                        {optimisticBookmarks && (
-                            <HStack gap={1}>
-                                <BookmarkIcon color='black' />
-                                <Box as='span'>{optimisticBookmarks}</Box>
-                            </HStack>
-                        )}
-
-                        {optimisticLikes && (
-                            <HStack alignItems='center' gap={1}>
-                                <HappyFaceIcon color='black' />
-                                <Box as='span'>{optimisticLikes}</Box>
-                            </HStack>
-                        )}
+                        <HStack gap={1}>
+                            <BookmarkIcon color='black' />
+                            <Box as='span'>{localBookmarks}</Box>
+                        </HStack>
+                        <HStack alignItems='center' gap={1}>
+                            <HappyFaceIcon color='black' />
+                            <Box as='span'>{localLikes}</Box>
+                        </HStack>
                     </HStack>
                 </CardHeader>
                 <CardBody
@@ -219,8 +215,7 @@ export const FullSizeCard = ({
                     {!isRecipeCreateByCurrentUser && (
                         <Stack direction='row' spacing={2} alignItems='center'>
                             <Button
-                                size={{ base: 'xs', sm: 'sm', xl: 'lg' }}
-                                px={{ base: 2, sm: 3 }}
+                                {...FULL_CARD_STYLES.likeBtn}
                                 leftIcon={
                                     <HappyFaceIcon
                                         boxSize={{ base: 3, sm: 4 }}
@@ -234,48 +229,18 @@ export const FullSizeCard = ({
                                     />
                                 }
                                 colorScheme='black'
-                                variant='outline'
-                                fontSize={{ base: 12, sm: 16, xl: 14 }}
-                                sx={{
-                                    transition: 'all 0.3s ease-in-out',
-                                    '&:focus': {
-                                        outline: 'none',
-                                        borderColor: 'transparent',
-                                    },
-                                    '&:hover': {
-                                        bgColor: 'lime.600',
-                                        color: 'white',
-                                        borderColor: 'lime.600',
-                                    },
-                                }}
                                 onClick={handleLike}
+                                isLoading={isLiking}
+                                disabled={isLiking}
                             >
                                 Оценить рецепт
                             </Button>
                             <Button
-                                size={{ base: 'sx', sm: 'sm', xl: 'lg' }}
+                                {...FULL_CARD_STYLES.bookmarkBtn}
                                 leftIcon={<BookmarkIcon />}
-                                colorScheme='black'
-                                variant='solid'
-                                bgColor='lime.400'
-                                color='black'
-                                fontWeight={600}
-                                fontSize={{ base: 12, sm: 16, xl: 14 }}
-                                p={1}
-                                px={{ base: 2, sm: 3 }}
-                                sx={{
-                                    transition: 'all 0.3s ease-in-out',
-                                    '&:focus': {
-                                        outline: 'none',
-                                        borderColor: 'transparent',
-                                    },
-                                    '&:hover': {
-                                        bgColor: 'white',
-                                        color: 'black',
-                                        borderColor: 'black',
-                                    },
-                                }}
                                 onClick={handleBookmark}
+                                isLoading={isBookmarking}
+                                disabled={isBookmarking}
                             >
                                 Сохранить в закладки
                             </Button>
@@ -295,27 +260,9 @@ export const FullSizeCard = ({
                                 data-test-id={DataTestId.RecipeDeleteBtn}
                             />
                             <Button
-                                size={{ base: 'sx', sm: 'sm', xl: 'lg' }}
+                                {...FULL_CARD_STYLES.editBtn}
                                 leftIcon={<WriteDraftIcon boxSize={4} />}
-                                colorScheme='black'
-                                variant='outline'
-                                color='blackAlpha.800'
-                                borderColor='blackAlpha.800'
-                                fontSize={{ base: 12, md: 18 }}
-                                p='3px'
                                 onClick={handleEditClick}
-                                sx={{
-                                    transition: 'all 0.3s ease-in-out',
-                                    '&:focus': {
-                                        outline: 'none',
-                                        borderColor: 'blackAlpha.800',
-                                    },
-                                    '&:hover': {
-                                        bgColor: 'lime.600',
-                                        color: 'white',
-                                        borderColor: 'lime.600',
-                                    },
-                                }}
                             >
                                 Редактировать рецепт
                             </Button>

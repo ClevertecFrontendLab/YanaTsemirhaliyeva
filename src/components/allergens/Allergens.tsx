@@ -17,6 +17,7 @@ import { DataTestId } from '~/consts/consts';
 import { generateTestId } from '~/utils';
 
 import { Toggle } from '../toggle/Toggle';
+import { ALLERGENS_STYLES } from './styles';
 
 const allergens = [
     'Молочные продукты',
@@ -112,15 +113,6 @@ export const AllergenSelect = ({
                 <Button
                     data-test-id={testIdMenuButton}
                     rightIcon={isOpen ? <ChevronUpIcon mr={2} /> : <ChevronDownIcon mr={2} />}
-                    display='flex'
-                    justifyContent='space-between'
-                    variant='outline'
-                    w='100%'
-                    fontWeight='400'
-                    color='blackAlpha.700'
-                    minH='fit-content'
-                    h='fit-content'
-                    textAlign='start'
                     onClick={() => {
                         if (isFilterActive) {
                             setShadowVisible?.(true);
@@ -128,25 +120,8 @@ export const AllergenSelect = ({
                         }
                     }}
                     isDisabled={!isFilterActive}
-                    sx={{
-                        transition: 'border-color 0.3s ease-in-out',
-                        padding: 2,
-                        paddingLeft: 3,
-                        '&:focus': {
-                            outline: 'none',
-                        },
-                        '&:hover': {
-                            bgColor: 'transparent',
-                            borderColor: 'blackAlpha.400',
-                        },
-                        '&[data-active]': {
-                            bgColor: 'transparent !important',
-                            borderColor: 'lime.300 !important',
-                        },
-                        '&:disabled': {
-                            pointerEvents: 'none',
-                        },
-                    }}
+                    {...ALLERGENS_STYLES.mainButton}
+                    textAlign='start'
                 >
                     {selectedAllergens.length > 0 ? (
                         <HStack gap={2} flexWrap='wrap'>
@@ -174,25 +149,8 @@ export const AllergenSelect = ({
                         data-test-id={testIdMenuList ? testIdMenuList : ''}
                         minW={width}
                         w={width}
-                        zIndex={10}
-                        position='absolute'
-                        top='100%'
-                        left={0}
-                        borderRadius='md'
-                        boxShadow='md'
-                        bg='white'
-                        p={0}
-                        mt={1}
-                        border='1px solid'
-                        borderColor='gray.200'
-                        color='blackAlpha.800'
-                        maxH='620px'
+                        {...ALLERGENS_STYLES.menuListBox}
                         overflowY='auto'
-                        sx={{
-                            '& > *:nth-of-type(odd):not(:last-child)': {
-                                bg: 'blackAlpha.100',
-                            },
-                        }}
                     >
                         <Box>
                             {allergensList.map((allergen, index) => (

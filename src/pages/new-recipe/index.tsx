@@ -3,9 +3,12 @@ import { useEffect, useRef, useState } from 'react';
 import { FormProvider } from 'react-hook-form';
 import { useNavigate, useParams } from 'react-router';
 
+import { HelmetComponent } from '~/components/helmet-component/HelmetComponent';
 import { AddImgModal } from '~/components/new-recipe-modals/AddImgModal';
 import { ConfirmFormModal } from '~/components/new-recipe-modals/ConfirmFormModal';
 import { ALERT_MESSAGES, AppRoute, DataTestId } from '~/consts/consts';
+import { ErrorCodes } from '~/consts/errors';
+import { PAGE_META } from '~/consts/page-meta';
 import { useBlockNavigation } from '~/hooks/use-block-navigation';
 import {
     useCreateRecipeMutation,
@@ -104,7 +107,7 @@ export const NewRecipe = () => {
             }, 10);
         } catch (err) {
             const status = (err as { statusCode?: number })?.statusCode;
-            if (status === 409) {
+            if (status === ErrorCodes.Conflict) {
                 dispatch(setAlertStatus(ALERT_MESSAGES.RECIPE_TITLE_CONFLICT));
             } else {
                 dispatch(setAlertStatus(ALERT_MESSAGES.RECIPE_POST_ERROR));
@@ -149,7 +152,7 @@ export const NewRecipe = () => {
             navigate(AppRoute.Index);
         } catch (err) {
             const status = (err as { statusCode?: number })?.statusCode;
-            if (status === 409) {
+            if (status === ErrorCodes.Conflict) {
                 dispatch(setAlertStatus(ALERT_MESSAGES.RECIPE_TITLE_CONFLICT));
             } else {
                 dispatch(setAlertStatus(ALERT_MESSAGES.RECIPE_SAVE_DRAFT_ERROR));
@@ -229,39 +232,42 @@ export const NewRecipe = () => {
     };
 
     return (
-        <Box pl={{ base: 4, '2xs': 5, md: 6 }} pr={{ base: 4, '2xs': 5, md: 0 }} pt={{ sm: 7 }}>
-            <FormProvider {...methods}>
-                <RecipeForm
-                    methods={methods}
-                    isModalOpen={isModalOpen}
-                    onOpenModalClick={handleOpenModal}
-                    onDeleteImageClick={handleDeleteImage}
-                    addStep={addStep}
-                    removeStep={removeStep}
-                    addIngredient={addIngredient}
-                    removeIngredient={removeIngredient}
-                    onSaveDraftClick={handleSaveDraft}
-                    onValidateFormClick={handleValidate}
-                    isSavingDraft={isSavingDraft}
-                    hasTitle={hasTitle}
-                    onSubmit={onSubmit}
-                    ingredientFields={ingredientFields}
+        <>
+            <HelmetComponent {...PAGE_META.NewRecipe} />
+            <Box pl={{ base: 4, '2xs': 5, md: 6 }} pr={{ base: 4, '2xs': 5, md: 0 }} pt={{ sm: 7 }}>
+                <FormProvider {...methods}>
+                    <RecipeForm
+                        methods={methods}
+                        isModalOpen={isModalOpen}
+                        onOpenModalClick={handleOpenModal}
+                        onDeleteImageClick={handleDeleteImage}
+                        addStep={addStep}
+                        removeStep={removeStep}
+                        addIngredient={addIngredient}
+                        removeIngredient={removeIngredient}
+                        onSaveDraftClick={handleSaveDraft}
+                        onValidateFormClick={handleValidate}
+                        isSavingDraft={isSavingDraft}
+                        hasTitle={hasTitle}
+                        onSubmit={onSubmit}
+                        ingredientFields={ingredientFields}
+                    />
+                </FormProvider>
+                <AddImgModal
+                    isOpen={isModalOpen}
+                    onClose={handleImageModalClose}
+                    imgPreview={imgPreview}
+                    onDelete={handleDeleteImage}
+                    index={currentStepIndex || 0}
+                    dataTestId={dataTestId}
                 />
-            </FormProvider>
-            <AddImgModal
-                isOpen={isModalOpen}
-                onClose={handleImageModalClose}
-                imgPreview={imgPreview}
-                onDelete={handleDeleteImage}
-                index={currentStepIndex || 0}
-                dataTestId={dataTestId}
-            />
-            <ConfirmFormModal
-                isOpen={isModalConfirmOpen}
-                onClose={handleConfirmModalClose}
-                onSaveDraft={onSaveDraft}
-                onLeaveWithoutSaving={handleLeaveWithoutSaving}
-            />
-        </Box>
+                <ConfirmFormModal
+                    isOpen={isModalConfirmOpen}
+                    onClose={handleConfirmModalClose}
+                    onSaveDraft={onSaveDraft}
+                    onLeaveWithoutSaving={handleLeaveWithoutSaving}
+                />
+            </Box>
+        </>
     );
 };

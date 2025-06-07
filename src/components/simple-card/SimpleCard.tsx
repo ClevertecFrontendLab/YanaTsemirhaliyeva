@@ -15,6 +15,7 @@ import {
 } from '@chakra-ui/react';
 
 import { API_IMG } from '~/consts/consts';
+import { BookmarkIcon, SubscribersIcon } from '~/shared/custom-icons';
 import { useAppSelector } from '~/store/hooks';
 import { categoriesSelector } from '~/store/slices/categories-slice';
 import { Recipe } from '~/types/recipe';
@@ -85,26 +86,18 @@ export const SimpleCard = ({ item }: SimpleCardProps) => {
                     lineHeight='140%'
                     pr={{ base: 0, xl: 4 }}
                 >
-                    {bookmarks && (
-                        <HStack>
-                            <Image
-                                src='/svg/BsBookmarkHeart.svg'
-                                boxSize='12px'
-                                alt='bookmarks count'
-                            />
-                            <Box as='span'>{bookmarks}</Box>
-                        </HStack>
-                    )}
-                    {likes && (
-                        <HStack>
-                            <Image
-                                src='/svg/BsEmojiHeartEyes.svg'
-                                boxSize='12px'
-                                alt='bookmarks count'
-                            />
-                            <Box as='span'>{likes}</Box>
-                        </HStack>
-                    )}
+                    <HStack gap={1}>
+                        <BookmarkIcon color='black' boxSize={3} />
+                        <Box as='span' lineHeight='100%'>
+                            {bookmarks}
+                        </Box>
+                    </HStack>
+                    <HStack gap={1}>
+                        <SubscribersIcon color='black' boxSize={3} />
+                        <Box as='span' lineHeight='100%'>
+                            {likes}
+                        </Box>
+                    </HStack>
                 </HStack>
             </CardFooter>
         </Card>

@@ -5,6 +5,7 @@ import { Link, useLocation } from 'react-router';
 
 import { AppRoute, DataTestId } from '~/consts/consts';
 import { useAppDispatch, useAppSelector } from '~/store/hooks';
+import { currentUserSelector } from '~/store/slices/bloggers-slice';
 import {
     currentRecipeTitleSelector,
     setCategory,
@@ -17,6 +18,7 @@ import { getCategoryAndSubcategoryFromUrl } from '~/utils';
 const routeNames: Record<string, string> = {
     [AppRoute.Juicy]: 'Самое сочное',
     [AppRoute.NewRecipe]: 'Новый рецепт',
+    [AppRoute.Blogs]: 'Блоги',
 };
 
 type CategoryData = {
@@ -34,6 +36,7 @@ export const Breadcrumbs = ({ onBreadcrumbClick }: BreadcrumbsProps) => {
     const location = useLocation();
     const shouldWrap = useBreakpointValue({ base: true, md: false });
     const dispatch = useAppDispatch();
+    const userData = useAppSelector(currentUserSelector);
 
     const [categoryData, setCategoryData] = useState<CategoryData>({
         category: null,
@@ -108,14 +111,39 @@ export const Breadcrumbs = ({ onBreadcrumbClick }: BreadcrumbsProps) => {
             </BreadcrumbItem>
 
             {routeNames[location.pathname] && (
-                <BreadcrumbItem isCurrentPage>
+                <BreadcrumbItem
+                    isCurrentPage
+                    data-test-id={
+                        location.pathname === AppRoute.Blogs
+                            ? DataTestId.BloggerUserBreadCrumbName
+                            : ''
+                    }
+                >
+                    <BreadcrumbLink as={Link} color='black' pointerEvents='none'>
+                        {routeNames[location.pathname]}
+                    </BreadcrumbLink>
+                </BreadcrumbItem>
+            )}
+            {userData && (
+                <BreadcrumbItem data-test-id={DataTestId.BloggerUserBreadCrumbName}>
                     <BreadcrumbLink
                         as={Link}
-                        to={location.pathname}
-                        color='black'
-                        pointerEvents='none'
+                        to={AppRoute.Blogs}
+                        _hover={{
+                            textDecor: 'none',
+                        }}
                     >
-                        {routeNames[location.pathname]}
+                        {routeNames[AppRoute.Blogs]}
+                    </BreadcrumbLink>
+                </BreadcrumbItem>
+            )}
+            {userData && (
+                <BreadcrumbItem
+                    isCurrentPage
+                    data-test-id={DataTestId.BloggerUserBreadCrumbSection}
+                >
+                    <BreadcrumbLink as={Link} color='black' pointerEvents='none'>
+                        {userData.firstName} {userData.lastName} (@{userData.login})
                     </BreadcrumbLink>
                 </BreadcrumbItem>
             )}

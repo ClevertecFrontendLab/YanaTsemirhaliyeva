@@ -3,6 +3,7 @@ import './index.css';
 import { ChakraProvider, createStandaloneToast } from '@chakra-ui/react';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
+import { HelmetProvider } from 'react-helmet-async';
 import { Provider } from 'react-redux';
 import { RouterProvider } from 'react-router';
 
@@ -17,7 +18,9 @@ createRoot(document.getElementById('root')!).render(
     <StrictMode>
         <Provider store={store}>
             <ChakraProvider theme={theme}>
-                <RouterProvider router={router} />
+                <HelmetProvider>
+                    <RouterProvider router={router} />
+                </HelmetProvider>
                 <ToastContainer />
             </ChakraProvider>
         </Provider>
