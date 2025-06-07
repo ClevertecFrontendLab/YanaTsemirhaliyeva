@@ -69,7 +69,7 @@ export const CardBlogger = ({
             justifyContent='center'
             gap={6}
         >
-            <Avatar name={firstName} src={firstName} size='2xl' />
+            <Avatar name={firstName} src={firstName} size={{ base: 'xl', sm: '2xl' }} />
             <VStack alignItems='flex-start' w={{ base: '100%', sm: 'fit-content' }} maxW='100%'>
                 <CardHeader
                     data-test-id={DataTestId.BloggerUserInfoName}
@@ -87,6 +87,7 @@ export const CardBlogger = ({
                 </CardHeader>
                 <CardBody
                     p={0}
+                    pb={2}
                     fontSize={14}
                     color='blackAlpha.700'
                     data-test-id={DataTestId.BloggerUserInfoLogin}

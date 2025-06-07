@@ -116,10 +116,9 @@ export const BloggerProfilePage = () => {
             display='flex'
             flexDir='column'
             gap={10}
-            mt={-2}
-            pl={{ base: '26px' }}
-            pr={{ base: '54px' }}
-            pt={{ base: 6, sm: 0 }}
+            mt={{ base: 1, md: 0 }}
+            pl={{ base: 4, sm: 5, md: '26px' }}
+            pr={{ base: 4, sm: 5, md: '54px' }}
         >
             {userInfo && (
                 <CardBlogger
